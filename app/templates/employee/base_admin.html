@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicondaichiro.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicondaichiro.png') }}">
+    <title>{% block title %}Admin{% endblock %} - Daichiro Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script>document.documentElement.style.visibility='hidden'</script>
+    <script src="https://cdn.tailwindcss.com" onload="document.documentElement.style.visibility=''"></script>
+    <script>setTimeout(function(){document.documentElement.style.visibility=''},2000)</script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Inter', 'Helvetica Neue', 'sans-serif'], nike: ['Anton', 'sans-serif'] },
+                    colors: {
+                        zinc: {
+                            950: '#F0F4FA',  /* main page background → cream */
+                            900: '#0C2547',  /* sidebar / dark panels → deep navy */
+                            800: '#E4EBF7',  /* secondary panels → light blue-gray */
+                            700: '#C8D4E8',  /* borders → soft blue-gray */
+                            600: '#8A9BB5',  /* muted text → blue-gray */
+                            500: '#697488',  /* softer text */
+                            400: '#8A99B0',  /* placeholder text */
+                            300: '#2D3F5C',  /* body text → dark navy */
+                            200: '#1A2B4A',  /* heading text */
+                        },
+                        black: '#0C2547',     /* hero banners → navy */
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+    /* ── Responsive Sidebar ── */
+    #admin-sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 100vh;
+        width: 256px;
+        z-index: 50;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+        background: linear-gradient(180deg, #0C2547 0%, #091A35 100%);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    #admin-sidebar.open { transform: translateX(0); }
+    #sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        z-index: 40;
+    }
+    #sidebar-overlay.open { display: block; }
+    #admin-main {
+        margin-left: 0;
+        min-width: 0;
+    }
+    /* ── Hamburger Button ── */
+    #hamburger-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(255,255,255,0.08);
+        cursor: pointer;
+        position: relative;
+        transition: background 0.25s cubic-bezier(.4,0,.2,1);
+        -webkit-tap-highlight-color: transparent;
+    }
+    #hamburger-btn:hover { background: rgba(255,255,255,0.15); }
+    #hamburger-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.94); }
+    .hb-line {
+        position: absolute;
+        left: 50%;
+        width: 18px;
+        height: 1.8px;
+        background: #fff;
+        border-radius: 2px;
+        transform: translateX(-50%);
+        transition: transform 0.32s cubic-bezier(.4,0,.2,1),
+                    opacity 0.22s ease,
+                    top 0.32s cubic-bezier(.4,0,.2,1),
+                    width 0.28s cubic-bezier(.4,0,.2,1);
+    }
+    .hb-line.top { top: calc(50% - 5px); }
+    .hb-line.bot { top: calc(50% + 3px); width: 13px; }
+    #hamburger-btn.is-open .hb-line.top {
+        top: 50%;
+        width: 18px;
+        transform: translateX(-50%) rotate(45deg);
+    }
+    #hamburger-btn.is-open .hb-line.bot {
+        top: 50%;
+        width: 18px;
+        transform: translateX(-50%) rotate(-45deg);
+    }
+    /* Close button: visible on mobile/tablet, hidden on desktop */
+    .sidebar-close-btn { display: flex; }
+    @media (min-width: 1024px) {
+        .sidebar-close-btn { display: none !important; }
+    }
+    /* ── Tablet (≥768px iPad) ── */
+    @media (min-width: 768px) {
+        #admin-sidebar { transform: translateX(-100%); }
+        #admin-sidebar.open { transform: translateX(0); }
+    }
+    /* ── Desktop (≥1024px) ── */
+    @media (min-width: 1024px) {
+        #admin-sidebar { transform: translateX(0) !important; position: fixed; }
+        #admin-main { margin-left: 256px; }
+        #hamburger-btn { display: none !important; }
+        #sidebar-overlay { display: none !important; }
+    }
+    /* ── Mobile top bar ── */
+    #mobile-topbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: linear-gradient(180deg, #0C2547 0%, #091A35 100%);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    @media (min-width: 1024px) {
+        #mobile-topbar { display: none !important; }
+    }
+    /* ── Page content padding ── */
+    @media (max-width: 767px) {
+        .admin-page-content { padding: 16px !important; }
+        .admin-page-header { padding: 16px !important; }
+    }
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .admin-page-content { padding: 24px !important; }
+        .admin-page-header { padding: 20px 24px !important; }
+    }
+    /* ── Gold Hover for Sidebar Nav ── */
+    #admin-sidebar .nav-link:hover {
+        color: #f59e0b !important;
+        background: rgba(245,158,11,0.1) !important;
+    }
+    #admin-sidebar .nav-link.bg-white:hover {
+        color: #000 !important;
+        background: #ffffff !important;
+    }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white font-sans antialiased">
+
+<!-- Sidebar overlay (mobile/tablet) -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<div class="flex min-h-screen">
+
+    <!-- ══════ SIDEBAR ══════ -->
+    <aside id="admin-sidebar">
+        <!-- Brand -->
+        <div class="p-6 border-b border-zinc-800" style="background:rgba(0,0,0,0.2);">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="font-nike text-xl uppercase tracking-tighter text-white">Daichiro</h1>
+                    <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500 mt-0.5">Staff Portal</p>
+                </div>
+                <!-- Close button (mobile/tablet) -->
+                <button onclick="closeSidebar()" class="sidebar-close-btn p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-6 px-4 space-y-1">
+            <a href="{{ url_for('employee.dashboard') }}" 
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'overview' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">📊</span> Overview
+            </a>
+
+            <a href="{{ url_for('employee.appointments_page') }}" 
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'appointments' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">📅</span> Appointments
+            </a>
+            <a href="{{ url_for('employee.skillnest_page') }}" 
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'skillnest' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">🎯</span> SkillNest
+            </a>
+            <a href="{{ url_for('employee.assessments_page') }}" 
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'assessments' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">🧠</span> Assessments
+            </a>
+            <a href="{{ url_for('admin.photos_page') }}"
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'photos' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">🖼️</span> Gallery
+            </a>
+            <a href="{{ url_for('admin.employees_page') }}"
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'employees' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">👥</span> Employees
+            </a>
+            <a href="{{ url_for('admin.gemini_settings') }}" 
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'gemini' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">✨</span> Gemini AI
+            </a>
+            <a href="{{ url_for('admin.contact_settings_page') }}"
+               class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'contact_settings' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+               onclick="closeSidebar()">
+                <span class="text-lg">📞</span> Contact & Social
+            </a>
+
+            <!-- Account section -->
+            <div class="pt-3 mt-2 border-t border-zinc-700/50 space-y-1">
+                <a href="{{ url_for('admin.admin_profile') }}"
+                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 {{ 'bg-white text-black' if active_page == 'profile' else 'text-zinc-400 hover:text-white hover:bg-zinc-800' }}"
+                   onclick="closeSidebar()">
+                    <span class="text-lg">👤</span> My Profile
+                </a>
+            </div>
+
+        </nav>
+
+        <!-- User Info + Logout -->
+        <div class="p-4 border-t border-zinc-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-bold text-white">{{ session.admin_username }}</p>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Administrator</p>
+                </div>
+                <a href="{{ url_for('employee.logout') }}" class="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400 border border-zinc-700 rounded hover:bg-red-600 hover:text-white hover:border-red-600 transition-all">
+                    Logout
+                </a>
+            </div>
+            <p class="text-[8px] text-zinc-600 uppercase tracking-widest mt-3 text-center">
+                Powered by <span class="text-zinc-500 font-black tracking-[0.12em]">ARTORYX</span>
+            </p>
+        </div>
+    </aside>
+
+    <!-- ══════ MAIN CONTENT ══════ -->
+    <main id="admin-main" class="flex-1 min-w-0">
+
+        <!-- Mobile/Tablet Top Bar -->
+        <div id="mobile-topbar">
+            <button id="hamburger-btn" onclick="toggleSidebar()" aria-label="Open menu">
+                <span class="hb-line top"></span>
+                <span class="hb-line bot"></span>
+            </button>
+            <div>
+                <h1 style="font-size:16px; font-weight:900; color:#fff; text-transform:uppercase; letter-spacing:-0.03em;">{{ self.page_title() }}</h1>
+            </div>
+        </div>
+
+        <!-- Desktop Top Bar (hidden on mobile/tablet, shown ≥1024px) -->
+        <header class="sticky top-0 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800 z-30 px-8 py-5 admin-page-header hidden lg:flex" style="flex-direction:column;">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-nike uppercase tracking-tight text-zinc-900">{% block page_title %}Dashboard{% endblock %}</h2>
+                <div class="text-xs text-zinc-500 font-semibold uppercase tracking-widest">
+                    {% block page_subtitle %}{% endblock %}
+                </div>
+            </div>
+
+        </header>
+
+        <!-- Page Content -->
+        <div class="p-8 admin-page-content">
+            {% block page_content %}{% endblock %}
+        </div>
+    </main>
+
+</div>
+
+
+<script>
+function toggleSidebar() {
+    const btn = document.getElementById('hamburger-btn');
+    const sidebar = document.getElementById('admin-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        btn.classList.remove('is-open');
+        document.body.style.overflow = '';
+    } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        btn.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    }
+}
+function openSidebar() {
+    document.getElementById('admin-sidebar').classList.add('open');
+    document.getElementById('sidebar-overlay').classList.add('open');
+    document.getElementById('hamburger-btn').classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+    document.getElementById('admin-sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+    document.getElementById('hamburger-btn').classList.remove('is-open');
+    document.body.style.overflow = '';
+}
+// Auto-open sidebar on desktop
+function handleResize() {
+    if (window.innerWidth >= 1024) {
+        document.getElementById('sidebar-overlay').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+}
+window.addEventListener('resize', handleResize);
+</script>
+
+</body>
+</html>
+

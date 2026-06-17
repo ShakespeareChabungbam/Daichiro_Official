@@ -1,0 +1,721 @@
+################################################################################
+#              COPY RETAINED BY: ARTORYX (Developer)                           #
+################################################################################
+
+================================================================================
+                                    ARTORYX
+                   MASTER DEVELOPMENT & PAYMENT AGREEMENT
+================================================================================
+
+Date: __________________
+
+Project: Daichiro Professional Skills Academy — Full-Stack Web Application
+Domain: daichiro.in
+
+--------------------------------------------------------------------------------
+
+This Agreement is entered into by and between:
+
+    DEVELOPER:
+    ArtoryX, represented by Shakespeare Chabungbam, Founder
+    (hereinafter referred to as "ArtoryX")
+
+    CLIENT:
+    Daichiro Professional Skills Academy, represented by ___________________________
+    (hereinafter referred to as "the Client")
+
+Both parties agree to the following terms and conditions.
+
+
+================================================================================
+SECTION 1 — SCOPE OF WORK
+================================================================================
+
+1.1  Technology Stack:
+     Frontend  : HTML, CSS, JavaScript
+     Backend   : Python, Flask
+     Database  : PostgreSQL
+     AI Engine : Google Gemini AI (Vision + Text Generation)
+     Server    : AWS EC2 (Ubuntu), Nginx, Gunicorn
+
+1.2  Deliverables:
+     (a) Full-stack web application deployed at daichiro.in
+     (b) Public website — Booking, About, SkillNest, Sunday Programs
+     (c) Admin Dashboard
+     (d) Employee Staff Portal (role-based, permission-controlled)
+     (e) Client Assessment Portal (self-destructing credentials)
+     (f) AWS EC2 deployment with Gunicorn + systemd
+     (g) Nginx reverse proxy with HTTPS / SSL
+     (h) PostgreSQL database schema and backup scripts
+     (i) Sitemap, robots.txt, SEO structure
+     (j) Maintenance page for downtime
+
+1.3  Features:
+     (a) Appointment Booking — Phone validation, package selection,
+         price-locking, booking open/close control
+     (b) AI Career Assessment (5-Step) — Auto-save, Gemini AI analysis,
+         PDF reports, OCR photo scan via Gemini Vision
+     (c) SkillNest Admissions — Seat cap, open/close toggle, admin workflow
+     (d) Invoice & Email — HTML invoice emails via Gmail SMTP,
+         password reset emails with signed tokens
+     (e) Employee Permissions — Granular role-based access control
+     (f) Admin Panel — Full control over all data and settings
+     (g) Site Config Store — All settings manageable from admin panel
+     (h) Background Automation — Client auto-expiry (3 hrs),
+         assessment archival (90 days), appointment archival (90 days)
+     (i) Security — CSRF, rate limiting, HSTS, CSP, XSS headers,
+         bcrypt hashing, secure sessions
+     (j) Developer Credit Portal — ArtoryX's branded credit management
+
+
+================================================================================
+SECTION 2 — PAYMENT MILESTONES
+================================================================================
+
+2.1  All payments are non-refundable. Both phases are now complete.
+
+2.2  Total Project Fee: Rs. ________________ (Rupees ________________________).
+
+2.3  Phase 1 — Advance Payment:
+     Amount    : Rs. 9,000 (Rupees Nine Thousand Only)
+     Received  : 24 March 2025
+     Method    : Google Pay (UPI)
+     Status    : RECEIVED
+
+2.4  Phase 2 — Final Payment:
+     Amount    : Rs. ________________ (Rupees ________________________)
+     Received  : 22 May 2025
+     Method    : ___________________________
+     Status    : RECEIVED
+
+
+================================================================================
+SECTION 3 — MAINTENANCE & SUPPORT
+================================================================================
+
+3.1  Warranty:
+     Starting from the date of this Agreement, ArtoryX provides a 14-day
+     warranty to fix critical bugs in the delivered code. This does not
+     cover issues caused by third-party modifications, server changes,
+     or Client interference.
+
+3.2  Maintenance Fees (Prepaid):
+     All maintenance fees must be paid in advance before the start of
+     each billing period. Services will not commence until payment is received.
+
+     Complimentary Period — First 1 month from the date of final payment:
+     Included as part of the project handover at no charge.
+
+     Phase A — Next 6 months after the complimentary period:
+     Rs. 2,000/month, prepaid monthly (Total: Rs. 12,000)
+     Covers system monitoring, bug fixes, minor updates, and support.
+
+     Phase B — After Phase A onwards (select one):
+     [ ] Option 1: Rs. 1,500/month, prepaid monthly
+     [ ] Option 2: Rs. 4,800/quarter, prepaid quarterly
+
+3.3  Non-Payment:
+     If prepayment is not received before the billing period begins,
+     services will not be provided. ArtoryX is not responsible for any
+     issues that occur during unpaid periods.
+
+3.4  Out-of-Scope Work:
+     New features, major redesigns, database restructuring, or server
+     migration are not included. These will be quoted and billed separately.
+
+
+================================================================================
+SECTION 4 — AWS HOSTING & LIABILITY
+================================================================================
+
+4.1  The application runs on AWS EC2 (Mumbai Region) with Nginx and Gunicorn.
+
+4.2  The Client is solely responsible for their AWS account — including
+     EC2, databases, storage, DNS, billing, and all associated services.
+
+4.3  ArtoryX has delivered deployment-ready code. ArtoryX bears no liability
+     for the Client's production environment — including server crashes,
+     security breaches, data loss, downtime, or AWS billing.
+
+
+================================================================================
+SECTION 5 — CODE INTEGRITY & WARRANTY VOID
+================================================================================
+
+5.1  If the Client, any third-party developer, or any unauthorised person
+     modifies the server environment, database, or deployment configuration
+     — all risk transfers to the Client immediately.
+
+5.2  Repair work caused by unauthorised changes voids all warranties and
+     will be invoiced separately as emergency repair.
+
+
+================================================================================
+SECTION 6 — CONFIDENTIALITY
+================================================================================
+
+6.1  ArtoryX will not share, sell, or disclose any Client data — including
+     student records, assessment data, credentials, or business information.
+
+6.2  Both parties agree to keep all project discussions, pricing, and
+     business assets confidential during and after this Agreement.
+
+6.3  Breach by ArtoryX:
+     If ArtoryX is found to have disclosed, shared, or misused any
+     confidential Client data in violation of this Section, the Client
+     shall have the right to pursue legal action against ArtoryX. ArtoryX
+     shall be held fully liable for any damages resulting from such breach.
+
+6.4  This obligation survives for 3 years after termination of this Agreement.
+
+
+================================================================================
+SECTION 7 — OWNERSHIP & INTELLECTUAL PROPERTY
+================================================================================
+
+7.1  ArtoryX retains ownership of the source code, database schemas,
+     deployment scripts, and all configuration files. The application has
+     been deployed and is fully operational on the Client's server.
+
+7.2  Source Code Availability:
+     The source code has not been handed over to the Client at this time.
+     The Client may request a copy of the source code by providing written
+     notice to ArtoryX. Upon such request, delivery of the source code
+     shall be subject to the terms outlined in Section 9.6.
+
+7.3  ArtoryX retains the right to use the project's visual design in its
+     portfolio and marketing materials.
+
+
+================================================================================
+SECTION 8 — CANCELLATION & REFUND POLICY
+================================================================================
+
+8.1  The project has been completed and fully paid. All payments received
+     by ArtoryX are final.
+
+8.2  The Client may cancel maintenance with 30 days written notice.
+     No refunds for the current billing cycle.
+
+
+================================================================================
+SECTION 9 — ACCEPTANCE & TESTING
+================================================================================
+
+9.1  ArtoryX has provided the completed application for the Client's
+     review and testing.
+
+9.2  The Client has 7 days from the date of this Agreement to test and
+     report defects in writing.
+
+9.3  If no defects are reported within 7 days, the application is deemed
+     accepted and is considered to meet all agreed specifications.
+
+9.4  Only defects that deviate from the agreed scope (Section 1) qualify
+     for free correction. New features or design preferences are
+     out-of-scope (Section 3.4).
+
+9.5  After acceptance, issues are governed by the Warranty (Section 3.1)
+     and Maintenance terms (Section 3.2) only.
+
+9.6  Source Code Handover & Agreement Termination:
+     If the Client requests the source code (Section 7.2), or if any issue
+     cannot be resolved through Warranty or Maintenance, ArtoryX shall
+     provide the complete source code, database schemas, deployment scripts,
+     and all files needed to independently operate the application.
+
+     Upon source code delivery, this Agreement is immediately and
+     permanently terminated. From the date of handover:
+     (a) The Client assumes full and exclusive responsibility for the
+         application, its operation, and all associated risks;
+     (b) All of ArtoryX's obligations — including warranty, maintenance,
+         support, and liability — are permanently ended;
+     (c) ArtoryX bears absolutely no risk, responsibility, or liability
+         of any kind related to this website;
+     (d) No claims of any nature may be made against ArtoryX after
+         source code delivery.
+
+
+================================================================================
+SECTION 10 — DISCLAIMER OF WARRANTIES
+================================================================================
+
+10.1 After the 14-day Warranty Period, the application is provided "AS IS".
+
+10.2 ArtoryX does not guarantee uninterrupted operation, as the application
+     depends on external factors (server uptime, network, third-party APIs).
+
+10.3 Third-party services (Google Gemini AI, OCR, automated reports) are
+     operated by their respective providers. ArtoryX is not responsible for
+     their accuracy, reliability, or future compatibility.
+
+10.4 ArtoryX has delivered a professionally engineered application built
+     to current industry standards.
+
+10.5 ArtoryX bears no liability for failures, pricing changes, deprecation,
+     or discontinuation of third-party services (Google Gemini AI, AWS,
+     Gmail SMTP, open-source libraries).
+
+
+================================================================================
+SECTION 11 — CLIENT RESPONSIBILITIES
+================================================================================
+
+The Client is responsible for:
+
+(a) Testing the application during the 7-day Acceptance Period and 14-day
+    Warranty Period, and reporting issues in writing within those timeframes.
+
+(b) Having provided accurate and timely information during development.
+    ArtoryX is not responsible for issues caused by incomplete or delayed input.
+
+(c) Ensuring their use of the application complies with all applicable
+    laws, including data protection and privacy regulations.
+
+
+================================================================================
+SECTION 12 — LIMITATION OF LIABILITY
+================================================================================
+
+12.1 ArtoryX's maximum total liability under this Agreement shall not exceed
+     the total fees received from the Client.
+
+12.2 ArtoryX is not liable for:
+     (a) Indirect, incidental, consequential, or punitive damages;
+     (b) Loss of revenue, profit, or business;
+     (c) Loss of data or data corruption;
+     (d) Business interruption or downtime;
+     (e) Damages from the Client's failure to maintain backups or security.
+
+
+================================================================================
+SECTION 13 — FORCE MAJEURE
+================================================================================
+
+Neither party is liable for failures caused by events beyond reasonable
+control — including natural disasters, pandemics, government actions,
+war, power failures, or internet outages.
+
+
+================================================================================
+SECTION 14 — DISPUTE RESOLUTION
+================================================================================
+
+14.1 This Agreement is governed by the laws of India.
+
+14.2 Disputes shall first be resolved through good-faith negotiation
+     within 30 days.
+
+14.3 If unresolved, disputes shall be subject to the exclusive jurisdiction
+     of the courts at Imphal, Manipur, India.
+
+
+================================================================================
+SECTION 15 — GENERAL PROVISIONS
+================================================================================
+
+15.1 This Agreement constitutes the entire understanding between both parties
+     and supersedes all prior agreements, written or oral.
+
+15.2 Amendments require written consent signed by both parties.
+
+15.3 If any provision is found invalid, the remaining provisions remain
+     in full effect.
+
+15.4 ArtoryX is an independent contractor. This Agreement does not create
+     a partnership, joint venture, or employment relationship.
+
+
+================================================================================
+                                  SIGNATURES
+================================================================================
+
+By signing below, both parties confirm they have read, understood, and agree
+to all terms in this Agreement.
+
+
+FOR ARTORYX (Developer):
+
+Signature : ___________________________
+Name      : Shakespeare Chabungbam
+Title     : Founder, ArtoryX
+Date      : ___________________________
+
+
+FOR DAICHIRO PROFESSIONAL SKILLS ACADEMY (Client):
+
+Signature : ___________________________
+Full Name : ___________________________
+Title     : ___________________________
+Date      : ___________________________
+
+================================================================================
+                              END OF AGREEMENT
+================================================================================
+
+
+
+
+################################################################################
+################################################################################
+##                         — PAGE BREAK —                                     ##
+################################################################################
+################################################################################
+
+
+
+
+################################################################################
+#     COPY RETAINED BY: DAICHIRO PROFESSIONAL SKILLS ACADEMY (Client)          #
+################################################################################
+
+================================================================================
+                                    ARTORYX
+                   MASTER DEVELOPMENT & PAYMENT AGREEMENT
+================================================================================
+
+Date: __________________
+
+Project: Daichiro Professional Skills Academy — Full-Stack Web Application
+Domain: daichiro.in
+
+--------------------------------------------------------------------------------
+
+This Agreement is entered into by and between:
+
+    DEVELOPER:
+    ArtoryX, represented by Shakespeare Chabungbam, Founder
+    (hereinafter referred to as "ArtoryX")
+
+    CLIENT:
+    Daichiro Professional Skills Academy, represented by ___________________________
+    (hereinafter referred to as "the Client")
+
+Both parties agree to the following terms and conditions.
+
+
+================================================================================
+SECTION 1 — SCOPE OF WORK
+================================================================================
+
+1.1  Technology Stack:
+     Frontend  : HTML, CSS, JavaScript
+     Backend   : Python, Flask
+     Database  : PostgreSQL
+     AI Engine : Google Gemini AI (Vision + Text Generation)
+     Server    : AWS EC2 (Ubuntu), Nginx, Gunicorn
+
+1.2  Deliverables:
+     (a) Full-stack web application deployed at daichiro.in
+     (b) Public website — Booking, About, SkillNest, Sunday Programs
+     (c) Admin Dashboard
+     (d) Employee Staff Portal (role-based, permission-controlled)
+     (e) Client Assessment Portal (self-destructing credentials)
+     (f) AWS EC2 deployment with Gunicorn + systemd
+     (g) Nginx reverse proxy with HTTPS / SSL
+     (h) PostgreSQL database schema and backup scripts
+     (i) Sitemap, robots.txt, SEO structure
+     (j) Maintenance page for downtime
+
+1.3  Features:
+     (a) Appointment Booking — Phone validation, package selection,
+         price-locking, booking open/close control
+     (b) AI Career Assessment (5-Step) — Auto-save, Gemini AI analysis,
+         PDF reports, OCR photo scan via Gemini Vision
+     (c) SkillNest Admissions — Seat cap, open/close toggle, admin workflow
+     (d) Invoice & Email — HTML invoice emails via Gmail SMTP,
+         password reset emails with signed tokens
+     (e) Employee Permissions — Granular role-based access control
+     (f) Admin Panel — Full control over all data and settings
+     (g) Site Config Store — All settings manageable from admin panel
+     (h) Background Automation — Client auto-expiry (3 hrs),
+         assessment archival (90 days), appointment archival (90 days)
+     (i) Security — CSRF, rate limiting, HSTS, CSP, XSS headers,
+         bcrypt hashing, secure sessions
+     (j) Developer Credit Portal — ArtoryX's branded credit management
+
+
+================================================================================
+SECTION 2 — PAYMENT MILESTONES
+================================================================================
+
+2.1  All payments are non-refundable. Both phases are now complete.
+
+2.2  Total Project Fee: Rs. ________________ (Rupees ________________________).
+
+2.3  Phase 1 — Advance Payment:
+     Amount    : Rs. 9,000 (Rupees Nine Thousand Only)
+     Received  : 24 March 2025
+     Method    : Google Pay (UPI)
+     Status    : RECEIVED
+
+2.4  Phase 2 — Final Payment:
+     Amount    : Rs. ________________ (Rupees ________________________)
+     Received  : 22 May 2025
+     Method    : ___________________________
+     Status    : RECEIVED
+
+
+================================================================================
+SECTION 3 — MAINTENANCE & SUPPORT
+================================================================================
+
+3.1  Warranty:
+     Starting from the date of this Agreement, ArtoryX provides a 14-day
+     warranty to fix critical bugs in the delivered code. This does not
+     cover issues caused by third-party modifications, server changes,
+     or Client interference.
+
+3.2  Maintenance Fees (Prepaid):
+     All maintenance fees must be paid in advance before the start of
+     each billing period. Services will not commence until payment is received.
+
+     Complimentary Period — First 1 month from the date of final payment:
+     Included as part of the project handover at no charge.
+
+     Phase A — Next 6 months after the complimentary period:
+     Rs. 2,000/month, prepaid monthly (Total: Rs. 12,000)
+     Covers system monitoring, bug fixes, minor updates, and support.
+
+     Phase B — After Phase A onwards (select one):
+     [ ] Option 1: Rs. 1,500/month, prepaid monthly
+     [ ] Option 2: Rs. 4,800/quarter, prepaid quarterly
+
+3.3  Non-Payment:
+     If prepayment is not received before the billing period begins,
+     services will not be provided. ArtoryX is not responsible for any
+     issues that occur during unpaid periods.
+
+3.4  Out-of-Scope Work:
+     New features, major redesigns, database restructuring, or server
+     migration are not included. These will be quoted and billed separately.
+
+
+================================================================================
+SECTION 4 — AWS HOSTING & LIABILITY
+================================================================================
+
+4.1  The application runs on AWS EC2 (Mumbai Region) with Nginx and Gunicorn.
+
+4.2  The Client is solely responsible for their AWS account — including
+     EC2, databases, storage, DNS, billing, and all associated services.
+
+4.3  ArtoryX has delivered deployment-ready code. ArtoryX bears no liability
+     for the Client's production environment — including server crashes,
+     security breaches, data loss, downtime, or AWS billing.
+
+
+================================================================================
+SECTION 5 — CODE INTEGRITY & WARRANTY VOID
+================================================================================
+
+5.1  If the Client, any third-party developer, or any unauthorised person
+     modifies the server environment, database, or deployment configuration
+     — all risk transfers to the Client immediately.
+
+5.2  Repair work caused by unauthorised changes voids all warranties and
+     will be invoiced separately as emergency repair.
+
+
+================================================================================
+SECTION 6 — CONFIDENTIALITY
+================================================================================
+
+6.1  ArtoryX will not share, sell, or disclose any Client data — including
+     student records, assessment data, credentials, or business information.
+
+6.2  Both parties agree to keep all project discussions, pricing, and
+     business assets confidential during and after this Agreement.
+
+6.3  Breach by ArtoryX:
+     If ArtoryX is found to have disclosed, shared, or misused any
+     confidential Client data in violation of this Section, the Client
+     shall have the right to pursue legal action against ArtoryX. ArtoryX
+     shall be held fully liable for any damages resulting from such breach.
+
+6.4  This obligation survives for 3 years after termination of this Agreement.
+
+
+================================================================================
+SECTION 7 — OWNERSHIP & INTELLECTUAL PROPERTY
+================================================================================
+
+7.1  ArtoryX retains ownership of the source code, database schemas,
+     deployment scripts, and all configuration files. The application has
+     been deployed and is fully operational on the Client's server.
+
+7.2  Source Code Availability:
+     The source code has not been handed over to the Client at this time.
+     The Client may request a copy of the source code by providing written
+     notice to ArtoryX. Upon such request, delivery of the source code
+     shall be subject to the terms outlined in Section 9.6.
+
+7.3  ArtoryX retains the right to use the project's visual design in its
+     portfolio and marketing materials.
+
+
+================================================================================
+SECTION 8 — CANCELLATION & REFUND POLICY
+================================================================================
+
+8.1  The project has been completed and fully paid. All payments received
+     by ArtoryX are final.
+
+8.2  The Client may cancel maintenance with 30 days written notice.
+     No refunds for the current billing cycle.
+
+
+================================================================================
+SECTION 9 — ACCEPTANCE & TESTING
+================================================================================
+
+9.1  ArtoryX has provided the completed application for the Client's
+     review and testing.
+
+9.2  The Client has 7 days from the date of this Agreement to test and
+     report defects in writing.
+
+9.3  If no defects are reported within 7 days, the application is deemed
+     accepted and is considered to meet all agreed specifications.
+
+9.4  Only defects that deviate from the agreed scope (Section 1) qualify
+     for free correction. New features or design preferences are
+     out-of-scope (Section 3.4).
+
+9.5  After acceptance, issues are governed by the Warranty (Section 3.1)
+     and Maintenance terms (Section 3.2) only.
+
+9.6  Source Code Handover & Agreement Termination:
+     If the Client requests the source code (Section 7.2), or if any issue
+     cannot be resolved through Warranty or Maintenance, ArtoryX shall
+     provide the complete source code, database schemas, deployment scripts,
+     and all files needed to independently operate the application.
+
+     Upon source code delivery, this Agreement is immediately and
+     permanently terminated. From the date of handover:
+     (a) The Client assumes full and exclusive responsibility for the
+         application, its operation, and all associated risks;
+     (b) All of ArtoryX's obligations — including warranty, maintenance,
+         support, and liability — are permanently ended;
+     (c) ArtoryX bears absolutely no risk, responsibility, or liability
+         of any kind related to this website;
+     (d) No claims of any nature may be made against ArtoryX after
+         source code delivery.
+
+
+================================================================================
+SECTION 10 — DISCLAIMER OF WARRANTIES
+================================================================================
+
+10.1 After the 14-day Warranty Period, the application is provided "AS IS".
+
+10.2 ArtoryX does not guarantee uninterrupted operation, as the application
+     depends on external factors (server uptime, network, third-party APIs).
+
+10.3 Third-party services (Google Gemini AI, OCR, automated reports) are
+     operated by their respective providers. ArtoryX is not responsible for
+     their accuracy, reliability, or future compatibility.
+
+10.4 ArtoryX has delivered a professionally engineered application built
+     to current industry standards.
+
+10.5 ArtoryX bears no liability for failures, pricing changes, deprecation,
+     or discontinuation of third-party services (Google Gemini AI, AWS,
+     Gmail SMTP, open-source libraries).
+
+
+================================================================================
+SECTION 11 — CLIENT RESPONSIBILITIES
+================================================================================
+
+The Client is responsible for:
+
+(a) Testing the application during the 7-day Acceptance Period and 14-day
+    Warranty Period, and reporting issues in writing within those timeframes.
+
+(b) Having provided accurate and timely information during development.
+    ArtoryX is not responsible for issues caused by incomplete or delayed input.
+
+(c) Ensuring their use of the application complies with all applicable
+    laws, including data protection and privacy regulations.
+
+
+================================================================================
+SECTION 12 — LIMITATION OF LIABILITY
+================================================================================
+
+12.1 ArtoryX's maximum total liability under this Agreement shall not exceed
+     the total fees received from the Client.
+
+12.2 ArtoryX is not liable for:
+     (a) Indirect, incidental, consequential, or punitive damages;
+     (b) Loss of revenue, profit, or business;
+     (c) Loss of data or data corruption;
+     (d) Business interruption or downtime;
+     (e) Damages from the Client's failure to maintain backups or security.
+
+
+================================================================================
+SECTION 13 — FORCE MAJEURE
+================================================================================
+
+Neither party is liable for failures caused by events beyond reasonable
+control — including natural disasters, pandemics, government actions,
+war, power failures, or internet outages.
+
+
+================================================================================
+SECTION 14 — DISPUTE RESOLUTION
+================================================================================
+
+14.1 This Agreement is governed by the laws of India.
+
+14.2 Disputes shall first be resolved through good-faith negotiation
+     within 30 days.
+
+14.3 If unresolved, disputes shall be subject to the exclusive jurisdiction
+     of the courts at Imphal, Manipur, India.
+
+
+================================================================================
+SECTION 15 — GENERAL PROVISIONS
+================================================================================
+
+15.1 This Agreement constitutes the entire understanding between both parties
+     and supersedes all prior agreements, written or oral.
+
+15.2 Amendments require written consent signed by both parties.
+
+15.3 If any provision is found invalid, the remaining provisions remain
+     in full effect.
+
+15.4 ArtoryX is an independent contractor. This Agreement does not create
+     a partnership, joint venture, or employment relationship.
+
+
+================================================================================
+                                  SIGNATURES
+================================================================================
+
+By signing below, both parties confirm they have read, understood, and agree
+to all terms in this Agreement.
+
+
+FOR ARTORYX (Developer):
+
+Signature : ___________________________
+Name      : Shakespeare Chabungbam
+Title     : Founder, ArtoryX
+Date      : ___________________________
+
+
+FOR DAICHIRO PROFESSIONAL SKILLS ACADEMY (Client):
+
+Signature : ___________________________
+Full Name : ___________________________
+Title     : ___________________________
+Date      : ___________________________
+
+================================================================================
+                              END OF AGREEMENT
+================================================================================

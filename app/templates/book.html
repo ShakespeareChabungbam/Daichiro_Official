@@ -1,0 +1,674 @@
+{% extends "base.html" %}
+
+{% block title %}Book a Counselling Appointment — Daichiro Academy{% endblock %}
+
+{% block content %}
+
+<style>
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .book-el { opacity: 0; animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    /* Package card */
+    .pkg-card {
+        border: 2.5px solid rgba(232,236,240,0.25);
+        transition: all 0.32s cubic-bezier(0.16,1,0.3,1);
+        position: relative;
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+    .pkg-card:hover {
+        border-color: #C9A84C;
+        transform: translateY(-5px);
+        box-shadow: 0 20px 56px rgba(15,45,94,0.15);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    /* ── Mobile Carousel ── */
+    .cards-carousel {
+        display: none; /* hidden on desktop */
+    }
+    .carousel-track {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 16px;
+        padding: 24px 24px 8px;
+        scroll-padding-left: 24px;
+        align-items: flex-start;
+    }
+    .carousel-track::-webkit-scrollbar { display: none; }
+    .carousel-slide {
+        scroll-snap-align: center;
+        flex: 0 0 85vw;
+        max-width: 340px;
+    }
+    /* Dot indicators */
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 16px;
+        padding-bottom: 4px;
+    }
+    .carousel-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+        cursor: pointer;
+    }
+    .carousel-dot.active {
+        width: 28px;
+        border-radius: 4px;
+        background: #C9A84C;
+        box-shadow: 0 0 12px rgba(201,168,76,0.6);
+    }
+    /* Swipe hint animation */
+    @keyframes swipeHint {
+        0%   { transform: translateX(0); opacity: 1; }
+        40%  { transform: translateX(10px); opacity: 0.6; }
+        60%  { transform: translateX(10px); opacity: 0.6; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+    .swipe-hint { animation: swipeHint 2s ease 1.2s 2 forwards; }
+
+    /* Card glow effects */
+    .pkg-card-single {
+        background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+        border: 1.5px solid rgba(255,255,255,0.12);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+    }
+    .pkg-card-recommended {
+        background: linear-gradient(145deg, rgba(201,168,76,0.18) 0%, rgba(201,168,76,0.06) 100%);
+        border: 1.5px solid rgba(201,168,76,0.35);
+        box-shadow: 0 8px 40px rgba(201,168,76,0.2), inset 0 1px 0 rgba(201,168,76,0.15);
+        backdrop-filter: blur(12px);
+    }
+    .pkg-card-recommended::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(ellipse at top, rgba(201,168,76,0.12) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    /* Desktop grid */
+    .cards-desktop { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+    @media (max-width: 639px) {
+        .cards-carousel { display: block; }
+        .cards-desktop { display: none; }
+    }
+
+    /* Accordion */
+    .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.16,1,0.3,1); }
+    .acc-body.open { max-height: 900px; }
+    .acc-icon { transition: transform 0.3s ease; display: inline-block; }
+    .acc-open .acc-icon { transform: rotate(45deg); }
+
+    @keyframes pulse-ring {
+        0%   { box-shadow: 0 0 0 0 rgba(201,168,76,0.5); }
+        70%  { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
+        100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+    }
+    .badge-pulse { animation: pulse-ring 2.2s ease infinite; }
+</style>
+
+<!-- ══════════════════════════════════════════
+     ABOVE-THE-FOLD — Title + Packages
+══════════════════════════════════════════ -->
+<section class="min-h-screen flex flex-col bg-school-navy relative overflow-hidden">
+    <!-- Subtle background texture -->
+    <div class="absolute inset-0 opacity-[0.04]"
+         style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <div class="absolute -right-24 top-0 w-[380px] h-[380px] rounded-full bg-school-gold opacity-[0.05] blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 flex-1 flex flex-col justify-center max-w-5xl mx-auto w-full px-4 sm:px-6 py-14">
+
+        <!-- Compact title block -->
+        <div class="text-center mb-10">
+            <div class="book-el inline-flex items-center gap-2 mb-4 px-4 py-1.5 bg-school-gold/15 border border-school-gold/40 rounded-full" style="animation-delay:0.05s">
+                <span class="w-1.5 h-1.5 bg-school-gold rounded-full animate-pulse badge-pulse"></span>
+                <span class="text-school-gold text-[11px] font-bold uppercase tracking-[0.25em]">Book Your Appointment · Everyone Welcome</span>
+            </div>
+            <h1 class="book-el font-serif text-3xl md:text-4xl font-black text-white leading-tight mb-2" style="animation-delay:0.12s">
+                Student Counselling &amp; <span class="text-school-gold">Parent Guidance</span>
+            </h1>
+            <p class="book-el text-white/50 text-sm max-w-md mx-auto" style="animation-delay:0.2s">
+                Choose your package below to get started — confidential, child-friendly sessions.
+            </p>
+        </div>
+
+        {% if booking_closed == '1' %}
+        <!-- ── BOOKINGS CLOSED STATE ── -->
+        <div class="book-el max-w-xl mx-auto w-full" style="animation-delay:0.28s">
+            <!-- Closed icon -->
+            <div class="flex flex-col items-center text-center mb-8">
+                <div class="w-20 h-20 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mb-5">
+                    <svg class="w-9 h-9 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-red-400 mb-2">Bookings Currently Closed</p>
+                <h2 class="font-serif text-2xl md:text-3xl font-black text-white mb-3">We're not accepting<br>bookings right now</h2>
+                {% if booking_message %}
+                <p class="text-white/60 text-sm max-w-sm leading-relaxed">{{ booking_message }}</p>
+                {% else %}
+                <p class="text-white/50 text-sm max-w-sm">Our booking window is temporarily closed. Please check back soon or contact us directly.</p>
+                {% endif %}
+            </div>
+
+            {% if booking_reopen_date %}
+            <!-- Reopen date — highlighted card -->
+            <div class="bg-school-gold/12 border border-school-gold/35 rounded-2xl p-6 text-center mb-6">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">📅 Reopening On</p>
+                <p class="font-serif text-3xl font-black text-white mb-1" id="reopen-date-display">{{ booking_reopen_date }}</p>
+                <p class="text-white/40 text-xs" id="reopen-countdown">calculating…</p>
+            </div>
+            <script>
+            (function() {
+                var raw = "{{ booking_reopen_date }}";  /* YYYY-MM-DD */
+                var target = new Date(raw + "T00:00:00");
+                var el = document.getElementById("reopen-countdown");
+                var nameEl = document.getElementById("reopen-date-display");
+
+                /* Format the date nicely */
+                var opts = { day: 'numeric', month: 'long', year: 'numeric' };
+                nameEl.textContent = target.toLocaleDateString('en-IN', opts);
+
+                function tick() {
+                    var now = new Date();
+                    var diff = target - now;
+                    if (diff <= 0) { el.textContent = "Reopening today!"; return; }
+                    var days = Math.floor(diff / 86400000);
+                    var hrs  = Math.floor((diff % 86400000) / 3600000);
+                    var mins = Math.floor((diff % 3600000) / 60000);
+                    el.textContent = days + " day" + (days != 1 ? "s" : "") + " · " + hrs + "h · " + mins + "m remaining";
+                }
+                tick();
+                setInterval(tick, 60000);
+            })();
+            </script>
+            {% endif %}
+
+            <!-- Contact instead -->
+            <div class="bg-white/6 border border-white/10 rounded-xl px-6 py-4 flex flex-wrap gap-4 items-center justify-center">
+                <div class="text-center">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-school-gold mb-0.5">Call Us</p>
+                    <p class="text-sm font-bold text-white">+91 {{ site_phone_primary or "9366862651" }}{% if site_phone_secondary %} · {{ site_phone_secondary }}{% endif %}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-school-gold mb-0.5">Email</p>
+                    <p class="text-xs text-white/70">daichiro.academy@gmail.com</p>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Package Cards (always visible, link to form page) -->
+        <!-- ═══════════════════════════════════════
+             MOBILE CAROUSEL (hidden on desktop)
+        ═══════════════════════════════════════ -->
+        <div class="cards-carousel book-el" style="animation-delay:0.28s">
+
+            <!-- Swipe hint -->
+            <div class="flex items-center justify-center gap-2 mb-3">
+                <span class="text-white/35 text-[10px] uppercase tracking-[0.2em] font-bold">Swipe to explore</span>
+                <span class="swipe-hint text-white/40 text-sm">→</span>
+            </div>
+
+            <div class="carousel-track" id="pkgCarousel">
+
+                <!-- ── Slide 1: Single Session ── -->
+                <div class="carousel-slide pt-5">
+                    <a href="{{ url_for('main.book_form_page', package='single') }}"
+                       class="pkg-card pkg-card-single rounded-3xl p-6 block relative overflow-hidden" style="min-height:420px">
+                        {% if offer_label %}
+                        <div class="absolute -top-3.5 left-5 bg-school-gold text-school-navy text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg z-10">
+                            🎉 {{ offer_label }}
+                        </div>
+                        {% endif %}
+                        <!-- Glow orb -->
+                        <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(255,255,255,0.07) 0%,transparent 70%);"></div>
+
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center" style="box-shadow:inset 0 1px 0 rgba(255,255,255,0.15);">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <span class="text-white/30 text-xs font-semibold tracking-wide">Tap to book →</span>
+                        </div>
+
+                        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-3">Single Session</p>
+
+                        {% if offer_price %}
+                        <div class="flex items-center gap-3 mb-1 flex-wrap">
+                            <span class="font-serif text-5xl font-black" style="color:#FFD96A;">₹{{ offer_price }}</span>
+                            <div class="flex flex-col gap-1">
+                                {% if counselling_fee %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase" style="background:rgba(220,38,38,0.28);color:#FCA5A5;">{{ ((((counselling_fee|int - offer_price|int) / counselling_fee|int) * 100)|round|int) }}% OFF</span>
+                                {% endif %}
+                                <span class="text-white/45 text-lg font-bold line-through decoration-red-400 decoration-2">₹{{ counselling_fee or '399' }}</span>
+                            </div>
+                        </div>
+                        <span class="text-white/40 text-xs mb-3 block">/ session</span>
+                        <div class="inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black px-3 py-1.5 rounded-full mb-3">
+                            🎉 You save ₹{{ counselling_fee|int - offer_price|int }}
+                        </div>
+                        {% elif counselling_fee %}
+                        <div class="flex items-baseline gap-1.5 mb-1">
+                            <span class="font-serif text-5xl font-black text-white">₹{{ counselling_fee }}</span>
+                            <span class="text-white/50 text-sm">/ session</span>
+                        </div>
+                        {% else %}
+                        <div class="flex items-baseline gap-1.5 mb-1">
+                            <span class="font-serif text-5xl font-black text-white">₹399</span>
+                            <span class="text-white/50 text-sm">/ session</span>
+                        </div>
+                        {% endif %}
+
+                        <p class="text-white/40 text-xs mb-4">45 – 60 minutes · One individual session</p>
+
+                        {% if offer_expiry %}
+                        <div class="inline-flex items-center gap-1 bg-red-500/15 text-red-300 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                            ⏰ Offer ends {{ offer_expiry }}
+                        </div>
+                        {% endif %}
+
+                        <div class="border-t border-white/10 pt-4 mb-5">
+                            <p class="text-white/40 text-[10px] uppercase tracking-wider mb-3 font-bold">Choose one session type:</p>
+                            {% for item in ['Student Counselling', 'Parent Counselling', 'Parent–Child Joint'] %}
+                            <div class="flex items-center gap-2.5 text-sm text-white/75 mb-2.5">
+                                <span class="w-4 h-4 rounded-full bg-school-gold/20 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-2.5 h-2.5 text-school-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </span>
+                                {{ item }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="w-full py-3.5 rounded-2xl text-school-navy font-black text-sm uppercase tracking-wider text-center"
+                             style="background:linear-gradient(135deg,#E8C85A 0%,#C9A84C 100%);box-shadow:0 4px 20px rgba(201,168,76,0.4);">
+                            Book Single Session
+                        </div>
+                    </a>
+                </div>
+
+                <!-- ── Slide 2: Complete Package ── -->
+                <div class="carousel-slide pt-5">
+                    <a href="{{ url_for('main.book_form_page', package='recommended') }}"
+                       class="pkg-card pkg-card-recommended rounded-3xl p-6 block relative" style="min-height:420px">
+                        <!-- Best Value badge -->
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-school-gold text-school-navy text-[9px] font-black uppercase tracking-[0.2em] px-5 py-1.5 rounded-full z-10 whitespace-nowrap" style="box-shadow:0 4px 20px rgba(201,168,76,0.5);">
+                            ★ Best Value
+                        </div>
+                        <!-- Glow orb -->
+                        <div class="absolute -top-8 -right-8 w-36 h-36 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(201,168,76,0.2) 0%,transparent 70%);"></div>
+
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-12 h-12 rounded-2xl bg-school-gold/20 flex items-center justify-center" style="box-shadow:inset 0 1px 0 rgba(201,168,76,0.3);">
+                                <svg class="w-6 h-6 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-school-gold/50 text-xs font-semibold tracking-wide">Tap to book →</span>
+                        </div>
+
+                        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-3">Complete Package</p>
+
+                        {% if package_offer_price %}
+                        <div class="flex items-center gap-3 mb-1 flex-wrap">
+                            <span class="font-serif text-5xl font-black" style="color:#FFD96A;">₹{{ package_offer_price }}</span>
+                            <div class="flex flex-col gap-1">
+                                {% if package_price %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase" style="background:rgba(220,38,38,0.28);color:#FCA5A5;">{{ ((((package_price|int - package_offer_price|int) / package_price|int) * 100)|round|int) }}% OFF</span>
+                                {% endif %}
+                                <span class="text-white/45 text-lg font-bold line-through decoration-red-400 decoration-2">₹{{ package_price or '999' }}</span>
+                            </div>
+                        </div>
+                        <span class="text-white/40 text-xs mb-3 block">/ package</span>
+                        <div class="inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black px-3 py-1.5 rounded-full mb-3">
+                            🎉 You save ₹{{ package_price|int - package_offer_price|int }}
+                        </div>
+                        {% elif package_price %}
+                        <div class="flex items-baseline gap-1.5 mb-1">
+                            <span class="font-serif text-5xl font-black text-white">₹{{ package_price }}</span>
+                            <span class="text-white/50 text-sm">/ package</span>
+                        </div>
+                        {% else %}
+                        <div class="flex items-baseline gap-1.5 mb-1">
+                            <span class="font-serif text-5xl font-black text-white">₹999</span>
+                            <span class="text-white/50 text-sm">/ package</span>
+                        </div>
+                        {% endif %}
+
+                        <p class="text-white/40 text-xs mb-2">All 3 session types · Full family support</p>
+
+                        {% if offer_expiry %}
+                        <div class="inline-flex items-center gap-1 bg-red-500/15 text-red-300 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                            ⏰ Offer ends {{ offer_expiry }}
+                        </div>
+                        {% else %}
+                        <div class="inline-flex items-center gap-1 bg-amber-400/15 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-full mb-3">
+                            💰 Save more with the package deal
+                        </div>
+                        {% endif %}
+
+                        <div class="border-t border-white/10 pt-4 mb-5">
+                            <p class="text-white/40 text-[10px] uppercase tracking-wider mb-3 font-bold">All 3 session types included:</p>
+                            {% for item in ['Student Counselling', 'Parent Counselling', 'Parent–Child Joint', 'Structured follow-up'] %}
+                            <div class="flex items-center gap-2.5 text-sm text-white/75 mb-2.5">
+                                <span class="w-4 h-4 rounded-full bg-school-gold/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-2.5 h-2.5 text-school-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </span>
+                                {{ item }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="w-full py-3.5 rounded-2xl text-school-navy font-black text-sm uppercase tracking-wider text-center"
+                             style="background:linear-gradient(135deg,#E8C85A 0%,#C9A84C 100%);box-shadow:0 4px 24px rgba(201,168,76,0.5);">
+                            Book Complete Package
+                        </div>
+                    </a>
+                </div>
+
+            </div><!-- end carousel-track -->
+
+            <!-- Dot indicators -->
+            <div class="carousel-dots" id="pkgDots">
+                <div class="carousel-dot active" onclick="scrollToSlide(0)"></div>
+                <div class="carousel-dot" onclick="scrollToSlide(1)"></div>
+            </div>
+
+        </div><!-- end cards-carousel -->
+
+        <!-- ═══════════════════════════════════════
+             DESKTOP GRID (hidden on mobile)
+        ═══════════════════════════════════════ -->
+        <div class="cards-desktop book-el" style="animation-delay:0.28s">
+
+            <!-- ── Single Session ── -->
+            <a href="{{ url_for('main.book_form_page', package='single') }}" class="pkg-card bg-white/6 backdrop-blur-sm border-white/15 rounded-2xl p-7 hover:bg-white/10">
+                {% if offer_label %}
+                <div class="absolute -top-3.5 left-6 bg-school-gold text-school-navy text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg">
+                    🎉 {{ offer_label }}
+                </div>
+                {% endif %}
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <span class="text-white/40 text-xs font-semibold">Tap to book →</span>
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">Single Session</p>
+                {% if offer_price %}
+                <div class="flex items-center gap-4 mb-0.5 flex-wrap">
+                    <span class="font-serif text-5xl font-black" style="color:#FFD96A;">₹{{ offer_price }}</span>
+                    <div class="flex flex-col gap-1">
+                        {% if counselling_fee %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider" style="background:rgba(220,38,38,0.28);color:#FCA5A5;">{{ ((((counselling_fee|int - offer_price|int) / counselling_fee|int) * 100)|round|int) }}% OFF</span>
+                        {% endif %}
+                        <span class="text-white/45 text-xl font-bold line-through decoration-red-400 decoration-2">₹{{ counselling_fee or '399' }}</span>
+                    </div>
+                </div>
+                <span class="text-white/40 text-xs mb-1 block">/ session</span>
+                <div class="inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black px-3 py-1 rounded-full mb-1">
+                    🎉 You save ₹{{ counselling_fee|int - offer_price|int }} on this session
+                </div>
+                {% elif counselling_fee %}
+                <div class="flex items-baseline gap-1.5 mb-1">
+                    <span class="font-serif text-4xl font-black text-white">₹{{ counselling_fee }}</span>
+                    <span class="text-white/50 text-sm">/ session</span>
+                </div>
+                {% else %}
+                <div class="flex items-baseline gap-1.5 mb-1">
+                    <span class="font-serif text-4xl font-black text-white">₹399</span>
+                    <span class="text-white/50 text-sm">/ session</span>
+                </div>
+                {% endif %}
+                <p class="text-white/45 text-sm mb-1">45 – 60 minutes · One individual session</p>
+                {% if offer_expiry %}
+                <div class="inline-flex items-center gap-1 bg-red-500/15 text-red-300 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                    ⏰ Offer ends {{ offer_expiry }}
+                </div>
+                {% endif %}
+                <div class="border-t border-white/10 pt-4">
+                    <p class="text-white/50 text-[10px] uppercase tracking-wider mb-2.5 font-bold">Choose one session type:</p>
+                    {% for item in ['Student Counselling — for the student', 'Parent Counselling — for parents only', 'Parent–Child Joint Session — both together'] %}
+                    <div class="flex items-center gap-2.5 text-sm text-white/70 mb-2">
+                        <span class="w-4 h-4 rounded-full bg-school-gold/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-2.5 h-2.5 text-school-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        </span>{{ item }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-5 w-full py-3 rounded-xl bg-school-gold text-school-navy font-bold text-sm uppercase tracking-wider text-center">
+                    Book Single Session
+                </div>
+            </a>
+
+            <!-- ── Complete Package ── -->
+            <a href="{{ url_for('main.book_form_page', package='recommended') }}" class="pkg-card bg-school-gold/10 backdrop-blur-sm border-school-gold/30 rounded-2xl p-7 hover:bg-school-gold/15">
+                <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-school-gold text-school-navy text-[9px] font-black uppercase tracking-[0.2em] px-5 py-1.5 rounded-full shadow-lg">
+                    ★ Best Value
+                </div>
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-11 h-11 rounded-xl bg-school-gold/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-school-gold/60 text-xs font-semibold">Tap to book →</span>
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">Complete Package</p>
+                {% if package_offer_price %}
+                <div class="flex items-center gap-4 mb-0.5 flex-wrap">
+                    <span class="font-serif text-5xl font-black" style="color:#FFD96A;">₹{{ package_offer_price }}</span>
+                    <div class="flex flex-col gap-1">
+                        {% if package_price %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider" style="background:rgba(220,38,38,0.28);color:#FCA5A5;">{{ ((((package_price|int - package_offer_price|int) / package_price|int) * 100)|round|int) }}% OFF</span>
+                        {% endif %}
+                        <span class="text-white/45 text-xl font-bold line-through decoration-red-400 decoration-2">₹{{ package_price or '999' }}</span>
+                    </div>
+                </div>
+                <span class="text-white/40 text-xs mb-1 block">/ package</span>
+                <div class="inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black px-3 py-1 rounded-full mb-2">
+                    🎉 You save ₹{{ package_price|int - package_offer_price|int }} on this package
+                </div>
+                {% elif package_price %}
+                <div class="flex items-baseline gap-1.5 mb-1">
+                    <span class="font-serif text-4xl font-black text-white">₹{{ package_price }}</span>
+                    <span class="text-white/50 text-sm">/ package</span>
+                </div>
+                {% else %}
+                <div class="flex items-baseline gap-1.5 mb-1">
+                    <span class="font-serif text-4xl font-black text-white">₹999</span>
+                    <span class="text-white/50 text-sm">/ package</span>
+                </div>
+                {% endif %}
+                <p class="text-white/45 text-sm mb-2">All 3 session types · Full family support</p>
+                {% if offer_expiry %}
+                <div class="inline-flex items-center gap-1 bg-red-500/15 text-red-300 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                    ⏰ Offer ends {{ offer_expiry }}
+                </div>
+                {% else %}
+                <div class="inline-flex items-center gap-1 bg-amber-400/15 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-4">
+                    💰 Save more with the package deal
+                </div>
+                {% endif %}
+                <div class="border-t border-white/10 pt-4">
+                    <p class="text-white/50 text-[10px] uppercase tracking-wider mb-2.5 font-bold">All 3 session types included:</p>
+                    {% for item in ['Student Counselling session', 'Parent Counselling session', 'Parent–Child Joint session', 'Structured follow-up plan'] %}
+                    <div class="flex items-center gap-2.5 text-sm text-white/70 mb-2">
+                        <span class="w-4 h-4 rounded-full bg-school-gold/30 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-2.5 h-2.5 text-school-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        </span>{{ item }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-5 w-full py-3 rounded-xl bg-school-gold text-school-navy font-bold text-sm uppercase tracking-wider text-center">
+                    Book Complete Package
+                </div>
+            </a>
+
+        </div><!-- end cards-desktop -->
+        {% endif %}
+
+        <!-- Scroll hint -->
+        <div class="flex flex-col items-center gap-1 mt-10 animate-bounce opacity-30">
+            <span class="text-white text-[10px] uppercase tracking-widest">More below</span>
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BELOW THE FOLD — Accordions
+══════════════════════════════════════════ -->
+<section class="py-12 bg-white">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 space-y-3">
+        <p class="text-[10px] font-black uppercase tracking-[0.35em] text-school-muted mb-6 text-center">More Information</p>
+
+        <!-- Why Daichiro -->
+        <div class="acc-item rounded-2xl border border-school-mid overflow-hidden">
+            <button onclick="toggleAcc(this)" class="acc-trigger w-full flex items-center justify-between px-6 py-4 text-left hover:bg-school-light transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-school-gold/12 flex items-center justify-center flex-shrink-0" style="background:rgba(201,168,76,0.1)">
+                        <svg style="width:17px;height:17px;" fill="none" stroke="#C9A84C" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <span class="font-bold text-school-navy text-sm">Why Choose Daichiro?</span>
+                </div>
+                <span class="acc-icon text-school-navy font-black text-xl w-7 h-7 rounded-full bg-school-gold/10 flex items-center justify-center flex-shrink-0">+</span>
+            </button>
+            <div class="acc-body">
+                <div class="px-6 pb-6 pt-1 space-y-2.5">
+                    {% for icon, title, desc in [
+                        ('M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', 'Child-Friendly & Non-Judgmental', 'A safe space where children feel heard, never judged.'),
+                        ('M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', 'Confidential & Ethical', 'What you share stays between your family and the counsellor.'),
+                        ('M13 10V3L4 14h7v7l9-11h-7z', 'Growth-Focused', 'Every session moves your child forward — not backward.')
+                    ] %}
+                    <div class="flex items-start gap-3 p-4 bg-school-light rounded-xl">
+                        <div class="w-8 h-8 rounded-lg bg-school-navy flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="{{ icon }}"/></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-school-navy text-xs">{{ title }}</p>
+                            <p class="text-school-muted text-xs mt-0.5">{{ desc }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="acc-item rounded-2xl border border-school-mid overflow-hidden">
+            <button onclick="toggleAcc(this)" class="acc-trigger w-full flex items-center justify-between px-6 py-4 text-left hover:bg-school-light transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,168,76,0.1)">
+                        <svg style="width:17px;height:17px;" fill="none" stroke="#C9A84C" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    <span class="font-bold text-school-navy text-sm">How It Works — 3 Steps</span>
+                </div>
+                <span class="acc-icon text-school-navy font-black text-xl w-7 h-7 rounded-full bg-school-gold/10 flex items-center justify-center flex-shrink-0">+</span>
+            </button>
+            <div class="acc-body">
+                <div class="px-6 pb-6 pt-1 space-y-2.5">
+                    {% for num, bg, title, desc in [
+                        ('01','bg-school-gold text-school-navy','Choose & Fill the Form','Select a package above and fill your details.'),
+                        ('02','bg-school-navy text-white','We Call Within 24 hrs','Our team confirms your date and time over the phone.'),
+                        ('03','bg-school-gold text-school-navy','Attend Your Session','Meet your counsellor for a personal session.')
+                    ] %}
+                    <div class="flex items-start gap-3 p-4 bg-school-light rounded-xl">
+                        <div class="w-8 h-8 {{ bg }} rounded-lg flex items-center justify-center flex-shrink-0 font-black text-xs">{{ num }}</div>
+                        <div>
+                            <p class="font-bold text-school-navy text-xs">{{ title }}</p>
+                            <p class="text-school-muted text-xs mt-0.5">{{ desc }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="bg-school-navy text-white rounded-xl px-5 py-4 flex flex-wrap gap-4 items-center">
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-school-gold mb-0.5">Call Us</p>
+                            <p class="text-sm font-bold">+91 {{ site_phone_primary or "9366862651" }}{% if site_phone_secondary %} · {{ site_phone_secondary }}{% endif %}</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-school-gold mb-0.5">Email</p>
+                            <p class="text-xs text-white/70">daichiro.academy@gmail.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What Happens in a Session -->
+        <div class="acc-item rounded-2xl border border-school-mid overflow-hidden">
+            <button onclick="toggleAcc(this)" class="acc-trigger w-full flex items-center justify-between px-6 py-4 text-left hover:bg-school-light transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(201,168,76,0.1)">
+                        <svg style="width:17px;height:17px;" fill="none" stroke="#C9A84C" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </div>
+                    <span class="font-bold text-school-navy text-sm">What Happens in a Session?</span>
+                </div>
+                <span class="acc-icon text-school-navy font-black text-xl w-7 h-7 rounded-full bg-school-gold/10 flex items-center justify-center flex-shrink-0">+</span>
+            </button>
+            <div class="acc-body">
+                <div class="px-6 pb-6 pt-1">
+                    <div class="space-y-2">
+                        {% for item in ['Understanding the concern in depth', 'Emotional & Behaviour Assessment', 'Academic & Digital habits review', 'Parent guidance and action plan'] %}
+                        <div class="flex items-center gap-3 p-3.5 bg-school-light rounded-xl text-sm text-school-text">
+                            <span class="w-1.5 h-1.5 rounded-full bg-school-gold flex-shrink-0"></span>{{ item }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    function toggleAcc(btn) {
+        const item = btn.closest('.acc-item');
+        const body = item.querySelector('.acc-body');
+        const isOpen = body.classList.contains('open');
+        document.querySelectorAll('.acc-body').forEach(b => b.classList.remove('open'));
+        document.querySelectorAll('.acc-trigger').forEach(b => b.classList.remove('acc-open'));
+        if (!isOpen) { body.classList.add('open'); btn.classList.add('acc-open'); }
+    }
+
+    /* ── Carousel dot sync ── */
+    (function() {
+        const track = document.getElementById('pkgCarousel');
+        const dots  = document.querySelectorAll('#pkgDots .carousel-dot');
+        if (!track) return;
+
+        function updateDots() {
+            const idx = Math.round(track.scrollLeft / track.offsetWidth);
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
+        track.addEventListener('scroll', updateDots, { passive: true });
+
+        window.scrollToSlide = function(idx) {
+            const slide = track.querySelectorAll('.carousel-slide')[idx];
+            if (slide) slide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        };
+    })();
+</script>
+
+{% endblock %}

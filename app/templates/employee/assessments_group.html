@@ -1,0 +1,694 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}{{ group_title }}{% endblock %}
+{% block page_title %}{{ group_icon }} {{ group_title }}{% endblock %}
+{% block page_subtitle %}{{ records|length }} student{{ 's' if records|length != 1 }}{% endblock %}
+
+{% block page_content %}
+
+{# ── Top bar: back button + search ── #}
+<div class="flex flex-col sm:flex-row gap-3 mb-4 items-stretch sm:items-center">
+    <a href="{{ back_url }}" class="flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-widest no-underline whitespace-nowrap transition-all"
+        style="
+        {% if group_color == 'emerald' %}background:#10b981; color:#000;
+        {% elif group_color == 'indigo' %}background:#6366f1; color:#fff;
+        {% elif group_color == 'amber' %}background:#f59e0b; color:#000;
+        {% elif group_color == 'red' %}background:#ef4444; color:#fff;
+        {% else %}background:#27272a; color:#fff;{% endif %}">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        Back
+    </a>
+    <div class="relative flex-1">
+        <input id="search-input" type="text" placeholder="SEARCH NAME, SCHOOL, CLASS..."
+            class="w-full text-sm font-bold uppercase tracking-wider px-4 py-3 focus:outline-none transition-all"
+            style="background:#1c1c1e; border:1px solid #3f3f46; color:#ffffff;">
+    </div>
+    {% if group_key == 'trash' %}
+    <button onclick="emptyTrash()" class="px-5 py-3 font-black uppercase tracking-widest text-xs whitespace-nowrap transition-all" style="background:#ef4444; color:#fff;">🔥 Empty Trash</button>
+    {% endif %}
+</div>
+
+{# ── Filter bar ── #}
+<div class="flex items-center gap-3 mb-6 flex-wrap">
+    <button onclick="openFilter()"
+        class="flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-widest transition-all"
+        style="background:#1c1c1e; border:1px solid #3f3f46; color:#ffffff;">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M7 8h10M11 12h2M13 16h-2"/></svg>
+        Filters
+    </button>
+    <div id="active-tags" class="flex flex-wrap gap-2"></div>
+    <span id="result-count-top" class="ml-auto text-[10px] font-black uppercase tracking-widest" style="color:#C9A84C;"></span>
+</div>
+
+{# ── Amazon-style filter drawer (slide from right) ── #}
+<div id="filter-backdrop" onclick="closeFilter()"
+    class="fixed inset-0 bg-black/60 z-40 hidden transition-opacity"></div>
+
+<div id="filter-drawer"
+    class="fixed top-0 right-0 h-full w-80 bg-zinc-950 border-l border-zinc-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    {# Drawer header #}
+    <div class="flex items-center justify-between px-6 py-5 border-b border-zinc-800">
+        <h2 class="text-lg font-nike uppercase tracking-tight text-white">Filters</h2>
+        <button onclick="closeFilter()" class="w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    {# Drawer body — scrollable #}
+    <div class="flex-1 overflow-y-auto px-6 py-5 space-y-7">
+
+        {# Sort #}
+        <div>
+            <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-600 mb-3">Sort By</p>
+            <div class="space-y-2">
+                <label class="filter-option flex items-center gap-3 cursor-pointer group">
+                    <input type="radio" name="sort" value="newest" checked class="filter-radio accent-white w-4 h-4">
+                    <span class="text-sm font-bold text-zinc-400 group-hover:text-white transition-colors">↓ Newest First</span>
+                </label>
+                <label class="filter-option flex items-center gap-3 cursor-pointer group">
+                    <input type="radio" name="sort" value="oldest" class="filter-radio accent-white w-4 h-4">
+                    <span class="text-sm font-bold text-zinc-400 group-hover:text-white transition-colors">↑ Oldest First</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="h-px bg-zinc-800"></div>
+
+        {# Type #}
+        <div>
+            <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-600 mb-3">Type</p>
+            <div class="space-y-2">
+                <label class="filter-option flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="type" value="scanned" class="filter-check accent-white w-4 h-4 rounded">
+                    <span class="text-sm font-bold text-zinc-400 group-hover:text-white transition-colors">📷 Scanned (Paper Upload)</span>
+                </label>
+                <label class="filter-option flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="type" value="digital" class="filter-check accent-white w-4 h-4 rounded">
+                    <span class="text-sm font-bold text-zinc-400 group-hover:text-white transition-colors">💻 Digital (Online Form)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="h-px bg-zinc-800"></div>
+
+        {# Standard Group #}
+        <div>
+            <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-600 mb-3">Standard Group</p>
+            <div class="space-y-2">
+                {% for val, lbl in [
+                    ('pre-primary',   'Pre-Primary'),
+                    ('primary',       'Primary (1–5)'),
+                    ('middle',        'Middle (6–8)'),
+                    ('secondary',     'Secondary (9–10)'),
+                    ('sr-secondary',  'Sr. Secondary (11–12)'),
+                    ('undergraduate', 'Undergraduate'),
+                    ('postgraduate',  'Postgraduate')
+                ] %}
+                <label class="filter-option flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="sg" value="{{ val }}" class="filter-check accent-white w-4 h-4 rounded">
+                    <span class="text-sm font-bold text-zinc-400 group-hover:text-white transition-colors">{{ lbl }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {# Drawer footer: Apply + Clear #}
+    <div class="px-6 py-5 border-t border-zinc-800 flex gap-3">
+        <button onclick="clearFilters()" class="flex-1 py-3 bg-zinc-900 border border-zinc-700 text-zinc-400 font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 hover:text-white transition-all">Clear</button>
+        <button onclick="applyFilters()" class="flex-1 py-3 bg-white text-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-amber-400 transition-all">Apply</button>
+    </div>
+</div>
+
+
+{# ── Color accent header strip ── #}
+<div class="mb-6 px-1">
+    <div class="h-1 w-20" style="
+        {% if group_color == 'emerald' %}background:#10b981;
+        {% elif group_color == 'indigo' %}background:#6366f1;
+        {% elif group_color == 'amber' %}background:#f59e0b;
+        {% elif group_color == 'red' %}background:#ef4444;
+        {% endif %}"></div>
+    <p id="result-count" class="text-[10px] uppercase tracking-widest font-black mt-2" style="color:#ffffff;">{{ records|length }} student{{ 's' if records|length != 1 }}</p>
+</div>
+
+{# ── Cards list ── #}
+<div id="card-list" class="space-y-3">
+    {% for a in records %}
+
+    {# Standard Group Label + filter key #}
+    {% set g = (a.personal_info.class_grade or '') | lower %}
+    {% if '11' in g or '12' in g or 'xii' in g %}
+        {% set sg = 'Sr. Secondary (11–12)' %}{% set sgkey = 'sr-secondary' %}
+    {% elif '9' in g or '10' in g %}
+        {% set sg = 'Secondary (9–10)' %}{% set sgkey = 'secondary' %}
+    {% elif '6' in g or '7' in g or '8' in g %}
+        {% set sg = 'Middle (6–8)' %}{% set sgkey = 'middle' %}
+    {% elif '1' in g or '2' in g or '3' in g or '4' in g or '5' in g %}
+        {% set sg = 'Primary (1–5)' %}{% set sgkey = 'primary' %}
+    {% elif 'ukg' in g or 'lkg' in g or 'nursery' in g %}
+        {% set sg = 'Pre-Primary' %}{% set sgkey = 'pre-primary' %}
+    {% elif 'ug' in g or 'bsc' in g or 'btech' in g or 'ba' in g or 'bca' in g or 'bcom' in g %}
+        {% set sg = 'Undergraduate' %}{% set sgkey = 'undergraduate' %}
+    {% elif 'pg' in g or 'msc' in g or 'mba' in g or 'mca' in g or 'mtech' in g %}
+        {% set sg = 'Postgraduate' %}{% set sgkey = 'postgraduate' %}
+    {% else %}{% set sg = '' %}{% set sgkey = '' %}{% endif %}
+
+    {% set has_ai = a.ai_response is not none and a.ai_response %}
+    {% set is_inprog = a.status == 'in_progress' %}
+    {% set is_scanned = a.client_username == 'scan_upload' %}
+
+    <div class="assessment-card relative overflow-hidden transition-all duration-200 hover:translate-y-[-2px]"
+        style="
+        {% if group_color == 'emerald' %}
+          background: #111; border: 1px solid #111; border-left: 5px solid #10b981;
+        {% elif group_color == 'indigo' %}
+          background: #111; border: 1px solid #111; border-left: 5px solid #6366f1;
+        {% elif group_color == 'amber' %}
+          background: #111; border: 1px solid #111; border-left: 5px solid #f59e0b;
+        {% elif group_color == 'red' %}
+          background: #111; border: 1px solid #111; border-left: 5px solid #ef4444;
+        {% endif %}"
+        data-name="{{ (a.personal_info.full_name or a.client_username) | lower }}"
+        data-school="{{ (a.personal_info.school_name or '') | lower }}"
+        data-class="{{ (a.personal_info.class_grade or '') | lower }}"
+        data-sg="{{ sgkey }}"
+        data-scanned="{{ 'yes' if is_scanned else 'no' }}"
+        data-date="{{ a.created_at.strftime('%Y%m%d%H%M') if a.created_at else '0' }}">
+
+        <div class="p-5">
+            {# ── Top Row: Avatar + Info + Date ── #}
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <div class="flex items-center gap-4 min-w-0">
+
+                    {# Bold solid avatar #}
+                    <div class="w-14 h-14 flex-shrink-0 flex items-center justify-center text-xl font-black"
+                        style="
+                        {% if group_color == 'emerald' %}background: #10b981; color: #000;
+                        {% elif group_color == 'indigo' %}background: #6366f1; color: #fff;
+                        {% elif group_color == 'amber' %}background: #f59e0b; color: #000;
+                        {% elif group_color == 'red' %}background: #ef4444; color: #fff;
+                        {% endif %}">
+                        {{ (a.personal_info.full_name or a.client_username or 'S')[0] | upper }}
+                    </div>
+
+                    <div class="min-w-0">
+                        <h4 class="text-base font-black uppercase tracking-widest truncate" style="color: #ffffff;">
+                            {{ a.personal_info.full_name or a.client_username }}
+                        </h4>
+                        <p class="text-[10px] font-bold uppercase tracking-wider truncate mt-0.5" style="color: #e4e4e7;">
+                            {{ a.personal_info.class_grade or '—' }}{% if a.personal_info.school_name %} · {{ a.personal_info.school_name }}{% endif %}
+                        </p>
+                        <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                            {% if sg %}
+                            <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider"
+                                style="
+                                {% if group_color == 'emerald' %}border: 1.5px solid #10b981; color: #10b981; background: transparent;
+                                {% elif group_color == 'indigo' %}border: 1.5px solid #818cf8; color: #818cf8; background: transparent;
+                                {% elif group_color == 'amber' %}border: 1.5px solid #f59e0b; color: #f59e0b; background: transparent;
+                                {% elif group_color == 'red' %}border: 1.5px solid #ef4444; color: #ef4444; background: transparent;
+                                {% endif %}">{{ sg }}</span>
+                            {% endif %}
+                            {% if is_scanned %}
+                            <span class="px-2 py-0.5 text-[9px] font-black uppercase" style="border: 1.5px solid #0ea5e9; color: #0ea5e9; background: transparent;">📷 Scanned</span>
+                            {% endif %}
+                            {% if is_inprog %}
+                            <span class="px-2 py-0.5 text-[9px] font-black uppercase animate-pulse" style="border: 1.5px solid #f59e0b; color: #f59e0b; background: transparent;">⚡ Step {{ a.current_step or 1 }}/5</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if a.created_at %}
+                <div class="text-right flex-shrink-0 pt-1">
+                    <p class="text-xs font-black" style="color:#ffffff;">{{ a.created_at.strftime('%d %b %Y') }}</p>
+                    <p class="text-[10px] mt-0.5" style="color:#71717a;">{{ a.created_at.strftime('%H:%M') }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            {# ── Action Buttons ── #}
+            <div class="flex items-center gap-2 flex-wrap">
+                {% if group_key == 'trash' %}
+                    <button onclick="restoreAssessment({{ a.id }})"
+                        class="flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all active:scale-95"
+                        style="background: #10b981; color: #000;">
+                        ♻️ Restore
+                    </button>
+                    <button class="trash-hard-delete flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all active:scale-95"
+                        style="background: #ef4444; color: #fff;"
+                        data-id="{{ a.id }}" data-name="{{ a.personal_info.full_name or a.client_username }}">
+                        🔥 Delete Forever
+                    </button>
+                {% elif not is_inprog %}
+                    {% if not has_ai %}
+                    <button onclick="runAnalysis(this,{{ a.id }},'{{ url_for('employee.reanalyze_assessment', assessment_id=a.id) }}')"
+                        class="analyse-btn flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all active:scale-95"
+                        style="background: #6366f1; color: #fff;">
+                        <span class="btn-icon">🧠</span><span class="btn-text">Analyse</span>
+                    </button>
+                    <a href="{{ url_for('employee.assessment_pdf', assessment_id=a.id) }}?ref={{ request.url | urlencode }}"
+                       class="flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all no-underline"
+                       style="background: #fff; color: #000;">
+                        👁️ View Form
+                    </a>
+                    <button onclick="copyPrompt({{ a.id }})"
+                        class="flex items-center gap-1.5 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all"
+                        style="background: #f59e0b; color: #000;">
+                        📋 Copy Prompt
+                    </button>
+                    {% else %}
+                    <button onclick="runAnalysis(this,{{ a.id }},'{{ url_for('employee.reanalyze_assessment', assessment_id=a.id) }}')"
+                        class="analyse-btn flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all active:scale-95"
+                        style="background: #27272a; border: 1px solid #3f3f46; color: #fff;">
+                        <span class="btn-icon">🔄</span><span class="btn-text">Re-analyse</span>
+                    </button>
+                    <a href="{{ url_for('employee.assessment_pdf', assessment_id=a.id) }}?ref={{ request.url | urlencode }}"
+                       class="flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all no-underline"
+                       style="background: #fff; color: #000;">
+                        PDF ↓
+                    </a>
+                    <button onclick="copyPrompt({{ a.id }})"
+                        class="flex items-center gap-1.5 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all"
+                        style="background: #f59e0b; color: #000;">
+                        📋 Copy Prompt
+                    </button>
+                    {% endif %}
+                {% else %}
+                    {% set ac = active_clients.get(a.client_username) if active_clients else None %}
+                    {% if ac and ac.temp_password_hash %}
+                    <button onclick="copyText('{{ ac.username }}','{{ ac.temp_password_hash }}')"
+                        class="flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all"
+                        style="background: #f59e0b; color: #000;">
+                        📋 Copy Credentials
+                    </button>
+                    <span class="font-mono text-[9px] text-zinc-600">{{ ac.username }} / {{ ac.temp_password_hash }}</span>
+                    {% endif %}
+                {% endif %}
+
+                <div class="ml-auto flex items-center gap-2">
+                    {% if group_key != 'trash' %}
+                    <button class="trash-move-btn flex items-center justify-center w-9 h-9 transition-all"
+                        title="Move to Trash" data-id="{{ a.id }}" data-name="{{ a.personal_info.full_name or a.client_username }}"
+                        style="background: #1c1c1e; color: #52525b;"
+                        onmouseover="this.style.background='#ef4444';this.style.color='#fff';"
+                        onmouseout="this.style.background='#1c1c1e';this.style.color='#52525b';">
+                        🗑️
+                    </button>
+                    {% endif %}
+                    <button onclick="toggleDetails(this)"
+                        class="flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                        style="background: #1c1c1e; color: #ffffff; border: 1px solid #3f3f46;">
+                        <span class="dlbl">Details</span>
+                        <svg class="chev w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {# ── Expandable Details Panel ── #}
+        <div class="dpanel hidden p-5 space-y-4" style="border-top: 3px solid
+            {% if group_color == 'emerald' %}#10b981
+            {% elif group_color == 'indigo' %}#6366f1
+            {% elif group_color == 'amber' %}#f59e0b
+            {% elif group_color == 'red' %}#ef4444
+            {% endif %}; background: #0a0a0a;">
+            {# Info grid #}
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="p-3" style="background: #1c1c1e; border: 1px solid #3f3f46;">
+                    <p style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#71717a; margin-bottom:4px;">Name</p>
+                    <p style="font-weight:900; color:#ffffff; font-size:12px;">{{ a.personal_info.full_name or '—' }}</p>
+                </div>
+                <div class="p-3" style="background: #1c1c1e; border: 1px solid #3f3f46;">
+                    <p style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#71717a; margin-bottom:4px;">Class</p>
+                    <p style="font-weight:900; color:#ffffff; font-size:12px;">{{ a.personal_info.class_grade or '—' }}</p>
+                </div>
+                <div class="p-3" style="background: #1c1c1e; border: 1px solid #3f3f46;">
+                    <p style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#71717a; margin-bottom:4px;">School</p>
+                    <p style="font-weight:900; color:#ffffff; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ a.personal_info.school_name or '—' }}</p>
+                </div>
+                <div class="p-3" style="background: #1c1c1e; border: 1px solid #3f3f46;">
+                    <p style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#71717a; margin-bottom:4px;">Phone</p>
+                    <p style="font-weight:900; color:#ffffff; font-size:12px;">{{ a.personal_info.contact_number or '—' }}</p>
+                </div>
+                {% if a.personal_info.email %}
+                <div class="col-span-2 sm:col-span-4 p-3" style="background: #1c1c1e; border: 1px solid #3f3f46;">
+                    <p style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#71717a; margin-bottom:4px;">Email</p>
+                    <p style="font-weight:900; color:#ffffff; font-size:12px;">{{ a.personal_info.email }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+
+            {% if a.aptitude %}
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-widest mb-2" style="color:#a1a1aa;">Aptitude Scores</p>
+                <div class="grid grid-cols-9 gap-1 text-center">
+                    {% for key, lbl in {'logical':'Logic','science':'Sci','writing':'Write','computers':'PC','design':'Design','speaking':'Speak','planning':'Plan','helping':'Help','tech':'Tech'}.items() %}
+                    {% set sc = (a.aptitude.get(key,'3'))|int %}
+                    <div class="py-2 {% if sc>=4 %}apt-tile-hi{% elif sc>=3 %}apt-tile-mid{% else %}apt-tile-lo{% endif %}">
+                        <div class="apt-num">{{ sc }}</div>
+                        <div class="apt-lbl">{{ lbl }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if a.interests %}
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-widest mb-2" style="color:#a1a1aa;">Interests</p>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for i in (a.interests.activities or []) %}<span class="tag-indigo">{{ i }}</span>{% endfor %}
+                    {% for i in (a.interests.subjects or []) %}<span class="tag-sky">{{ i }}</span>{% endfor %}
+                    {% for i in (a.interests.professions or []) %}<span class="tag-green">{{ i }}</span>{% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if a.personality %}
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-widest mb-2" style="color:#a1a1aa;">Personality</p>
+                <div class="flex flex-wrap gap-1.5">{% for t in a.personality %}<span class="tag-amber">{{ t }}</span>{% endfor %}</div>
+            </div>
+            {% endif %}
+
+
+            {% if has_ai and a.ai_response.profile_summary %}
+            <div style="background:#1c1c1e; border: 1px solid #3f3f46; padding:16px;">
+                <p style="font-size:8px; color:#a1a1aa; font-weight:900; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">🧠 AI Summary</p>
+                <p style="font-size:13px; color:#ffffff; line-height:1.6;">{{ a.ai_response.profile_summary }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% else %}
+    <div class="text-center py-20 border border-zinc-800 rounded-2xl">
+        <p class="text-2xl font-nike uppercase" style="color:#ffffff;">No Records Found</p>
+        <p class="text-xs mt-2 uppercase tracking-widest" style="color:rgba(255,255,255,0.5);">Nothing in this category yet</p>
+    </div>
+    {% endfor %}
+</div>
+
+{# No search results #}
+<div id="no-results" class="hidden text-center py-16 border border-zinc-800 rounded-2xl mt-4">
+    <p class="text-xl font-nike uppercase" style="color:#ffffff;">No Results</p>
+    <p class="text-xs mt-2 uppercase tracking-widest" style="color:rgba(255,255,255,0.5);">Try a different name or class</p>
+</div>
+
+{# Toast #}
+<div id="toast" class="hidden fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl font-bold text-sm uppercase tracking-widest shadow-2xl"></div>
+
+<style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinning { animation: spin 0.8s linear infinite; display: inline-block; }
+
+    /* ── Override admin.css for assessment page dark cards ── */
+    /* admin.css sets .text-white { color: navy !important } — we must beat it */
+    .assessment-card { color: #e4e4e7; }
+    .dpanel * { box-sizing: border-box; }
+
+    /* Force all aptitude score tiles to show white text */
+    .apt-tile-hi  { background: #10b981 !important; color: #000 !important; }
+    .apt-tile-mid { background: #6366f1 !important; color: #fff !important; }
+    .apt-tile-lo  { background: #1c1c1e !important; color: #71717a !important; }
+    .apt-tile-hi .apt-num,
+    .apt-tile-mid .apt-num { color: #fff !important; font-weight: 900 !important; font-size: 16px !important; }
+    .apt-tile-hi .apt-num  { color: #000 !important; }
+    .apt-tile-hi .apt-lbl,
+    .apt-tile-mid .apt-lbl,
+    .apt-tile-lo .apt-lbl  { color: rgba(255,255,255,0.6) !important; font-size: 7px !important; }
+    .apt-tile-hi .apt-lbl  { color: rgba(0,0,0,0.6) !important; }
+    .apt-tile-lo .apt-num  { color: #a1a1aa !important; font-weight: 900 !important; font-size: 16px !important; }
+
+    /* Interest / personality tags */
+    .tag-indigo { background: #6366f1 !important; color: #fff !important; font-size: 9px !important; font-weight: 900 !important; padding: 4px 10px !important; display: inline-block !important; }
+    .tag-sky    { background: #0ea5e9 !important; color: #000 !important; font-size: 9px !important; font-weight: 900 !important; padding: 4px 10px !important; display: inline-block !important; }
+    .tag-green  { background: #10b981 !important; color: #000 !important; font-size: 9px !important; font-weight: 900 !important; padding: 4px 10px !important; display: inline-block !important; }
+    .tag-amber  { background: #f59e0b !important; color: #000 !important; font-size: 9px !important; font-weight: 900 !important; padding: 4px 10px !important; display: inline-block !important; }
+</style>
+
+
+<!-- Assessment data for Copy Prompt -->
+<script>
+const _promptData = {};
+{% for a in records %}
+{% if a.personal_info %}
+{% if a.career_vision is mapping %}{% set cv = a.career_vision %}{% else %}{% set cv = {} %}{% endif %}
+_promptData[{{ a.id }}] = {
+    name:     {{ (a.personal_info.full_name or '') | tojson }},
+    grade:    {{ (a.personal_info.class_grade or '') | tojson }},
+    school:   {{ (a.personal_info.school_name or '') | tojson }},
+    activities:  {{ ((a.interests or {}).get('activities') or []) | tojson }},
+    subjects:    {{ ((a.interests or {}).get('subjects') or []) | tojson }},
+    professions: {{ ((a.interests or {}).get('professions') or []) | tojson }},
+    apt: {
+        logical:   {{ ((a.aptitude or {}).get('logical','3')) | tojson }},
+        science:   {{ ((a.aptitude or {}).get('science','3')) | tojson }},
+        writing:   {{ ((a.aptitude or {}).get('writing','3')) | tojson }},
+        computers: {{ ((a.aptitude or {}).get('computers','3')) | tojson }},
+        design:    {{ ((a.aptitude or {}).get('design','3')) | tojson }},
+        speaking:  {{ ((a.aptitude or {}).get('speaking','3')) | tojson }},
+        planning:  {{ ((a.aptitude or {}).get('planning','3')) | tojson }},
+        helping:   {{ ((a.aptitude or {}).get('helping','3')) | tojson }},
+        tech:      {{ ((a.aptitude or {}).get('tech','3')) | tojson }}
+    },
+    personality:  {{ (a.personality or []) | tojson }},
+    cv_careers: {{ (cv.get('current_careers') or '') | tojson }},
+    cv_goals:   {{ (cv.get('five_year_goals') or '') | tojson }},
+    cv_life:    {{ (cv.get('ideal_life') or '') | tojson }}
+};
+{% endif %}
+{% endfor %}
+</script>
+
+<script>
+// ── Drawer open/close ──
+function openFilter() {
+    document.getElementById('filter-drawer').style.transform = 'translateX(0)';
+    document.getElementById('filter-backdrop').classList.remove('hidden');
+}
+function closeFilter() {
+    document.getElementById('filter-drawer').style.transform = 'translateX(100%)';
+    document.getElementById('filter-backdrop').classList.add('hidden');
+}
+
+// ── State ──
+let sortAsc = false;
+
+// ── Apply — called by the Apply button in the drawer ──
+function applyFilters() {
+    closeFilter();
+    applyAll();
+    renderActiveTags();
+}
+
+// ── Clear all filters ──
+function clearFilters() {
+    document.querySelector('input[name="sort"][value="newest"]').checked = true;
+    document.querySelectorAll('input[name="type"]').forEach(i => i.checked = false);
+    document.querySelectorAll('input[name="sg"]').forEach(i => i.checked = false);
+    closeFilter();
+    applyAll();
+    renderActiveTags();
+}
+
+// ── Read current filter state from drawer ──
+function getFilters() {
+    const sort  = document.querySelector('input[name="sort"]:checked')?.value || 'newest';
+    const types = [...document.querySelectorAll('input[name="type"]:checked')].map(i => i.value);
+    const sgs   = [...document.querySelectorAll('input[name="sg"]:checked')].map(i => i.value);
+    return { sort, types, sgs };
+}
+
+// ── Show active filter tags above the list ──
+function renderActiveTags() {
+    const { sort, types, sgs } = getFilters();
+    const tagBox = document.getElementById('active-tags');
+    tagBox.innerHTML = '';
+    const make = (label, clearFn) => {
+        const t = document.createElement('span');
+        t.className = 'inline-flex items-center gap-1.5 px-3 py-1 bg-amber-400 text-black text-[9px] font-black uppercase tracking-widest rounded-full cursor-pointer';
+        t.innerHTML = label + ' <span class="text-black/60 hover:text-black">✕</span>';
+        t.onclick = clearFn;
+        tagBox.appendChild(t);
+    };
+    if (sort === 'oldest') make('↑ Oldest First', () => {
+        document.querySelector('input[name="sort"][value="newest"]').checked = true;
+        applyAll(); renderActiveTags();
+    });
+    types.forEach(v => make(v === 'scanned' ? '📷 Scanned' : '💻 Digital', () => {
+        document.querySelector(`input[name="type"][value="${v}"]`).checked = false;
+        applyAll(); renderActiveTags();
+    }));
+    sgs.forEach(v => {
+        const lbl = document.querySelector(`input[name="sg"][value="${v}"]`)?.nextElementSibling?.textContent?.trim() || v;
+        make(lbl, () => {
+            document.querySelector(`input[name="sg"][value="${v}"]`).checked = false;
+            applyAll(); renderActiveTags();
+        });
+    });
+}
+
+// ── Apply filters + search, sort, update visible cards ──
+function applyAll() {
+    const { sort, types, sgs } = getFilters();
+    sortAsc = (sort === 'oldest');
+    const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
+    const cards = [...document.querySelectorAll('.assessment-card')];
+
+    let visible = cards.filter(c => {
+        // Search
+        if (q && !c.dataset.name.includes(q) && !c.dataset.school.includes(q) && !c.dataset.class.includes(q)) return false;
+        // Type filter
+        if (types.length) {
+            const isScanned = c.dataset.scanned === 'yes';
+            const matchType = (types.includes('scanned') && isScanned) || (types.includes('digital') && !isScanned);
+            if (!matchType) return false;
+        }
+        // Standard group filter
+        if (sgs.length && !sgs.includes(c.dataset.sg)) return false;
+        return true;
+    });
+
+    // Sort
+    visible.sort((a, b) => sortAsc
+        ? a.dataset.date.localeCompare(b.dataset.date)
+        : b.dataset.date.localeCompare(a.dataset.date));
+
+    const list = document.getElementById('card-list');
+    cards.forEach(c => c.style.display = 'none');
+    visible.forEach(c => { c.style.display = ''; list.appendChild(c); });
+
+    const cnt = visible.length;
+    document.getElementById('result-count').textContent = cnt + ' student' + (cnt !== 1 ? 's' : '');
+    const rc = document.getElementById('result-count-top');
+    if (rc) rc.textContent = cnt + ' result' + (cnt !== 1 ? 's' : '');
+    document.getElementById('no-results').classList.toggle('hidden', cnt > 0);
+}
+
+// Search box — live filter
+document.getElementById('search-input').addEventListener('input', applyAll);
+
+// Run once on load
+applyAll();
+
+
+// ── AJAX Analyse with spinner ──
+async function runAnalysis(btn, id, url) {
+    const icon = btn.querySelector('.btn-icon');
+    const label = btn.querySelector('.btn-text');
+    const [oi, ol] = [icon.textContent, label.textContent];
+    btn.disabled = true;
+    icon.classList.add('spinning'); icon.textContent = '⏳';
+    label.textContent = 'Analysing…'; btn.classList.add('opacity-60');
+    try {
+        const resp = await fetch(url, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': '{{ csrf_token() }}' } });
+        const data = await resp.json();
+        if (data.success) { showToast('✅ ' + data.message, 'success'); setTimeout(() => location.reload(), 1400); }
+        else { showToast('❌ ' + data.message, 'error'); restore(); }
+    } catch(e) { showToast('❌ Network error.', 'error'); restore(); }
+    function restore() {
+        btn.disabled = false; icon.classList.remove('spinning');
+        icon.textContent = oi; label.textContent = ol; btn.classList.remove('opacity-60');
+    }
+}
+
+// ── Toggle details ──
+function toggleDetails(btn) {
+    const card = btn.closest('.assessment-card');
+    const panel = card.querySelector('.dpanel');
+    const chev = btn.querySelector('.chev');
+    const lbl = btn.querySelector('.dlbl');
+    panel.classList.toggle('hidden');
+    chev.style.transform = panel.classList.contains('hidden') ? '' : 'rotate(180deg)';
+    lbl.textContent = panel.classList.contains('hidden') ? 'Details' : 'Close';
+}
+
+// ── Copy credentials ──
+function copyText(u, p) {
+    navigator.clipboard.writeText('Username: ' + u + '\nPassword: ' + p)
+        .then(() => showToast('📋 Copied!', 'info'));
+}
+
+// ── Trash Management (event delegation for data-* buttons) ──
+document.addEventListener('click', function(e) {
+    const moveBtn = e.target.closest('.trash-move-btn');
+    const delBtn  = e.target.closest('.trash-hard-delete');
+    if (moveBtn) {
+        const id = moveBtn.dataset.id;
+        const name = moveBtn.dataset.name || 'this assessment';
+        trashAssessment(id, name);
+    }
+    if (delBtn) {
+        const id = delBtn.dataset.id;
+        const name = delBtn.dataset.name || 'this assessment';
+        hardDeleteAssessment(id, name);
+    }
+});
+
+async function trashAssessment(id, name) {
+    try {
+        const r = await fetch(`/employee/assessment/${id}/trash`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token() }}' } });
+        const d = await r.json();
+        if(d.success) { showToast('🗑️ ' + d.message, 'info'); setTimeout(() => location.reload(), 1000); }
+        else showToast('❌ ' + d.message, 'error');
+    } catch(e) { showToast('❌ Network error.', 'error'); }
+}
+async function restoreAssessment(id) {
+    try {
+        const r = await fetch(`/employee/assessment/${id}/restore`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token() }}' } });
+        const d = await r.json();
+        if(d.success) { showToast('♻️ ' + d.message, 'success'); setTimeout(() => location.reload(), 1000); }
+        else showToast('❌ ' + d.message, 'error');
+    } catch(e) { showToast('❌ Network error.', 'error'); }
+}
+async function hardDeleteAssessment(id, name) {
+    try {
+        const r = await fetch(`/employee/assessment/${id}/delete_permanent`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token() }}' } });
+        const d = await r.json();
+        if(d.success) { showToast('🔥 ' + d.message, 'success'); setTimeout(() => location.reload(), 1000); }
+        else showToast('❌ ' + d.message, 'error');
+    } catch(e) { showToast('❌ Network error.', 'error'); }
+}
+async function emptyTrash() {
+    try {
+        const r = await fetch(`/employee/assessments/empty_trash`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token() }}' } });
+        const d = await r.json();
+        if(d.success) { showToast('🔥 ' + d.message, 'success'); setTimeout(() => location.reload(), 1000); }
+        else showToast('❌ ' + d.message, 'error');
+    } catch(e) { showToast('❌ Network error.', 'error'); }
+}
+
+// ── Copy Prompt for Gemini (prompt-engineered, same output as website) ──
+function copyPrompt(id) {
+    const d = _promptData[id];
+    if (!d) { showToast('⚠️ No data available', 'error'); return; }
+    
+    const prompt = `{"_system":"daichiro-career-ai-v5.0","_engine":"psychometric-nlp-v9","_model_role":"senior_career_psychologist_25_years_experience","_context":"north_east_india_adolescent_guidance","_rules":{"rule_1_personalization":"address_by_firstname_only|quote_exact_scores_and_data_including_career_vision|reference_exact_choices|flag_contradictions_gently","rule_2_calibration":"age_stage_specific|class_grade:${JSON.stringify(d.grade)}|calibrate_all_recommendations","rule_3_context":"NE_India_first|pan_india_fallback","rule_4_tone":"warm|encouraging|deeply_personal|not_generic","rule_5_brevity":"profile_summary_max_4_sentences|pathway_why_max_2_sentences","rule_6_colleges":"MANDATORY: name 2-3 real specific colleges relevant to top career pathway in 5-year roadmap milestones. Mix NE India institutions (NIT Silchar, Assam University, Manipur University, NIT Manipur, RGIIM Shillong, Cotton University, Gauhati University, NEHU Shillong, Tezpur University, AIIMS Guwahati, DM College Imphal, Manipur Institute of Technology) with top national colleges (IITs, IIMs, AIIMS Delhi, NIFT, NID Ahmedabad, Delhi University, Christ University Bangalore, Symbiosis Pune, Manipal University). Embed naturally in milestone sentences."},"_student_data":{"personal":{"full_name":${JSON.stringify(d.name)},"class_grade":${JSON.stringify(d.grade)},"school":${JSON.stringify(d.school)}},"interests":{"activities":${JSON.stringify(d.activities)},"subjects":${JSON.stringify(d.subjects)},"professions":${JSON.stringify(d.professions)}},"aptitude_scores_out_of_5":{"logical_numerical":${JSON.stringify(d.apt.logical)},"scientific_understanding":${JSON.stringify(d.apt.science)},"writing_communication":${JSON.stringify(d.apt.writing)},"computers_technology":${JSON.stringify(d.apt.computers)},"creative_design":${JSON.stringify(d.apt.design)},"public_speaking_leadership":${JSON.stringify(d.apt.speaking)},"planning_organisation":${JSON.stringify(d.apt.planning)},"helping_counselling":${JSON.stringify(d.apt.helping)},"learning_new_tech":${JSON.stringify(d.apt.tech)}},"personality_traits":${JSON.stringify(d.personality)},"career_vision":{"currently_considering":${JSON.stringify(d.cv_careers || '')},"five_year_goals":${JSON.stringify(d.cv_goals || '')},"ideal_future_life":${JSON.stringify(d.cv_life || '')}}},"_output_format":{"type":"plain_text_report","language":"english","style":"professional_and_warm","required_sections":["1. PROFILE SUMMARY (Evaluate their aptitude, personality, and explicitly address their CAREER VISION: integrate their currently considering, 5-year goals & ideal future life in 4 sentences MAX.)","2. CAREER PATHWAYS (Select 3 career pathways. For each, display title with % match, 2 sentences explaining why based on data, and 3 actionable steps.)","3. 5-YEAR ROADMAP (Outline Year 1 to Year 5 with a specific focus theme and 3 milestones per year. IMPORTANT: Name at least 2-3 real colleges relevant to the student career pathway naturally inside milestone sentences.)","4. CLOSING MESSAGE (Warm, encouraging send-off to the student.)"],"strict_instruction":"DO NOT OUTPUT JSON. Write a perfectly formatted plain text report directly."}}`;
+
+    navigator.clipboard.writeText(prompt)
+        .then(() => showToast('📋 Prompt copied! Open gemini.google.com → paste → get full report', 'success'))
+        .catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = prompt; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            showToast('📋 Prompt copied!', 'success');
+        });
+}
+
+// ── Toast ──
+function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    const c = {
+        success: 'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl font-bold text-sm uppercase tracking-widest shadow-2xl bg-emerald-500 text-black',
+        error:   'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl font-bold text-sm uppercase tracking-widest shadow-2xl bg-red-600 text-white',
+        info:    'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl font-bold text-sm uppercase tracking-widest shadow-2xl bg-white text-black'
+    };
+    t.className = c[type] || c.info;
+    setTimeout(() => { t.className = 'hidden'; }, 3000);
+}
+</script>
+
+{% endblock %}

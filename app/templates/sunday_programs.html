@@ -1,0 +1,904 @@
+{% extends "base.html" %}
+
+{% block title %}Structured Sunday Development Programs — Daichiro Professional Skills Academy{% endblock %}
+{% block meta_description %}SuperKids Personality Club (Ages 5–9) and Future Ready Personality Program (Ages 10–18). Weekly Sunday sessions at Daichiro Academy, {{ site_location_address or "Imphal" }}.{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(32px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+  @keyframes floatA {
+    0%,100% { transform: translateY(0px) rotate(0deg); }
+    50%     { transform: translateY(-18px) rotate(3deg); }
+  }
+  @keyframes floatB {
+    0%,100% { transform: translateY(0px) rotate(0deg); }
+    50%     { transform: translateY(-12px) rotate(-4deg); }
+  }
+  @keyframes pulse-ring {
+    0%   { transform:scale(1); opacity:0.6; }
+    100% { transform:scale(1.7); opacity:0; }
+  }
+
+  .h-el { opacity:0; animation: fadeUp 0.85s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+  /* ── HERO ── */
+  .hero-section {
+    background: linear-gradient(135deg, #060f26 0%, #0a1f4e 40%, #0f2d5e 70%, #0a2040 100%);
+    position: relative; overflow: hidden;
+    padding: 110px 24px 0;
+  }
+
+  /* ── COLLAPSIBLE DETAILS ── */
+  .details-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.55s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+    opacity: 0;
+  }
+  .details-panel.open {
+    max-height: 3000px;
+    opacity: 1;
+  }
+  .toggle-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-size: 0.82rem; font-weight: 800;
+    cursor: pointer; border: none;
+    letter-spacing: 0.04em;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s ease, background 0.2s;
+    margin-bottom: 0;
+  }
+  .toggle-btn:hover { transform: translateY(-2px); }
+  .toggle-btn .chevron {
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+  .toggle-btn.open .chevron { transform: rotate(180deg); }
+  .hero-grid-overlay {
+    position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-orb1 {
+    position:absolute; width:700px; height:700px; border-radius:50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.16) 0%, transparent 65%);
+    top:-200px; left:-200px; pointer-events:none;
+  }
+  .hero-orb2 {
+    position:absolute; width:500px; height:500px; border-radius:50%;
+    background: radial-gradient(circle, rgba(30,86,160,0.35) 0%, transparent 70%);
+    bottom:-150px; right:-100px; pointer-events:none;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:10px;
+    padding:10px 22px; border-radius:50px;
+    border:1px solid rgba(201,168,76,0.35);
+    background: rgba(201,168,76,0.1);
+    backdrop-filter:blur(8px);
+    margin-bottom:28px;
+  }
+  .hero-badge-dot {
+    width:8px; height:8px; border-radius:50%; background:#C9A84C;
+    position:relative;
+  }
+  .hero-badge-dot::after {
+    content:''; position:absolute; inset:0; border-radius:50%;
+    background:#C9A84C; animation: pulse-ring 1.8s ease-out infinite;
+  }
+  .hero-title {
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    font-weight:900; line-height:1.08; color:#fff;
+    letter-spacing:-0.02em;
+    font-family: 'Inter', var(--font-serif, serif);
+  }
+  .hero-title .gold-word {
+    background: linear-gradient(90deg, #C9A84C, #f59e0b, #fbbf24, #C9A84C);
+    background-size:200% auto;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+    animation: shimmer 4s linear infinite;
+  }
+  .hero-desc {
+    color:rgba(255,255,255,0.55); font-size:1.1rem; line-height:1.75;
+    max-width:620px; margin:20px auto 0;
+  }
+
+  /* ── STATS STRIP ── */
+  .stats-strip {
+    background: linear-gradient(90deg, #C9A84C 0%, #f59e0b 50%, #C9A84C 100%);
+    background-size: 200% auto;
+    animation: shimmer 5s linear infinite;
+    padding: 22px 32px;
+    margin-top: 0;
+  }
+  .stats-strip-inner {
+    max-width:1200px; margin:0 auto;
+    display:flex; align-items:center; justify-content:center;
+    flex-wrap:wrap; gap:0;
+  }
+  .stat-item {
+    display:flex; flex-direction:column; align-items:center;
+    padding:0 40px; position:relative;
+  }
+  .stat-item + .stat-item::before {
+    content:''; position:absolute; left:0; top:10%; height:80%;
+    width:1px; background:rgba(15,45,94,0.25);
+  }
+  .stat-num { font-size:1.8rem; font-weight:900; color:#0F2D5E; line-height:1; }
+  .stat-label { font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; color:rgba(15,45,94,0.7); margin-top:3px; }
+
+  /* ── PROGRAM SECTION ── */
+  .programs-section {
+    background: #F4F6FB;
+    padding: 80px 24px 100px;
+  }
+  .section-eyebrow {
+    font-size:0.65rem; font-weight:900; text-transform:uppercase;
+    letter-spacing:0.35em; color:#C9A84C; margin-bottom:12px;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight:900; color:#0F2D5E; line-height:1.15; margin-bottom:16px;
+  }
+  .section-sub {
+    color:#6B7A99; font-size:1rem; line-height:1.7; max-width:560px;
+  }
+  .programs-grid {
+    max-width:1280px; margin:60px auto 0;
+    display:grid; grid-template-columns: 1fr 1fr;
+    gap:28px;
+  }
+  @media(max-width:860px){ .programs-grid { grid-template-columns:1fr; } }
+
+  /* ── PROGRAM CARD ── */
+  .prog-card {
+    background:#fff; border-radius:28px;
+    overflow:hidden;
+    box-shadow: 0 4px 6px rgba(15,45,94,0.04), 0 20px 60px rgba(15,45,94,0.08);
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
+    cursor:pointer;
+    border:1px solid rgba(15,45,94,0.07);
+  }
+  .prog-card:hover {
+    transform:translateY(-8px);
+    box-shadow: 0 4px 6px rgba(15,45,94,0.04), 0 40px 80px rgba(15,45,94,0.14);
+  }
+  .prog-card:active { transform:translateY(-3px); }
+
+  .card-banner {
+    padding:36px 36px 32px;
+    position:relative; overflow:hidden;
+  }
+  .card-banner.gold-banner {
+    background: linear-gradient(135deg, #b8841c 0%, #C9A84C 40%, #f59e0b 75%, #fcd34d 100%);
+  }
+  .card-banner.navy-banner {
+    background: linear-gradient(135deg, #060f26 0%, #0F2D5E 40%, #1a4a8a 75%, #1e56a0 100%);
+  }
+  .card-banner-orb {
+    position:absolute; border-radius:50%; pointer-events:none;
+  }
+  .card-banner-orb1 { width:220px; height:220px; right:-60px; top:-60px; background:rgba(255,255,255,0.1); }
+  .card-banner-orb2 { width:120px; height:120px; right:60px; bottom:-30px; background:rgba(255,255,255,0.06); }
+
+  .card-icon-wrap {
+    width:70px; height:70px; border-radius:20px;
+    background:rgba(255,255,255,0.2); backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.3);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:20px;
+  }
+  .card-age-tag {
+    display:inline-block; padding:5px 14px; border-radius:50px;
+    background:rgba(255,255,255,0.22); backdrop-filter:blur(4px);
+    font-size:0.6rem; font-weight:900; text-transform:uppercase; letter-spacing:0.2em;
+    color:#fff; margin-bottom:10px;
+    border:1px solid rgba(255,255,255,0.25);
+  }
+  .gold-banner .card-age-tag { color:#0F2D5E; background:rgba(15,45,94,0.18); border-color:rgba(15,45,94,0.2); }
+  .card-title {
+    font-size:1.6rem; font-weight:900; color:#fff; line-height:1.2;
+    letter-spacing:-0.01em;
+  }
+  .gold-banner .card-title { color:#0F2D5E; }
+  .card-subtitle {
+    font-size:0.8rem; color:rgba(255,255,255,0.7); margin-top:6px; font-weight:500;
+  }
+  .gold-banner .card-subtitle { color:rgba(15,45,94,0.65); }
+
+  /* Card body */
+  .card-body { padding:28px 36px 32px; }
+
+  .info-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px;
+  }
+  .info-chip {
+    background:#F4F6FB; border-radius:14px; padding:14px 16px;
+    border:1px solid rgba(15,45,94,0.07);
+  }
+  .info-chip-label {
+    font-size:0.56rem; font-weight:900; text-transform:uppercase;
+    letter-spacing:0.18em; color:#9CA3AF; margin-bottom:4px;
+  }
+  .info-chip-value {
+    font-size:0.8rem; font-weight:700; color:#0F2D5E; line-height:1.35;
+  }
+
+  /* Outline / modules list */
+  .outline-section { margin-bottom:24px; }
+  .outline-heading {
+    font-size:0.58rem; font-weight:900; text-transform:uppercase;
+    letter-spacing:0.2em; color:#9CA3AF; margin-bottom:10px;
+  }
+  .outline-list { display:flex; flex-direction:column; gap:5px; }
+  .outline-row {
+    display:flex; align-items:center; gap:10px;
+    background:#F9FAFB; border-radius:10px; padding:9px 12px;
+    border:1px solid rgba(15,45,94,0.05);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .outline-row:hover { background:#EEF1F8; border-color:rgba(15,45,94,0.12); }
+  .outline-num {
+    min-width:30px; height:24px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.58rem; font-weight:900; flex-shrink:0;
+  }
+  .outline-num.gold-num { background:#FEF3C7; color:#92400E; }
+  .outline-num.navy-num { background:#0F2D5E; color:#C9A84C; }
+  .outline-text { font-size:0.775rem; color:#374151; font-weight:500; line-height:1.35; }
+
+  /* Benefit pills */
+  .benefits-list { display:flex; flex-direction:column; gap:6px; margin-bottom:24px; }
+  .benefit-row {
+    display:flex; align-items:flex-start; gap:9px;
+    font-size:0.78rem; color:#4B5563; line-height:1.45;
+  }
+  .benefit-check {
+    width:18px; height:18px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; margin-top:1px;
+  }
+  .benefit-check.gold-check { background:#FEF3C7; }
+  .benefit-check.navy-check { background:#EEF1F8; }
+
+  /* CTA inside card */
+  .card-cta {
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .cta-btn {
+    flex:1; min-width:130px; display:inline-flex; align-items:center;
+    justify-content:center; gap:8px;
+    padding:14px 20px; border-radius:14px;
+    font-size:0.8rem; font-weight:800; text-decoration:none;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s ease;
+    letter-spacing:0.02em;
+  }
+  .cta-btn:hover { transform:translateY(-2px); }
+  .cta-gold {
+    background: linear-gradient(135deg, #C9A84C, #f59e0b);
+    color:#0F2D5E;
+    box-shadow: 0 8px 24px rgba(201,168,76,0.35);
+  }
+  .cta-gold:hover { box-shadow:0 12px 32px rgba(201,168,76,0.5); }
+  .cta-navy {
+    background: linear-gradient(135deg, #0F2D5E, #1a4a8a);
+    color:#fff;
+    box-shadow: 0 8px 24px rgba(15,45,94,0.3);
+  }
+  .cta-navy:hover { box-shadow:0 12px 32px rgba(15,45,94,0.5); }
+  .cta-wa {
+    background: linear-gradient(135deg, #25D366, #1ebe57);
+    color:#fff;
+    box-shadow: 0 8px 24px rgba(37,211,102,0.3);
+  }
+  .cta-wa:hover { box-shadow:0 12px 32px rgba(37,211,102,0.5); }
+
+  /* ── FLOATING DECORATIONS on hero ── */
+  .hero-float1 {
+    position:absolute; top:14%; right:7%;
+    width:90px; height:90px; border-radius:24px;
+    background: rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2);
+    backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    animation: floatA 6s ease-in-out infinite;
+  }
+  .hero-float2 {
+    position:absolute; bottom:22%; left:5%;
+    width:70px; height:70px; border-radius:20px;
+    background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+    backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center;
+    animation: floatB 5s ease-in-out infinite;
+  }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    background: linear-gradient(135deg, #060f26 0%, #0a1f4e 50%, #0F2D5E 100%);
+    padding:90px 24px;
+    position:relative; overflow:hidden;
+  }
+  .cta-section .hero-grid-overlay { opacity:0.5; }
+  .cta-section .hero-orb1 { opacity:0.08; }
+  .cta-inner {
+    max-width:1000px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:48px; flex-wrap:wrap;
+  }
+  .cta-left { flex:1; min-width:260px; }
+  .cta-right { flex-shrink:0; display:flex; flex-direction:column; gap:14px; min-width:240px; }
+  .cta-section-title {
+    font-size:clamp(1.6rem,3.5vw,2.6rem); font-weight:900; color:#fff;
+    line-height:1.15; letter-spacing:-0.01em; margin-bottom:14px;
+  }
+  .cta-section-sub { color:rgba(255,255,255,0.5); font-size:0.95rem; line-height:1.65; }
+
+  .info-pill-row {
+    display:flex; gap:12px; flex-wrap:wrap; margin-top:28px;
+  }
+  .info-pill {
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1);
+    border-radius:12px; padding:10px 16px;
+    backdrop-filter:blur(6px);
+  }
+  .info-pill-label { font-size:0.65rem; font-weight:900; text-transform:uppercase; letter-spacing:0.12em; color:#C9A84C; margin-bottom:2px; }
+  .info-pill-value { font-size:0.78rem; color:rgba(255,255,255,0.7); font-weight:500; }
+
+  /* Wave */
+  .wave-divider { display:block; width:100%; overflow:hidden; line-height:0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-thumb { background:#C9A84C; border-radius:3px; }
+
+  /* ══════════════════════════════════════
+     MOBILE RESPONSIVE — Phone (≤ 640px)
+  ══════════════════════════════════════ */
+  @media(max-width:640px) {
+
+    /* ── Hero ── */
+    .hero-section {
+      padding: 90px 16px 0;
+      text-align: center;
+    }
+    .hero-float1, .hero-float2 { display:none; }
+    .hero-badge {
+      padding: 8px 14px;
+      margin-bottom: 18px;
+    }
+    .hero-badge span:last-child {
+      font-size: 0.52rem !important;
+      letter-spacing: 0.15em !important;
+    }
+    .hero-title {
+      font-size: clamp(2rem, 9vw, 3rem) !important;
+      line-height: 1.1;
+    }
+    .hero-desc {
+      font-size: 0.9rem !important;
+      line-height: 1.7;
+      padding: 0 4px;
+    }
+
+    /* Hero CTA buttons — stack on mobile */
+    .hero-section [style*="display:flex"][style*="gap:20px"] {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 12px !important;
+      padding: 0 8px;
+    }
+    .hero-section a[style*="padding:15px 32px"] {
+      justify-content: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Tagline row — hide horizontal lines on mobile */
+    .hero-section [style*="gap:12px"][style*="align-items:center"] span[style*="height:1px"] {
+      display: none !important;
+    }
+
+    /* ── Stats Strip ── */
+    .stats-strip { padding: 14px 10px; }
+    .stats-strip-inner {
+      flex-wrap: nowrap;
+      justify-content: center;
+      gap: 0;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 0 10px;
+      text-align: center;
+    }
+    .stat-item + .stat-item::before {
+      top: 15%; height: 70%;
+    }
+    .stat-num {
+      font-size: 0.85rem;
+      line-height: 1.3;
+      word-break: break-word;
+      white-space: normal;
+    }
+    .stat-label { font-size: 0.48rem; margin-top: 2px; }
+
+    /* ── Programs Section ── */
+    .programs-section { padding: 52px 14px 70px; }
+    .section-title { font-size: clamp(1.5rem, 7vw, 2rem); }
+    .section-sub { font-size: 0.9rem; padding: 0 8px; }
+    .programs-grid {
+      margin-top: 36px;
+      gap: 20px;
+      grid-template-columns: 1fr;
+    }
+
+    /* ── Program Card ── */
+    .prog-card { border-radius: 20px; }
+    .card-banner { padding: 24px 18px 20px; }
+    .card-icon-wrap {
+      width: 56px; height: 56px; border-radius: 16px;
+      margin-bottom: 14px;
+    }
+    .card-title { font-size: 1.35rem; }
+    .card-subtitle { font-size: 0.75rem; }
+    .card-age-tag { font-size: 0.55rem; }
+
+    /* ── Card Body ── */
+    .card-body { padding: 18px 16px 22px; }
+    .info-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .info-chip { padding: 11px 12px; border-radius: 12px; }
+    .info-chip-label { font-size: 0.5rem; }
+    .info-chip-value { font-size: 0.72rem; }
+
+    /* ── Toggle Button ── */
+    .toggle-btn {
+      padding: 12px 16px;
+      font-size: 0.75rem;
+      border-radius: 12px;
+    }
+
+    /* ── Collapsible Details ── */
+    .outline-text { font-size: 0.72rem; }
+    .outline-row { padding: 8px 10px; }
+
+    /* Details: "What will learn" grid → single column */
+    .details-panel [style*="grid-template-columns:repeat(auto-fit"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Outcome box inside details */
+    .details-panel [style*="padding:24px"] p {
+      font-size: 0.9rem !important;
+    }
+
+    /* Card CTA buttons */
+    .card-cta { flex-direction: column; gap: 10px; }
+    .cta-btn {
+      min-width: unset;
+      width: 100%;
+      padding: 13px 16px;
+      font-size: 0.75rem;
+      border-radius: 12px;
+    }
+
+    /* ── Bottom CTA Section ── */
+    .cta-section { padding: 56px 16px; }
+    .cta-inner {
+      flex-direction: column;
+      gap: 28px;
+      text-align: center;
+    }
+    .cta-left { min-width: unset; }
+    .cta-right {
+      min-width: unset;
+      width: 100%;
+    }
+    .cta-section-title { font-size: clamp(1.4rem, 6.5vw, 2rem); }
+    .cta-section-sub { font-size: 0.88rem; }
+    .info-pill-row {
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .info-pill { padding: 8px 12px; border-radius: 10px; }
+    .info-pill-label { font-size: 0.58rem; }
+    .info-pill-value { font-size: 0.72rem; }
+
+    /* CTA section phone button */
+    .cta-right a {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      font-size: 0.85rem !important;
+      padding: 16px 20px !important;
+      border-radius: 14px !important;
+      justify-content: center !important;
+    }
+  }
+
+  /* ── Tablet (641px – 860px) ── */
+  @media(min-width:641px) and (max-width:860px) {
+    .hero-section { padding: 100px 32px 0; }
+    .programs-section { padding: 64px 24px 80px; }
+    .programs-grid { grid-template-columns: 1fr; gap: 24px; }
+    .cta-inner { gap: 32px; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+
+  <!-- Floating decorations -->
+  <div class="hero-float1">
+    <svg width="38" height="38" fill="none" stroke="#C9A84C" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v1m0 16v1M4.22 4.22l.71.71M18.36 18.36l.71.71M3 12H2m20 0h-1M4.93 19.07l.71-.71M18.36 5.64l.71-.71"/>
+      <circle cx="12" cy="12" r="4" stroke-width="1.8"/>
+    </svg>
+  </div>
+  <div class="hero-float2">
+    <svg width="28" height="28" fill="none" stroke="rgba(255,255,255,0.5)" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+  </div>
+
+  <div class="relative z-10 text-center">
+    <div class="h-el hero-badge" style="animation-delay:0.05s">
+      <span class="hero-badge-dot"></span>
+      <span style="font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:0.3em;color:#C9A84C;">Every Sunday · Daichiro Academy · {{ site_location_address or 'Imphal' }}</span>
+    </div>
+
+    <h1 class="h-el hero-title" style="animation-delay:0.15s; margin-bottom:0;">
+      Structured Sunday<br>
+      <span class="gold-word">Development Programs</span>
+    </h1>
+    <div class="h-el" style="animation-delay:0.2s; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:28px;">
+      <span style="height:1px; width:40px; background:linear-gradient(90deg, transparent, #C9A84C);"></span>
+      <h2 style="color:#C9A84C; font-size:clamp(0.9rem, 2vw, 1.15rem); font-weight:800; letter-spacing:0.04em; margin:0;">
+        Because Personality is Built Early… and Polished for Life
+      </h2>
+      <span style="height:1px; width:40px; background:linear-gradient(-90deg, transparent, #C9A84C);"></span>
+    </div>
+
+    <p class="h-el hero-desc mx-auto" style="animation-delay:0.28s; font-size:1.1rem; color:rgba(255,255,255,0.75); line-height:1.85; max-width:700px; margin-top:22px; margin-bottom:10px;">
+      At Daichiro Professional Skills Academy, our specially designed Sunday programs nurture <strong style="color:#fff; font-weight:600; text-shadow:0 0 10px rgba(255,255,255,0.2);">confident, disciplined, and future-ready individuals</strong>—starting from childhood to teenage years.
+    </p>
+
+    <div class="h-el" style="animation-delay:0.4s; margin-top:40px; display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
+      <a href="#programs" style="display:inline-flex;align-items:center;gap:9px;padding:15px 32px;background:linear-gradient(135deg,#C9A84C,#f59e0b);color:#0F2D5E;font-weight:900;font-size:0.85rem;border-radius:14px;text-decoration:none;letter-spacing:0.04em;box-shadow:0 10px 30px rgba(201,168,76,0.4);transition:all 0.3s;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        Explore Programs
+      </a>
+      <a href="tel:{{ site_phone_primary or '9366862651' }}" style="display:inline-flex;align-items:center;gap:9px;padding:15px 32px;border:1.5px solid rgba(201,168,76,0.4);color:#C9A84C;font-weight:800;font-size:0.85rem;border-radius:14px;text-decoration:none;letter-spacing:0.04em;backdrop-filter:blur(6px);background:rgba(201,168,76,0.06);transition:all 0.3s;">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+        <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;">
+          <span>Call Us Now</span>
+          <span style="font-size:0.75rem;font-weight:900;letter-spacing:0.06em;color:#f59e0b;">{{ site_phone_primary or '9366862651' }}</span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Spacer to push content away from the gold strip -->
+  <div style="height:48px;"></div>
+</section>
+
+<!-- ── STATS STRIP ── -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div class="stat-item">
+      <span class="stat-num">2</span>
+      <span class="stat-label">Programs</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-num">{{ site_location_address or 'Imphal' }}</span>
+      <span class="stat-label">Location</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PROGRAMS — FULL DETAIL CARDS
+════════════════════════════════════════ -->
+<section id="programs" class="programs-section">
+  <div style="max-width:1280px; margin:0 auto; text-align:center;">
+    <p class="section-eyebrow">Choose Your Program</p>
+    <h2 class="section-title">World-Class Personality<br>Development for Every Age</h2>
+    <p class="section-sub mx-auto">Both programs are designed by expert educators and run every Sunday. Select a program below to see the full curriculum, schedule, and how to enrol.</p>
+  </div>
+
+  <div class="programs-grid">
+
+    <!-- ══ CARD 1: SUPERKIDS ══ -->
+    <div class="prog-card" id="card-superkids">
+      <div class="card-banner gold-banner">
+        <div class="card-banner-orb card-banner-orb1"></div>
+        <div class="card-banner-orb card-banner-orb2"></div>
+        <div class="card-icon-wrap" style="background:rgba(15,45,94,0.18);border-color:rgba(15,45,94,0.25);">
+          <svg width="32" height="32" fill="none" stroke="#0F2D5E" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <span class="card-age-tag">Ages 5 – 9 · Children</span>
+        <h2 class="card-title">SuperKids<br>Personality Club</h2>
+        <p class="card-subtitle">Fun-filled weekly journey every Sunday for confident, expressive kids</p>
+      </div>
+
+      <div class="card-body">
+        <!-- Info grid -->
+        <div class="info-grid">
+          <div class="info-chip">
+            <p class="info-chip-label">⏱ Duration</p>
+            <p class="info-chip-value">Every Sunday</p>
+          </div>
+          <div class="info-chip">
+            <p class="info-chip-label">👦 Eligibility</p>
+            <p class="info-chip-value">Children aged 5 to 9 years</p>
+          </div>
+          <div class="info-chip">
+            <p class="info-chip-label">📍 Location</p>
+            <p class="info-chip-value">{{ site_location_address }}</p>
+          </div>
+          <div class="info-chip">
+            <p class="info-chip-label">🏅 Certificate</p>
+            <p class="info-chip-value">Awarded upon Course Completion</p>
+          </div>
+        </div>
+
+        <!-- Toggle button -->
+        <button class="toggle-btn" id="toggle-superkids"
+          style="background:linear-gradient(135deg,#C9A84C,#f59e0b);color:#0F2D5E;box-shadow:0 8px 24px rgba(201,168,76,0.3);"
+          onclick="toggleDetails('superkids')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          <span class="btn-label">View Full Details</span>
+          <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <!-- Collapsible details -->
+        <div class="details-panel" id="details-superkids">
+          <div style="padding-top:20px;">
+
+        <!-- Intro Banner -->
+        <div style="background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(245,158,11,0.05)); border:1px solid rgba(201,168,76,0.2); border-radius:18px; padding:20px 24px; margin-bottom:24px;">
+          <h4 style="color:#92400E; font-size:1.05rem; font-weight:900; line-height:1.3; margin-bottom:6px; letter-spacing:-0.01em;">Building Strong Foundations for Life</h4>
+          <p style="color:#B45309; font-size:0.85rem; font-weight:500; line-height:1.5;">A joyful, engaging, and value-driven program designed to shape your child’s character and confidence from an early age.</p>
+        </div>
+
+        <!-- What Child Will Learn -->
+        <div class="outline-section">
+          <p class="outline-heading">What Your Child Will Learn</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+            {% for item in [
+              'Kindness & Good Values',
+              'Basic Communication Skills',
+              'Confidence Building Activities',
+              'Bravery & Self-Expression',
+              'Self-Discipline Habits',
+              'Social Etiquettes & Manners',
+              'Safe Digital Awareness',
+              'Life Skills through Fun Learning'
+            ] %}
+            <div class="outline-row" style="padding:10px 14px;">
+              <span class="benefit-check gold-check" style="background:#FEF3C7;">
+                <svg width="11" height="11" fill="none" stroke="#92400E" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>
+              </span>
+              <span class="outline-text" style="font-weight:700; color:#92400E;">{{ item }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Outcome -->
+        <div style="background: linear-gradient(135deg, #FFFCF0 0%, #FFF6D6 100%); border: 1px solid rgba(245,158,11,0.3); border-radius: 16px; padding: 24px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(245,158,11,0.1); position: relative; overflow: hidden;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+            <div style="background: linear-gradient(135deg, #F59E0B, #D97706); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(217,119,6,0.3);">
+              <svg width="14" height="14" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h5 style="color: #92400E; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; margin: 0;">Outcome</h5>
+          </div>
+          <p style="color: #92400E; font-size: 1.05rem; font-weight: 600; line-height: 1.6; margin: 0; position: relative; z-index: 1;">
+            Your child becomes more confident, expressive, well-mannered, and emotionally aware—both at home and school.
+          </p>
+        </div>
+
+        <!-- CTA -->
+        <div class="card-cta">
+          <a href="tel:{{ site_phone_primary or '9366862651' }}" class="cta-btn cta-gold">
+            <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            Call to Enrol: {{ site_phone_primary or '9366862651' }}
+          </a>
+        </div>
+
+          </div>
+        </div><!-- /details-panel -->
+      </div>
+    </div>
+
+    <!-- ══ CARD 2: FUTURE READY ══ -->
+    <div class="prog-card" id="card-futureready">
+      <div class="card-banner navy-banner">
+        <div class="card-banner-orb card-banner-orb1"></div>
+        <div class="card-banner-orb card-banner-orb2"></div>
+        <div class="card-icon-wrap">
+          <svg width="32" height="32" fill="none" stroke="#C9A84C" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <span class="card-age-tag">Ages 10 – 18 · Teens</span>
+        <h2 class="card-title">Future Ready<br>Personality Program</h2>
+        <p class="card-subtitle">Weekly transformation for the leaders of tomorrow</p>
+      </div>
+
+      <div class="card-body">
+        <!-- Info grid -->
+        <div class="info-grid">
+          <div class="info-chip">
+            <p class="info-chip-label">⏱ Duration</p>
+            <p class="info-chip-value">Every Sunday</p>
+          </div>
+          <div class="info-chip">
+            <p class="info-chip-label">🎓 Eligibility</p>
+            <p class="info-chip-value">Teens aged 10 to 18 years</p>
+          </div>
+          <div class="info-chip">
+            <p class="info-chip-label">📍 Location</p>
+            <p class="info-chip-value">{{ site_location_address }}</p>
+          </div>
+          <div class="info-chip">
+            <p class="info-chip-label">🏅 Certification</p>
+            <p class="info-chip-value">Certificate + Real-World Skills on Completion</p>
+          </div>
+        </div>
+
+        <!-- Toggle button -->
+        <button class="toggle-btn" id="toggle-futureready"
+          style="background:linear-gradient(135deg,#0F2D5E,#1a4a8a);color:#fff;box-shadow:0 8px 24px rgba(15,45,94,0.3);"
+          onclick="toggleDetails('futureready')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          <span class="btn-label">View Full Details</span>
+          <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <!-- Collapsible details -->
+        <div class="details-panel" id="details-futureready">
+          <div style="padding-top:20px;">
+
+        <!-- Intro Banner -->
+        <div style="background:linear-gradient(135deg,rgba(15,45,94,0.06),rgba(26,74,138,0.03)); border:1px solid rgba(15,45,94,0.1); border-radius:18px; padding:20px 24px; margin-bottom:24px;">
+          <h4 style="color:#0F2D5E; font-size:1.05rem; font-weight:900; line-height:1.3; margin-bottom:6px; letter-spacing:-0.01em;">Transforming Teens into Confident Leaders</h4>
+          <p style="color:#4B5563; font-size:0.85rem; font-weight:500; line-height:1.5;">A powerful program designed to prepare students for real-world success with strong communication, clarity, and confidence.</p>
+        </div>
+
+        <!-- What Students Will Master -->
+        <div class="outline-section">
+          <p class="outline-heading">🔥 What Students Will Master</p>
+          <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+            {% for item in [
+              'Advanced Communication Skills',
+              'Public Speaking & Stage Confidence',
+              'English Fluency Development',
+              'Self-Confidence & Personality Grooming',
+              'Emotional Intelligence & Self-Awareness',
+              'Health, Hygiene & Personal Care',
+              'Goal Setting & Discipline',
+              'Real-Life Skills for Future Success',
+              'Environmental Awareness'
+            ] %}
+            <div class="outline-row" style="padding:10px 16px;">
+              <span class="benefit-check navy-check" style="background:#E0E7FF; width:22px; height:22px; border-radius:8px;">
+                <svg width="12" height="12" fill="none" stroke="#3730A3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </span>
+              <span class="outline-text" style="font-weight:700; color:#1E3A8A; font-size:0.82rem;">{{ item }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Outcome -->
+        <div style="background: linear-gradient(135deg, #0F2D5E 0%, #1A4A8A 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 24px; margin-bottom: 28px; box-shadow: 0 16px 40px rgba(15,45,94,0.15); position: relative; overflow: hidden;">
+          <div style="position: absolute; top: -10px; right: -10px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; position: relative; z-index: 1;">
+            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);">
+              <svg width="14" height="14" fill="none" stroke="#C9A84C" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h5 style="color: #C9A84C; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; margin: 0;">Outcome</h5>
+          </div>
+          <p style="color: #fff; font-size: 1.05rem; font-weight: 500; line-height: 1.6; margin: 0; position: relative; z-index: 1; letter-spacing: 0.01em;">
+            Students become confident speakers, emotionally strong individuals, and future-ready personalities ready to face academics, interviews, and life challenges.
+          </p>
+        </div>
+
+        <!-- CTA -->
+        <div class="card-cta">
+          <a href="tel:{{ site_phone_primary or '9366862651' }}" class="cta-btn cta-navy">
+            <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            Call to Enrol: {{ site_phone_primary or '9366862651' }}
+          </a>
+        </div>
+
+          </div>
+        </div><!-- /details-panel -->
+      </div>
+    </div>
+
+  </div><!-- /programs-grid -->
+</section>
+
+<!-- ════════════════════════════════════════
+     CTA SECTION
+════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-orb1"></div>
+
+  <div class="cta-inner relative z-10">
+    <div class="cta-left">
+      <p style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.35em;color:#C9A84C;margin-bottom:12px;">Admissions Open Now</p>
+      <h2 class="cta-section-title">
+        Enrol Your Child Today.<br>
+        <span style="color:#C9A84C;">Limited Seats Available.</span>
+      </h2>
+      <p class="cta-section-sub">Both programs fill up quickly. Secure your child's spot now and invest in the most valuable skill — a powerful personality.</p>
+      <div class="info-pill-row">
+        <div class="info-pill">
+          <div>
+            <p class="info-pill-label">Location</p>
+            <p class="info-pill-value">{{ site_location_address }}</p>
+          </div>
+        </div>
+        <div class="info-pill">
+          <div>
+            <p class="info-pill-label">Schedule</p>
+            <p class="info-pill-value">Every Sunday</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="cta-right">
+      <a href="tel:{{ site_phone_primary or '9366862651' }}"
+         style="display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 28px;background:linear-gradient(135deg,#C9A84C,#f59e0b);color:#0F2D5E;font-weight:900;font-size:0.9rem;border-radius:16px;text-decoration:none;box-shadow:0 12px 36px rgba(201,168,76,0.4);transition:all 0.3s;letter-spacing:0.03em;">
+        <svg width="17" height="17" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+        Call: {{ site_phone_primary or '9366862651' }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+function toggleDetails(id) {
+  var panel  = document.getElementById('details-' + id);
+  var btn    = document.getElementById('toggle-' + id);
+  var isOpen = panel.classList.contains('open');
+
+  panel.classList.toggle('open');
+  btn.classList.toggle('open');
+
+  // swap button text
+  var label = btn.querySelector('.btn-label');
+  if (label) label.textContent = isOpen ? 'View Full Details' : 'Hide Details';
+}
+</script>
+{% endblock %}

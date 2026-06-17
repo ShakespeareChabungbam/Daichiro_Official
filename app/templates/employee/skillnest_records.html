@@ -1,0 +1,436 @@
+{% extends "employee/base_employee.html" %}
+
+{% block title %}Admission Records — SkillNest{% endblock %}
+{% block page_title %}Admission Records{% endblock %}
+{% block page_subtitle %}{{ admissions|length }} Total{% endblock %}
+
+{% block page_content %}
+
+<style>
+/* ── SkillNest Records overrides ── */
+.sn-page .sn-white { color: #ffffff !important; }
+.sn-page .sn-stat {
+    font-size: 1.875rem; font-weight: 900;
+    line-height: 1.2; margin-bottom: .25rem; display: block;
+}
+.sn-page .sn-sky    { color: #38bdf8 !important; }
+.sn-page .sn-red    { color: #f87171 !important; }
+.sn-page .sn-muted  { color: #71717a !important; }
+.sn-page .sn-lbl {
+    font-size: 9px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .3em; display: block;
+}
+.sn-page .sn-name {
+    font-size: .875rem; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: #ffffff !important; display: block;
+}
+.sn-page .sn-sub {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #71717a !important;
+    margin-top: .125rem; display: block;
+}
+.sn-page .sn-amber  { color: #fbbf24 !important; }
+.sn-page .sn-green  { color: #34d399 !important; }
+.sn-page .sn-field-lbl { font-size:9px; color:#52525b !important; text-transform:uppercase; letter-spacing:.1em; margin-bottom:2px; display:block; }
+.sn-page .sn-field-val { font-size:.875rem; font-weight:700; color:#d4d4d8 !important; display:block; }
+.sn-page .sn-field-val.sn-amber { color:#fbbf24 !important; }
+</style>
+
+
+
+<div class="sn-page">
+
+<!-- Back button -->
+<a href="{{ url_for('employee.skillnest_page') }}"
+   class="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-xl"
+   style="background:#18181b;border:1px solid #27272a;color:#a1a1aa;font-size:.875rem;font-weight:700;text-decoration:none;transition:border-color .2s,color .2s;"
+   onmouseover="this.style.borderColor='#60a5fa';this.style.color='#60a5fa';"
+   onmouseout="this.style.borderColor='#27272a';this.style.color='#a1a1aa';">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Back to SkillNest
+</a>
+
+<!-- Stats Row — Total + Seats only -->
+<div class="grid grid-cols-2 gap-3 mb-6" style="max-width:400px;">
+    <div class="rounded-xl p-5 text-center" style="background:#18181b;border:1.5px solid #3f3f46;">
+        <span class="sn-stat sn-white">{{ admissions|length }}</span>
+        <span class="sn-lbl" style="color:#a1a1aa;">Total</span>
+    </div>
+    {% if total_seats %}
+    <div class="rounded-xl p-5 text-center"
+         style="background:{% if seats_left == 0 %}#1a0707;border:1.5px solid #7f1d1d{% else %}#07161a;border:1.5px solid #0e4a5c{% endif %};">
+        <span class="sn-stat {% if seats_left == 0 %}sn-red{% else %}sn-sky{% endif %}">{{ seats_left }}</span>
+        <span class="sn-lbl {% if seats_left == 0 %}sn-red{% else %}sn-sky{% endif %}" style="color:{% if seats_left == 0 %}#dc2626{% else %}#0284c7{% endif %} !important;">Seats Left</span>
+        <span style="font-size:9px;color:#52525b;display:block;margin-top:2px;">of {{ total_seats }}</span>
+    </div>
+    {% else %}
+    <div class="rounded-xl p-5 text-center" style="background:#18181b;border:1.5px solid #27272a;opacity:.45;">
+        <span class="sn-stat sn-muted">—</span>
+        <span class="sn-lbl sn-muted">Seats</span>
+        <span style="font-size:9px;color:#3f3f46;display:block;margin-top:2px;">Not set</span>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Seats Full Banner -->
+{% if total_seats and seats_left == 0 %}
+<div class="mb-6 rounded-2xl overflow-hidden" style="border:1.5px solid rgba(239,68,68,.5);">
+    <div style="height:3px;background:linear-gradient(90deg,transparent,#ef4444 40%,#fca5a5 60%,transparent);"></div>
+    <div class="flex items-start gap-4 p-5" style="background:rgba(127,29,29,.35);">
+        <div class="rounded-xl flex items-center justify-center flex-shrink-0" style="width:44px;height:44px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.3);margin-top:2px;">
+            <svg style="width:22px;height:22px;color:#f87171;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.3em;color:#f87171;margin-bottom:4px;">🔴 All Seats Taken</p>
+            <p style="font-size:1rem;font-weight:900;color:#ffffff;margin-bottom:4px;">All {{ total_seats }} Seats Are Filled</p>
+            <p style="font-size:.75rem;color:rgba(255,255,255,.5);line-height:1.5;">
+                Online applications are automatically blocked.
+            </p>
+        </div>
+        <span style="display:inline-block;padding:6px 14px;border-radius:8px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;background:rgba(239,68,68,.25);color:#fca5a5;border:1px solid rgba(239,68,68,.3);">
+            FULL · {{ seats_left }}/{{ total_seats }} Left
+        </span>
+    </div>
+</div>
+{% endif %}
+
+<!-- Search + Sort Bar -->
+<div class="flex flex-col sm:flex-row gap-3 mb-5 items-stretch sm:items-center">
+    <!-- Search -->
+    <div style="display:block;flex:1;min-width:0;">
+        <input id="sn-search" type="text" placeholder="Search by name, school, contact..."
+               style="display:block;width:100%;background:#18181b;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:.875rem;font-weight:500;padding:.7rem 1rem;border-radius:.75rem;outline:none;transition:border-color .2s;box-sizing:border-box;"
+               onfocus="this.style.borderColor='#38bdf8';"
+               onblur="this.style.borderColor='#3f3f46';">
+    </div>
+    <!-- Sort -->
+    <div class="flex rounded-xl overflow-hidden flex-shrink-0" style="border:1.5px solid #3f3f46;">
+        <button id="sort-newest" onclick="setSort('newest')" style="background:#27272a;color:#38bdf8;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;padding:.6rem 1.1rem;border:none;cursor:pointer;border-right:1px solid #3f3f46;transition:background .2s;">↓ Newest</button>
+        <button id="sort-oldest" onclick="setSort('oldest')" style="background:transparent;color:#71717a;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;padding:.6rem 1.1rem;border:none;cursor:pointer;transition:background .2s;">↑ Oldest</button>
+    </div>
+    <!-- Count -->
+    <span id="sn-count" style="font-size:10px;font-weight:700;color:#52525b;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;align-self:center;"></span>
+</div>
+
+<!-- No Results -->
+<div id="sn-no-results" class="hidden rounded-2xl p-12 text-center mb-3" style="background:#111113;border:1px solid #1f1f23;">
+    <p style="font-size:2rem;margin-bottom:8px;">🔍</p>
+    <p style="font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#52525b;">No Results Found</p>
+    <p style="font-size:.8rem;color:#3f3f46;margin-top:6px;">Try a different name or school</p>
+</div>
+
+<!-- Admission Cards -->
+<div id="admission-list" class="space-y-2">
+{% for a in admissions %}
+<div class="admission-card rounded-xl overflow-hidden group"
+     data-name="{{ a.child_name|lower }}"
+     data-school="{{ (a.school_name or '')|lower }}"
+     data-contact="{{ a.parent_mobile or '' }}"
+     data-class="{{ (a.class_grade or '')|lower }}"
+     data-date="{{ a.created_at.strftime('%Y%m%d%H%M%S') }}"
+     style="background:#111113;border:1px solid #27272a;transition:border-color .2s;"
+     onmouseover="this.style.borderColor='#52525b';"
+     onmouseout="this.style.borderColor='#27272a';">
+
+    <div class="p-4 sm:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4"
+         onclick="this.parentElement.querySelector('.details').classList.toggle('hidden');this.querySelectorAll('.chevron').forEach(el => el.classList.toggle('rotate-180'))"
+         style="cursor:pointer;">
+        <div class="flex items-center justify-between w-full md:w-auto">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <!-- Avatar -->
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                     style="font-size:1.1rem;font-weight:900;color:#38bdf8;background:rgba(14,74,92,.35);border:1px solid rgba(56,189,248,.3);">
+                    {{ a.child_name[0]|upper }}
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="sn-name" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ a.child_name }}</span>
+                    <span class="sn-sub" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        {% if a.child_age %}Age {{ a.child_age }}{% endif %}
+                        {% if a.class_grade %} · {{ a.class_grade }}{% endif %}
+                        {% if a.school_name %} · {{ a.school_name }}{% endif %}
+                    </span>
+                    <span style="font-size:10px;color:#3f3f46;display:block;margin-top:2px;">{{ a.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+                </div>
+            </div>
+            <!-- Expand chevron for mobile -->
+            <div class="md:hidden flex-shrink-0 pl-2">
+                <svg class="chevron w-5 h-5 transition-transform duration-300" style="color:#52525b;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 flex-shrink-0 w-full md:w-auto mt-2 md:mt-0 pt-2 md:pt-0 border-t border-dashed border-[#27272a] md:border-none" onclick="event.stopPropagation();">
+            <!-- Status Action / Badge (Admin Control) -->
+            {% if a.status == 'approved' %}
+            <span class="hidden sm:inline px-2.5 py-1 rounded-lg" style="background:rgba(6,78,59,.2);color:#6ee7b7;border:1px solid rgba(52,211,153,.25);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;">✅ Approved</span>
+            {% elif a.status == 'pending' %}
+            <form method="POST" action="{{ url_for('employee.skillnest_approve', admission_id=a.id) }}" class="inline" style="margin:0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" style="padding:6px 14px;border-radius:8px;background:rgba(217,119,6,.2);color:#fcd34d;border:1px solid rgba(217,119,6,.3);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='rgba(217,119,6,.4)';" onmouseout="this.style.background='rgba(217,119,6,.2)';">⏳ Approve</button>
+            </form>
+            {% endif %}
+            <!-- View button -->
+            <button type="button" onclick="openSnModal({{ a.id }})"
+                    style="padding:6px 14px;border-radius:8px;background:#1e3a4a;color:#38bdf8;border:1px solid rgba(56,189,248,.3);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:background .2s;"
+                    onmouseover="this.style.background='#0e4a5c';"
+                    onmouseout="this.style.background='#1e3a4a';">👁 View</button>
+            <!-- Edit button -->
+            <a href="{{ url_for('employee.skillnest_edit', admission_id=a.id) }}"
+               style="padding:6px 14px;border-radius:8px;background:#27272a;color:#d4d4d8;border:1px solid #52525b;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:background .2s;text-decoration:none;"
+               onmouseover="this.style.background='#3f3f46';"
+               onmouseout="this.style.background='#27272a';">✏️ Edit</a>
+            <!-- Delete button -->
+            <form method="POST" action="{{ url_for('employee.skillnest_delete', admission_id=a.id) }}" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit"
+                        style="padding:6px 10px;border-radius:8px;background:#18181b;color:#71717a;border:1px solid #3f3f46;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:background .2s;"
+                        onmouseover="this.style.background='#dc2626';this.style.color='#fff';this.style.borderColor='#dc2626';"
+                        onmouseout="this.style.background='#18181b';this.style.color='#71717a';this.style.borderColor='#3f3f46';">🗑</button>
+            </form>
+            <!-- Expand chevron -->
+            <svg class="chevron hidden md:block w-4 h-4 transition-transform duration-300" style="color:#52525b;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Expandable Details -->
+    <div class="details hidden" style="border-top:1px solid #27272a;">
+        <div class="p-5 space-y-4">
+
+            <!-- Row 1: Student Info + Parent/Guardian -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #1f1f23;">
+                    <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#f59e0b;margin-bottom:12px;">👶 Student Information</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><span class="sn-field-lbl">Name</span><span class="sn-field-val">{{ a.child_name }}</span></div>
+                        <div><span class="sn-field-lbl">Date of Birth</span><span class="sn-field-val">{{ a.dob or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Age</span><span class="sn-field-val">{{ a.child_age or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Gender</span><span class="sn-field-val">{{ a.gender or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Class/Grade</span><span class="sn-field-val">{{ a.class_grade or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">School</span><span class="sn-field-val">{{ a.school_name or '—' }}</span></div>
+                    </div>
+                </div>
+                <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #1f1f23;">
+                    <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#34d399;margin-bottom:12px;">👨‍👩‍👦 Parent / Guardian</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><span class="sn-field-lbl">Father's Name</span><span class="sn-field-val">{{ a.father_name or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Mother's Name</span><span class="sn-field-val">{{ a.mother_name or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Primary Contact</span><span class="sn-field-val sn-amber">{{ a.parent_mobile }}</span></div>
+                        <div><span class="sn-field-lbl">Alternate Contact</span><span class="sn-field-val">{{ a.alt_contact or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Email</span><span class="sn-field-val">{{ a.parent_email or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Address</span><span class="sn-field-val">{{ a.address or '—' }}</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Academic & Health + Program Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #1f1f23;">
+                    <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#60a5fa;margin-bottom:12px;">📚 Academic & Health</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><span class="sn-field-lbl">Subjects Needing Help</span><span class="sn-field-val">{{ a.subjects_help or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Homework Support</span><span class="sn-field-val">{{ a.homework_support or '—' }}</span></div>
+                        <div class="col-span-2"><span class="sn-field-lbl">Child's Strengths</span><span class="sn-field-val">{{ a.child_strengths or '—' }}</span></div>
+                        <div class="col-span-2"><span class="sn-field-lbl">Areas to Improve</span><span class="sn-field-val">{{ a.areas_to_improve or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Behaviour</span><span class="sn-field-val">{{ a.child_behavior or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Medical / Allergy</span><span class="sn-field-val">{{ a.medical_condition or '—' }}</span></div>
+                    </div>
+                </div>
+                <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #1f1f23;">
+                    <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#c084fc;margin-bottom:12px;">🕐 Program & Admin</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><span class="sn-field-lbl">Preferred Timing</span><span class="sn-field-val">{{ a.preferred_timing or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Evening Snack</span><span class="sn-field-val">{{ a.evening_snack or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Batch Assigned</span><span class="sn-field-val sn-amber">{{ a.batch_assigned or '—' }}</span></div>
+                        <div><span class="sn-field-lbl">Fees Paid</span><span class="sn-field-val sn-green">{{ a.fees_paid or '—' }}</span></div>
+                        {% if a.notes %}<div class="col-span-2"><span class="sn-field-lbl">Remarks / Notes</span><span class="sn-field-val sn-amber">{{ a.notes }}</span></div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% else %}
+<div class="rounded-2xl p-16 text-center" style="background:#111113;border:1px solid #1f1f23;">
+    <p style="font-size:3rem;margin-bottom:16px;">🎓</p>
+    <p style="font-size:1.25rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#52525b;">No Admissions Yet</p>
+    <p style="font-size:.875rem;color:#3f3f46;margin-top:8px;">Use the <a href="{{ url_for('employee.skillnest_add_admission_page') }}" style="color:#34d399;font-weight:700;text-decoration:none;">Add Admission</a> page or send parents to <span style="color:#f59e0b;font-weight:700;">/skillnest/apply</span></p>
+</div>
+{% endfor %}
+</div>
+
+<!-- No Results -->
+<div id="no-results" class="hidden rounded-2xl p-12 text-center mt-3" style="background:#111113;border:1px solid #1f1f23;">
+    <p style="font-size:1.25rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#52525b;">No Results</p>
+</div>
+
+</div>
+
+<script>
+const list = document.getElementById('admission-list');
+const noResults = document.getElementById('sn-no-results');
+const countEl = document.getElementById('sn-count');
+let currentSort = 'newest';
+
+function getCards() { return [...list.querySelectorAll('.admission-card')]; }
+
+function applyAll() {
+    const q = document.getElementById('sn-search').value.trim().toLowerCase();
+    let cards = getCards();
+
+    // Filter by search
+    cards.forEach(c => {
+        const name = (c.dataset.name || '');
+        const school = (c.dataset.school || '');
+        const contact = (c.dataset.contact || '');
+        const cls = (c.dataset.class || '');
+        const match = !q || name.includes(q) || school.includes(q) || contact.includes(q) || cls.includes(q);
+        c.style.display = match ? '' : 'none';
+    });
+
+    // Sort visible cards
+    const visible = cards.filter(c => c.style.display !== 'none');
+    visible.sort((a, b) => {
+        const da = a.dataset.date || '';
+        const db = b.dataset.date || '';
+        return currentSort === 'newest' ? db.localeCompare(da) : da.localeCompare(db);
+    });
+    visible.forEach(c => list.appendChild(c));
+
+    // Count + no-results
+    countEl.textContent = visible.length + ' of ' + cards.length;
+    noResults.classList.toggle('hidden', visible.length > 0);
+}
+
+function setSort(s) {
+    currentSort = s;
+    const btnNew = document.getElementById('sort-newest');
+    const btnOld = document.getElementById('sort-oldest');
+    if (s === 'newest') {
+        btnNew.style.background = '#27272a'; btnNew.style.color = '#38bdf8';
+        btnOld.style.background = 'transparent'; btnOld.style.color = '#71717a';
+    } else {
+        btnOld.style.background = '#27272a'; btnOld.style.color = '#38bdf8';
+        btnNew.style.background = 'transparent'; btnNew.style.color = '#71717a';
+    }
+    applyAll();
+}
+
+document.getElementById('sn-search').addEventListener('input', applyAll);
+applyAll();
+
+// ── Modal data map (Jinja2 rendered) ──────────────────────────────
+const snData = {
+{% for a in admissions %}
+  {{ a.id }}: {
+    name:       {{ a.child_name | tojson }},
+    dob:        {{ (a.dob or '—') | tojson }},
+    age:        {{ (a.child_age|string if a.child_age else '—') | tojson }},
+    gender:     {{ (a.gender or '—') | tojson }},
+    grade:      {{ (a.class_grade or '—') | tojson }},
+    school:     {{ (a.school_name or '—') | tojson }},
+    father:     {{ (a.father_name or '—') | tojson }},
+    mother:     {{ (a.mother_name or '—') | tojson }},
+    mobile:     {{ (a.parent_mobile or '—') | tojson }},
+    alt:        {{ (a.alt_contact or '—') | tojson }},
+    email:      {{ (a.parent_email or '—') | tojson }},
+    address:    {{ (a.address or '—') | tojson }},
+    subjects:   {{ (a.subjects_help or '—') | tojson }},
+    hw:         {{ (a.homework_support or '—') | tojson }},
+    strengths:  {{ (a.child_strengths or '—') | tojson }},
+    improve:    {{ (a.areas_to_improve or '—') | tojson }},
+    behaviour:  {{ (a.child_behavior or '—') | tojson }},
+    medical:    {{ (a.medical_condition or '—') | tojson }},
+    payment:    {{ (a.payment_status or '—') | tojson }},
+    batch:      {{ (a.batch_assigned or '—') | tojson }},
+    fees:       {{ (a.fees_paid or '—') | tojson }},
+    notes:      {{ (a.notes or '') | tojson }},
+    date:       {{ a.created_at.strftime('%d %b %Y, %H:%M') | tojson }}
+  }{% if not loop.last %},{% endif %}
+{% endfor %}
+};
+
+function row(lbl, val) {
+  return `<div><span style="display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#52525b;margin-bottom:3px;">${lbl}</span><span style="font-size:.8rem;font-weight:600;color:#e4e4e7;">${val}</span></div>`;
+}
+
+function section(title, color, items) {
+  return `<div style="background:#09090b;border:1px solid #1f1f23;border-radius:12px;padding:16px;">
+    <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:${color};margin-bottom:12px;">${title}</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">${items.map(([l,v])=>row(l,v)).join('')}</div>
+  </div>`;
+}
+
+function openSnModal(id) {
+  const d = snData[id]; if (!d) return;
+  const overlay = document.getElementById('sn-modal');
+  const body    = document.getElementById('sn-modal-body');
+  const title   = document.getElementById('sn-modal-title');
+  document.getElementById('sn-modal-date').textContent = d.date;
+  title.textContent = d.name;
+  body.innerHTML =
+    section('👶 Student Information', '#f59e0b', [
+      ['Name', d.name], ['Date of Birth', d.dob],
+      ['Age', d.age],   ['Gender', d.gender],
+      ['Class / Grade', d.grade], ['School', d.school]
+    ]) +
+    section('👨‍👩‍👦 Parent / Guardian', '#34d399', [
+      ["Father's Name", d.father], ["Mother's Name", d.mother],
+      ['Primary Contact', d.mobile], ['Alternate Contact', d.alt],
+      ['Email', d.email], ['Address', d.address]
+    ]) +
+    section('📚 Academic & Health', '#60a5fa', [
+      ['Subjects Needing Help', d.subjects], ['Homework Support', d.hw],
+      ['Child\'s Strengths', d.strengths], ['Areas to Improve', d.improve],
+      ['Behaviour', d.behaviour], ['Medical / Allergy', d.medical]
+    ]) +
+    section('🕐 Program & Admin', '#c084fc', [
+      ['Payment Status', d.payment], ['Batch Assigned', d.batch],
+      ['Fees Paid', d.fees], ['Remarks', d.notes || '—']
+    ]);
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSnModal() {
+  document.getElementById('sn-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('sn-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeSnModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSnModal();
+});
+</script>
+
+<!-- ── View Modal ────────────────────────────────────────────────── -->
+<div id="sn-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;"
+     onclick="if(event.target===this)closeSnModal()">
+  <div style="width:100%;max-width:700px;background:#111113;border:1px solid #27272a;border-radius:20px;overflow:hidden;margin:auto;">
+    <!-- Modal Header -->
+    <div style="padding:20px 24px;background:#09090b;border-bottom:1px solid #1f1f23;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.3em;color:#38bdf8;margin-bottom:4px;">Admission Details</p>
+        <h2 id="sn-modal-title" style="font-size:1.25rem;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:.04em;margin:0;"></h2>
+        <p id="sn-modal-date" style="font-size:10px;color:#52525b;margin-top:4px;"></p>
+      </div>
+      <button onclick="closeSnModal()" style="width:36px;height:36px;border-radius:50%;background:#1f1f23;border:1px solid #3f3f46;color:#a1a1aa;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;"
+              onmouseover="this.style.background='#dc2626';this.style.color='#fff';"
+              onmouseout="this.style.background='#1f1f23';this.style.color='#a1a1aa';">✕</button>
+    </div>
+    <!-- Modal Body -->
+    <div id="sn-modal-body" style="padding:20px;display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+</div>
+
+{% endblock %}

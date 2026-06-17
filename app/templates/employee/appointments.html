@@ -1,0 +1,138 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}Appointments{% endblock %}
+{% block page_title %}Appointments{% endblock %}
+{% block page_subtitle %}{{ appointments|length }} Total{% endblock %}
+
+{% block page_content %}
+
+<style>
+.hub-card {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 28px;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+}
+.hub-card:hover { transform: translateY(-4px); }
+.hub-card .card-overlay {
+    position: absolute; inset: 0; opacity: 0; transition: opacity .3s;
+}
+.hub-card:hover .card-overlay { opacity: 1; }
+</style>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+    <!-- ── BOOKING STATUS ─────────────────────── -->
+    {% if emp.has_permission('appt_booking_status') %}
+    <a href="{{ url_for('employee.booking_status_page') }}" class="hub-card"
+       style="background:linear-gradient(145deg,#0d2218 0%,#071510 100%);border:1.5px solid rgba(52,211,153,.25);box-shadow:0 4px 24px rgba(52,211,153,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(52,211,153,.12) 0%,transparent 70%);"></div>
+
+        {% if booking_closed == '1' %}
+        <span style="position:absolute;top:16px;right:16px;padding:4px 10px;border-radius:999px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.3);">⛔ Closed</span>
+        {% else %}
+        <span style="position:absolute;top:16px;right:16px;padding:4px 10px;border-radius:999px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;background:rgba(52,211,153,.18);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);">✅ Open</span>
+        {% endif %}
+
+        <div style="position:relative;z-index:10;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(52,211,153,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+                <svg style="width:26px;height:26px;" fill="none" stroke="#34d399" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35em;color:#34d399;display:block;margin-bottom:6px;">Booking Status</span>
+            <span style="font-size:18px;font-weight:900;color:#ffffff;display:block;margin-bottom:6px;">Open / Close Bookings</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.5);display:block;margin-bottom:20px;line-height:1.5;">Set closure message · add reopen date · control public access</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:8px 14px;border-radius:10px;background:rgba(52,211,153,.15);color:#34d399;">
+                Manage Status →
+            </span>
+        </div>
+    </a>
+    {% endif %}
+
+    <!-- ── PRICING MANAGEMENT ─────────────────── -->
+    {% if emp.has_permission('appt_pricing') %}
+    <a href="{{ url_for('employee.pricing_page') }}" class="hub-card"
+       style="background:linear-gradient(145deg,#201800 0%,#140f00 100%);border:1.5px solid rgba(251,191,36,.25);box-shadow:0 4px 24px rgba(251,191,36,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(251,191,36,.12) 0%,transparent 70%);"></div>
+
+        <div style="position:relative;z-index:10;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(251,191,36,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+                <svg style="width:26px;height:26px;" fill="none" stroke="#fbbf24" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35em;color:#fbbf24;display:block;margin-bottom:6px;">Pricing Management</span>
+            <span style="font-size:18px;font-weight:900;color:#ffffff;display:block;margin-bottom:6px;">Session &amp; Package Prices</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.5);display:block;margin-bottom:20px;line-height:1.5;">Set regular &amp; offer prices · add discount · set expiry</span>
+            {% if counselling_fee or package_price %}
+            <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">
+                {% if counselling_fee %}
+                <div>
+                    <p style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin:0 0 3px;">Session</p>
+                    <p style="font-size:20px;font-weight:900;color:#fbbf24;line-height:1;margin:0;">₹{{ offer_price or counselling_fee }}</p>
+                    {% if offer_price %}<p style="font-size:9px;color:rgba(255,255,255,.3);text-decoration:line-through;margin:0;">₹{{ counselling_fee }}</p>{% endif %}
+                </div>
+                {% endif %}
+                {% if counselling_fee and package_price %}<div style="width:1px;height:32px;background:rgba(255,255,255,.1);"></div>{% endif %}
+                {% if package_price %}
+                <div>
+                    <p style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin:0 0 3px;">Package</p>
+                    <p style="font-size:20px;font-weight:900;color:#fbbf24;line-height:1;margin:0;">₹{{ package_offer_price or package_price }}</p>
+                    {% if package_offer_price %}<p style="font-size:9px;color:rgba(255,255,255,.3);text-decoration:line-through;margin:0;">₹{{ package_price }}</p>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:8px 14px;border-radius:10px;background:rgba(251,191,36,.15);color:#fbbf24;">
+                Edit Pricing →
+            </span>
+        </div>
+    </a>
+    {% endif %}
+
+    <!-- ── APPOINTMENT HISTORY ────────────────── -->
+    {% if emp.has_permission('appt_history') %}
+    {% set paid_count = appointments | selectattr('payment_status', 'in', ['Paid','Success']) | list | length %}
+    {% set pending_count = appointments|length - paid_count %}
+
+    <a href="{{ url_for('employee.appointment_history_page') }}" class="hub-card"
+       style="background:linear-gradient(145deg,#071525 0%,#040d18 100%);border:1.5px solid rgba(96,165,250,.25);box-shadow:0 4px 24px rgba(96,165,250,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(96,165,250,.12) 0%,transparent 70%);"></div>
+
+        <div style="position:relative;z-index:10;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(96,165,250,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+                <svg style="width:26px;height:26px;" fill="none" stroke="#60a5fa" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+            <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35em;color:#60a5fa;display:block;margin-bottom:6px;">Appointment History</span>
+            <span style="font-size:18px;font-weight:900;color:#ffffff;display:block;margin-bottom:6px;">All Booking Records</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.5);display:block;margin-bottom:20px;line-height:1.5;">View client details · mark as paid · track booking status</span>
+            <div style="display:flex;align-items:center;gap:24px;margin-bottom:20px;">
+                <div>
+                    <span style="font-size:32px;font-weight:900;color:#60a5fa;display:block;line-height:1;">{{ appointments|length }}</span>
+                    <span style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);display:block;margin-top:3px;">Total</span>
+                </div>
+                <div style="width:1px;height:36px;background:rgba(255,255,255,.08);"></div>
+                <div>
+                    <span style="font-size:24px;font-weight:900;color:#34d399;display:block;line-height:1;">{{ paid_count }}</span>
+                    <span style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);display:block;margin-top:3px;">Paid</span>
+                </div>
+                <div style="width:1px;height:36px;background:rgba(255,255,255,.08);"></div>
+                <div>
+                    <span style="font-size:24px;font-weight:900;color:#fbbf24;display:block;line-height:1;">{{ pending_count }}</span>
+                    <span style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);display:block;margin-top:3px;">Pending</span>
+                </div>
+            </div>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:8px 14px;border-radius:10px;background:rgba(96,165,250,.15);color:#60a5fa;">
+                View Records →
+            </span>
+        </div>
+    </a>
+    {% endif %}
+
+</div>
+{% endblock %}

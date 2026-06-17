@@ -1,0 +1,68 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Overview{% endblock %}
+{% block page_subtitle %}Welcome back, {{ session.admin_username }}{% endblock %}
+
+{% block page_content %}
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-600 transition-colors">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-widest text-zinc-500">Active Clients</p>
+                <p class="text-4xl font-black mt-2">{{ clients|length }}</p>
+            </div>
+            <span class="text-3xl opacity-30">👤</span>
+        </div>
+        <a href="{{ url_for('admin.assessments_page') }}" class="mt-4 inline-block text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-school-gold transition-colors">Manage →</a>
+    </div>
+
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-600 transition-colors">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-widest text-zinc-500">Appointments</p>
+                <p class="text-4xl font-black mt-2">{{ appointments|length }}</p>
+            </div>
+            <span class="text-3xl opacity-30">📅</span>
+        </div>
+        <a href="{{ url_for('admin.appointments_page') }}" class="mt-4 inline-block text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-school-gold transition-colors">View All →</a>
+    </div>
+
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-600 transition-colors">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-widest text-zinc-500">Assessments</p>
+                <p class="text-4xl font-black mt-2">{{ assessments|length }}</p>
+            </div>
+            <span class="text-3xl opacity-30">🧠</span>
+        </div>
+        <a href="{{ url_for('admin.assessments_page') }}" class="mt-4 inline-block text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-school-gold transition-colors">View All →</a>
+    </div>
+</div>
+
+
+<!-- Recent Assessments -->
+<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+    <div class="p-6 border-b border-zinc-800">
+        <h3 class="text-lg font-bold uppercase">Recent Assessments</h3>
+    </div>
+    <div class="divide-y divide-zinc-800">
+        {% for assessment in assessments[:5] %}
+        <div class="px-6 py-4 flex justify-between items-center hover:bg-school-gold/15 transition-colors">
+            <div>
+                <p class="text-sm font-bold">{{ assessment.personal_info.full_name or assessment.client_username }}</p>
+                <p class="text-xs text-zinc-500">{{ assessment.personal_info.class_grade or '—' }} · {{ assessment.created_at.strftime('%d %b %Y') }}</p>
+            </div>
+            <a href="{{ url_for('admin.assessment_pdf', assessment_id=assessment.id) }}" class="text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-school-gold transition-colors">View →</a>
+        </div>
+        {% else %}
+        <p class="px-6 py-8 text-sm text-zinc-500 text-center italic">No assessments yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Assessments{% endblock %}
+{% block page_title %}Assessments{% endblock %}
+{% block page_subtitle %}Career Intelligence Dashboard{% endblock %}
+
+{% block page_content %}
+
+{# ── Stats ── #}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
+    <div class="bg-white text-black rounded-2xl p-5">
+        <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-500">Total</p>
+        <p class="text-5xl font-nike leading-none mt-2">{{ assessments|length }}</p>
+        <p class="text-[9px] uppercase tracking-widest text-zinc-500 mt-1">Assessments</p>
+    </div>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+        <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-600">AI Done</p>
+        <p class="text-5xl font-nike leading-none mt-2 text-emerald-400">{{ all_ai_done|length }}</p>
+        <p class="text-[9px] uppercase tracking-widest text-zinc-700 mt-1">Analyzed</p>
+    </div>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+        <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-600">Pending AI</p>
+        <p class="text-5xl font-nike leading-none mt-2 text-indigo-400">{{ all_pending|length }}</p>
+        <p class="text-[9px] uppercase tracking-widest text-zinc-700 mt-1">Need Analysis</p>
+    </div>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+        <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-600">In Progress</p>
+        <p class="text-5xl font-nike leading-none mt-2 text-amber-400">{{ all_progress|length }}</p>
+        <p class="text-[9px] uppercase tracking-widest text-zinc-700 mt-1">Filling Form</p>
+    </div>
+</div>
+
+{# ── New Session ── #}
+<div class="mb-10 border border-zinc-800 rounded-2xl overflow-hidden">
+    <div class="p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <div>
+            <p class="text-[9px] font-black uppercase tracking-[0.35em] text-zinc-600 mb-1">Quick Action</p>
+            <h3 class="text-2xl font-nike uppercase tracking-tighter text-zinc-900">New Assessment Session</h3>
+            <p class="text-xs text-zinc-600 mt-1">One-time credentials. Expires in <strong class="text-amber-400">3 hours</strong>.</p>
+        </div>
+        <form action="{{ url_for('admin.create_client') }}" method="POST" class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="flex-1">
+                <label class="block text-[9px] font-black uppercase tracking-[0.25em] text-blue-600 mb-1.5">Student Name</label>
+                <input type="text" name="client_name" required placeholder="e.g. Rohan Sharma"
+                    style="background-color:#0C2547;color:#fff;border-color:#2D3F5C" class="w-full px-4 py-3 rounded-xl text-sm font-semibold placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-all">
+            </div>
+            <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-zinc-900 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-amber-400 hover:text-black transition-all whitespace-nowrap">Generate ⚡</button>
+        </form>
+    </div>
+    {% if clients %}
+    <div class="border-t border-zinc-800 px-6 py-4 bg-zinc-950/40">
+        <p class="text-[9px] font-black uppercase tracking-[0.3em] text-amber-400 mb-3">{{ clients|length }} Active Session{{ 's' if clients|length > 1 }}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+            {% for client in clients %}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-black text-white">{{ client.display_name or client.username }}</p>
+                    <p class="font-mono text-[10px] text-zinc-500 mt-0.5">{{ client.username }} / {{ client.temp_password_hash or '—' }}</p>
+                </div>
+                <button
+                    data-user="{{ client.username }}"
+                    data-pw="{{ client.temp_password_hash or '' }}"
+                    onclick="navigator.clipboard.writeText(this.dataset.user+'\n'+this.dataset.pw).then(()=>alert('Copied!'))"
+                    class="px-3 py-1.5 bg-zinc-800 border border-zinc-700 text-zinc-400 text-[9px] font-black uppercase rounded-lg hover:bg-amber-400 hover:text-black hover:border-amber-400 transition-all">Copy</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{# ══════════════════════════════════════════
+   THREE NAVIGATION BUTTONS — full width, Nike style
+══════════════════════════════════════════ #}
+<div class="space-y-4">
+
+    {# 1. AI Analysis Complete #}
+    <a href="{{ url_for('admin.assessments_ai_done') }}"
+       class="group flex items-center justify-between p-7 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-emerald-600 hover:bg-emerald-950/10 transition-all duration-200 no-underline">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center text-2xl sm:text-3xl group-hover:scale-110 transition-transform flex-shrink-0">🧠</div>
+            <div class="min-w-0">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-emerald-700 mb-0.5">Analysed</p>
+                <h3 class="text-xl sm:text-2xl font-nike uppercase tracking-tighter text-white group-hover:text-emerald-400 transition-colors leading-tight">AI Analysis Complete</h3>
+                <p class="text-xs text-zinc-600 mt-1 font-bold hidden sm:block">View all analyzed assessments, re-analyze, or download PDF</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <span class="text-4xl sm:text-6xl font-nike text-emerald-400">{{ all_ai_done|length }}</span>
+            <svg class="w-5 h-5 text-zinc-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    {# 2. Pending AI #}
+    <a href="{{ url_for('admin.assessments_pending') }}"
+       class="group flex items-center justify-between p-7 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-indigo-600 hover:bg-indigo-950/10 transition-all duration-200 no-underline">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-2xl sm:text-3xl group-hover:scale-110 transition-transform flex-shrink-0">⏳</div>
+            <div class="min-w-0">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-indigo-700 mb-0.5">Action Required</p>
+                <h3 class="text-xl sm:text-2xl font-nike uppercase tracking-tighter text-white group-hover:text-indigo-400 transition-colors leading-tight">Pending AI Analysis</h3>
+                <p class="text-xs text-zinc-600 mt-1 font-bold hidden sm:block">Students who submitted — click Analyse to generate AI report</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <span class="text-4xl sm:text-6xl font-nike text-indigo-400">{{ all_pending|length }}</span>
+            <svg class="w-5 h-5 text-zinc-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    {# 3. In Progress #}
+    <a href="{{ url_for('admin.assessments_in_progress') }}"
+       class="group flex items-center justify-between p-7 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-amber-600 hover:bg-amber-950/10 transition-all duration-200 no-underline">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-amber-950/60 border border-amber-900/40 flex items-center justify-center text-2xl sm:text-3xl group-hover:scale-110 transition-transform flex-shrink-0">🔄</div>
+            <div class="min-w-0">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-amber-700 mb-0.5">Student Filling</p>
+                <h3 class="text-xl sm:text-2xl font-nike uppercase tracking-tighter text-white group-hover:text-amber-400 transition-colors leading-tight">In Progress</h3>
+                <p class="text-xs text-zinc-600 mt-1 font-bold hidden sm:block">Active sessions — copy credentials to share with students</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <span class="text-4xl sm:text-6xl font-nike text-amber-400">{{ all_progress|length }}</span>
+            <svg class="w-5 h-5 text-zinc-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    {# 4. Upload Paper #}
+    <a href="{{ url_for('admin.upload_assessment') }}"
+       class="group flex items-center justify-between p-7 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-sky-600 hover:bg-sky-950/10 transition-all duration-200 no-underline">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-sky-950/60 border border-sky-900/40 flex items-center justify-center text-2xl sm:text-3xl group-hover:scale-110 transition-transform flex-shrink-0">📄</div>
+            <div class="min-w-0">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-sky-700 mb-0.5">Scan &amp; Digitize</p>
+                <h3 class="text-xl sm:text-2xl font-nike uppercase tracking-tighter text-white group-hover:text-sky-400 transition-colors leading-tight">Upload Paper</h3>
+                <p class="text-xs text-zinc-600 mt-1 font-bold hidden sm:block">Photo-scan a handwritten assessment form — AI extracts and analyzes it</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <svg class="w-5 h-5 text-zinc-600 group-hover:text-sky-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    {# 5. Manual Entry #}
+    <a href="{{ url_for('admin.manual_assessment') }}"
+       class="group flex items-center justify-between p-7 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-violet-600 hover:bg-violet-950/10 transition-all duration-200 no-underline">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-violet-950/60 border border-violet-900/40 flex items-center justify-center text-2xl sm:text-3xl group-hover:scale-110 transition-transform flex-shrink-0">✍️</div>
+            <div class="min-w-0">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-violet-700 mb-0.5">Admin Input</p>
+                <h3 class="text-xl sm:text-2xl font-nike uppercase tracking-tighter text-white group-hover:text-violet-400 transition-colors leading-tight">Manual Entry</h3>
+                <p class="text-xs text-zinc-600 mt-1 font-bold hidden sm:block">Type in student data directly — ideal when AI quota is exhausted or scanning is unavailable</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <svg class="w-5 h-5 text-zinc-600 group-hover:text-violet-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+    {# 6. Trash Bin #}
+    <a href="{{ url_for('admin.assessments_trash') }}"
+       class="group flex items-center justify-between p-7 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-red-600 hover:bg-red-950/10 transition-all duration-200 no-underline">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-red-950/60 border border-red-900/40 flex items-center justify-center text-2xl sm:text-3xl group-hover:scale-110 transition-transform flex-shrink-0">🗑️</div>
+            <div class="min-w-0">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-red-700 mb-0.5">Deleted Items</p>
+                <h3 class="text-xl sm:text-2xl font-nike uppercase tracking-tighter text-white group-hover:text-red-400 transition-colors leading-tight">Trash Bin</h3>
+                <p class="text-xs text-zinc-600 mt-1 font-bold hidden sm:block">Restore deleted assessments or empty trash permanently</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <span class="text-4xl sm:text-6xl font-nike text-red-500">{{ all_trash }}</span>
+            <svg class="w-5 h-5 text-zinc-600 group-hover:text-red-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+
+</div>
+
+{% endblock %}

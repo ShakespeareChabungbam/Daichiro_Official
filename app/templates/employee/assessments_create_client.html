@@ -1,0 +1,57 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}Client Password Generator{% endblock %}
+{% block page_title %}Assessments{% endblock %}
+{% block page_subtitle %}<p class="emp-header-subtitle" style="margin-top:2px;">Generate Client Login Credentials</p>{% endblock %}
+{% block page_content %}
+<div class="space-y-6">
+
+    <!-- Sub-nav -->
+    <div class="flex gap-3 text-xs font-bold uppercase tracking-widest">
+        {% if emp.has_permission('assessments_view') %}<a href="{{ url_for('employee.assessments_view') }}" class="px-4 py-2 rounded-lg bg-zinc-800 text-zinc-600 hover:text-zinc-900 transition-colors">View Assessments</a>{% endif %}
+        {% if emp.has_permission('assessments_create_client') %}<a href="{{ url_for('employee.assessments_create_client') }}" class="px-4 py-2 rounded-lg bg-amber-500 text-black transition-colors">Client Password Generator</a>{% endif %}
+    </div>
+
+    <!-- Create Client Form -->
+    <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl p-6 max-w-md">
+        <h3 class="text-xs font-black uppercase tracking-widest text-amber-400 mb-4">🔑 Generate Client Credentials</h3>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="flex gap-4 max-w-xl">
+                <input type="text" name="name" required placeholder="Student Name (e.g. John Doe)"
+                       class="flex-1 bg-zinc-950 border border-zinc-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-zinc-400 focus:outline-none">
+                <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2.5 rounded-lg font-black text-sm uppercase tracking-widest transition-colors flex items-center gap-2">
+                    Generate
+                </button>
+            </div>
+        </form>
+        <p class="text-[10px] text-zinc-600 mt-2">Username will be <span class="font-mono">firstname.lastname</span> — password shown once</p>
+    </div>
+
+    <!-- Clients Table -->
+    <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl overflow-hidden">
+        <div class="px-5 py-3 border-b border-zinc-200">
+            <h3 class="text-xs font-black uppercase tracking-widest text-zinc-500">All Clients ({{ clients|length }})</h3>
+        </div>
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-zinc-800 text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                    <th class="text-left px-5 py-3">Name</th>
+                    <th class="text-left px-5 py-3">Username</th>
+                    <th class="text-left px-5 py-3">Registered</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-800">
+                {% for c in clients %}
+                <tr class="hover:bg-zinc-800/30 transition-colors">
+                    <td class="px-5 py-3 font-semibold text-zinc-900">{{ c.display_name or c.username }}</td>
+                    <td class="px-5 py-3 font-mono text-zinc-600">{{ c.username }}</td>
+                    <td class="px-5 py-3 text-zinc-600">{{ c.created_at.strftime('%d %b %Y') if c.created_at else '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="px-5 py-12 text-center text-zinc-600">No clients created yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

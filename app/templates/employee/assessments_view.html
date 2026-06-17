@@ -1,0 +1,45 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}Assessments{% endblock %}
+{% block page_title %}Assessments{% endblock %}
+{% block page_subtitle %}<p class="emp-header-subtitle" style="margin-top:2px;">View Student Assessments</p>{% endblock %}
+{% block page_content %}
+<div class="space-y-6">
+
+    <!-- Sub-nav -->
+    <div class="flex gap-3 text-xs font-bold uppercase tracking-widest">
+        {% if emp.has_permission('assessments_view') %}<a href="{{ url_for('employee.assessments_view') }}" class="px-4 py-2 rounded-lg {% if request.endpoint == 'employee.assessments_view' %}bg-amber-500 text-black{% else %}bg-zinc-800 text-zinc-600 hover:text-zinc-900{% endif %} transition-colors">View Assessments</a>{% endif %}
+        {% if emp.has_permission('assessments_create_client') %}<a href="{{ url_for('employee.assessments_create_client') }}" class="px-4 py-2 rounded-lg {% if request.endpoint == 'employee.assessments_create_client' %}bg-amber-500 text-black{% else %}bg-zinc-800 text-zinc-600 hover:text-zinc-900{% endif %} transition-colors">Client Password Generator</a>{% endif %}
+    </div>
+
+    <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl overflow-hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-zinc-800 text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                    <th class="text-left px-5 py-3">Name</th>
+                    <th class="text-left px-5 py-3">Status</th>
+                    <th class="text-left px-5 py-3">Score</th>
+                    <th class="text-left px-5 py-3">Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-800">
+                {% for a in assessments %}
+                <tr class="hover:bg-zinc-800/30 transition-colors">
+                    <td class="px-5 py-3 font-semibold text-zinc-900">{{ a.student_name or '—' }}</td>
+                    <td class="px-5 py-3">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
+                            {% if a.ai_complete %}bg-emerald-900/40 text-emerald-400 border border-emerald-700
+                            {% else %}bg-amber-900/40 text-amber-400 border border-amber-700{% endif %}">
+                            {{ 'Complete' if a.ai_complete else 'In Progress' }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-3 text-zinc-600">{{ a.ai_score or '—' }}</td>
+                    <td class="px-5 py-3 text-zinc-600">{{ a.created_at.strftime('%d %b %Y') if a.created_at else '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="px-5 py-12 text-center text-zinc-600">No assessments yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

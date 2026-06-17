@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Submitted | SkillNest{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-purple-900 flex items-center justify-center px-4 relative overflow-hidden">
+    <!-- Background shapes -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-20 -left-20 w-64 h-64 bg-yellow-400 rounded-full mix-blend-multiply filter blur-2xl opacity-30"></div>
+        <div class="absolute bottom-20 -right-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-2xl opacity-30"></div>
+    </div>
+
+    <div class="relative z-10 max-w-lg w-full text-center">
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-12">
+            <!-- Success Icon -->
+            <div class="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+
+            <h1 class="font-nike text-3xl md:text-4xl text-white uppercase tracking-tight mb-3">Application Received!</h1>
+            <p class="text-blue-200 text-lg mb-2">Thank you, <strong class="text-yellow-400">{{ child_name }}</strong>'s parent!</p>
+            <p class="text-blue-300/60 text-sm mb-8">Your application for SkillNest After-School Club has been submitted. Our team will review it and contact you soon.</p>
+
+            <div class="bg-white/5 rounded-xl border border-white/10 p-5 mb-8 text-left">
+                <p class="text-[10px] font-black uppercase tracking-widest text-yellow-400 mb-3">What's Next?</p>
+                <ul class="space-y-2">
+                    <li class="flex items-start gap-2 text-sm text-blue-100">
+                        <span class="text-emerald-400 mt-0.5">✓</span> We will review your application
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-blue-100">
+                        <span class="text-emerald-400 mt-0.5">✓</span> You will receive a call/message for confirmation
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-blue-100">
+                        <span class="text-emerald-400 mt-0.5">✓</span> Complete admission fee payment upon approval
+                    </li>
+                </ul>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="{{ url_for('main.skillnest') }}" class="px-8 py-3 bg-white text-indigo-900 font-bold uppercase tracking-widest text-sm rounded-full hover:bg-yellow-400 transition-all duration-200 no-underline">
+                    Back to SkillNest
+                </a>
+                <a href="{{ url_for('main.index') }}" class="px-8 py-3 bg-white/10 border border-white/20 text-white font-bold uppercase tracking-widest text-sm rounded-full hover:bg-white/20 transition-all duration-200 no-underline">
+                    Home
+                </a>
+            </div>
+        </div>
+
+        <p class="mt-6 text-[10px] font-bold uppercase tracking-widest text-blue-300/40">Daichiro Professional Skills Academy</p>
+    </div>
+</section>
+{% endblock %}

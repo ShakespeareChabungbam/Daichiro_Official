@@ -1,0 +1,492 @@
+{% extends "base.html" %}
+
+{% block title %}Daichiro Professional Skills Academy — Student Counselling & Career Guidance{% endblock %}
+
+{% block content %}
+
+{% set dir_img = url_for('static', filename='img/DirectorPhoto.jpg') %}
+
+<style>
+/* ── Hero animations ──────────────────── */
+@keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.h-el { opacity: 0; animation: heroFadeUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+/* ── Scroll animations ───────────────── */
+[data-sa] { opacity: 0; will-change: transform, opacity; }
+.sa-up  { transform: translateY(44px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+.sa-fade{ transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1); }
+.sa-left{ transform: translateX(-44px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+.sa-right{ transform: translateX(44px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+.sa-vis { opacity: 1; transform: translate(0); }
+.sa-up.sa-vis   { opacity: 1; transform: translateY(0); }
+.sa-left.sa-vis { opacity: 1; transform: translateX(0); }
+.sa-right.sa-vis{ opacity: 1; transform: translateX(0); }
+
+/* ── Gold marquee ────────────────────── */
+@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ── Director image float ────────────── */
+@keyframes gentleFloat {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-10px); }
+}
+
+/* ── Glowing dot ─────────────────────── */
+@keyframes glowPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.5); }
+    50%     { box-shadow: 0 0 0 14px rgba(201,168,76,0); }
+}
+.glow-dot { animation: glowPulse 2.2s ease-in-out infinite; }
+
+/* ── Card hover ──────────────────────── */
+.service-card {
+    transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+    overflow: hidden;
+}
+.service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 3px;
+    background: linear-gradient(90deg, #C9A84C, #f59e0b);
+    transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.service-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(15,45,94,0.16); }
+.service-card:hover::before { width: 100%; }
+
+/* ── Stat counter ────────────────────── */
+.counter-num {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 3.5rem;
+    color: #0F2D5E;
+    line-height: 1;
+}
+
+/* ── Testimonial ─────────────────────── */
+.testimonial-card {
+    position: relative;
+    background: white;
+    border: 1px solid #E8ECF0;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 4px 24px rgba(15,45,94,0.07);
+    transition: all 0.3s ease;
+}
+.testimonial-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(15,45,94,0.14); }
+</style>
+
+<!-- ══════════════════════════════════════════
+     HERO — Split Layout with Director Photo
+══════════════════════════════════════════ -->
+<section id="hero" class="relative min-h-screen flex items-center overflow-hidden bg-school-navy">
+    <!-- Layered background -->
+    <div class="absolute inset-0"
+         style="background: linear-gradient(135deg, #071a3e 0%, #0F2D5E 55%, #0d2451 100%);"></div>
+    <div class="absolute inset-0 opacity-[0.035]"
+         style="background-image: radial-gradient(circle, #C9A84C 1px, transparent 1px); background-size: 36px 36px;"></div>
+    <!-- Radial gold glow — left -->
+    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.08]"
+         style="background: radial-gradient(circle, #C9A84C, transparent 70%); pointer-events:none;"></div>
+    <!-- Radial gold ring top right -->
+    <div class="absolute -right-32 -top-32 w-[500px] h-[500px] rounded-full border border-school-gold/15 opacity-60 pointer-events-none"></div>
+    <div class="absolute -right-16 -top-16 w-[320px] h-[320px] rounded-full border border-school-gold/20 opacity-40 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-10 pb-20 md:pt-16 md:pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            <!-- LEFT: Copy -->
+            <div>
+                <!-- Badge -->
+                <div class="h-el flex flex-wrap items-center gap-3 mb-8" style="animation-delay:0.05s">
+                    <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-school-gold/30 bg-school-gold/10">
+                        <span class="w-2 h-2 rounded-full bg-school-gold glow-dot"></span>
+                        <span class="text-school-gold text-xs font-bold uppercase tracking-[0.3em]">Career Counselling</span>
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-red-500/20 border border-red-400/30">
+                        <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+                        <span class="text-red-300 text-[10px] font-black uppercase tracking-[0.2em]">SkillNest Admissions Open</span>
+                    </div>
+                </div>
+
+                <h1 class="h-el font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[3.9rem] xl:text-7xl font-black text-white leading-[1.05] mb-6" style="animation-delay:0.15s">
+                    Guiding Every<br/>
+                    Child Toward<br/>
+                    <span class="text-school-gold">Their Best Life.</span>
+                </h1>
+
+                <p class="h-el text-white/60 text-base sm:text-lg leading-relaxed mb-3 max-w-lg" style="animation-delay:0.28s">
+                    Professional student counselling and parent guidance — because growing minds need <strong class="text-white/85">clarity, not pressure.</strong>
+                </p>
+                <p class="h-el text-white/40 text-sm leading-relaxed max-w-md mb-10" style="animation-delay:0.38s">
+                    Daichiro Professional Skills Academy is a holistic development centre committed to nurturing confident, disciplined, and future-ready young individuals. We offer professional student counselling, emotional support, and career guidance for students and families.
+                </p>
+
+                <!-- CTA buttons -->
+                <div class="h-el flex flex-col sm:flex-row gap-4" style="animation-delay:0.48s">
+                    <a href="{{ url_for('main.skillnest_apply_page') }}"
+                       class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-school-gold text-school-navy font-black text-sm uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all hover:-translate-y-0.5 shadow-lg shadow-school-gold/25">
+                        Apply to SkillNest
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="{{ url_for('main.book_page') }}"
+                       class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white/8 text-white font-semibold text-sm uppercase tracking-wider rounded-xl border border-white/15 hover:bg-white/15 transition-all hover:-translate-y-0.5 backdrop-blur-sm">
+                        Book Counselling
+                    </a>
+                </div>
+
+                <!-- Trust bar -->
+                <div class="h-el mt-12 pt-8 border-t border-white/10 grid grid-cols-3 gap-3 sm:gap-6" style="animation-delay:0.62s">
+                    <div>
+                        <div class="font-serif text-2xl sm:text-3xl font-black text-school-gold">500+</div>
+                        <div class="text-white/35 text-[9px] sm:text-[10px] font-semibold uppercase tracking-widest mt-1.5">Families Guided</div>
+                    </div>
+                    <div>
+                        <div class="font-serif text-2xl sm:text-3xl font-black text-school-gold">{{ skillnest_seats or '10' }}</div>
+                        <div class="text-white/35 text-[9px] sm:text-[10px] font-semibold uppercase tracking-widest mt-1.5">SkillNest Seats</div>
+                    </div>
+                    <div>
+                        <div class="font-serif text-2xl sm:text-3xl font-black text-school-gold">100%</div>
+                        <div class="text-white/35 text-[9px] sm:text-[10px] font-semibold uppercase tracking-widest mt-1.5">Confidential</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Director card -->
+            <div class="h-el hidden lg:flex flex-col items-center" style="animation-delay:0.3s">
+                <div class="relative w-full max-w-md">
+                    <!-- Decorative rings -->
+                    <div class="absolute inset-0 rounded-[32px] border-2 border-school-gold/20 scale-110 pointer-events-none"></div>
+                    <div class="absolute inset-0 rounded-[32px] bg-gradient-to-br from-school-gold/20 to-transparent scale-105 blur-2xl pointer-events-none"></div>
+
+                    <!-- Director photo -->
+                    <div class="relative rounded-[32px] overflow-hidden aspect-[3/4] shadow-[0_32px_80px_rgba(0,0,0,0.55)]" style="animation: gentleFloat 5s ease-in-out infinite; animation-delay:1s">
+                        <img src="{{ dir_img }}" alt="Sashipriya Potsangbam — Founder & Director"
+                             class="w-full h-full object-cover object-top">
+                        <!-- Subtle overlay -->
+                        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(7,26,62,0.72) 0%, rgba(7,26,62,0.1) 45%, transparent 70%);"></div>
+                        <!-- Name card on photo -->
+                        <div class="absolute bottom-0 left-0 right-0 p-7">
+                            <p class="text-white font-serif text-xl font-black leading-tight">Sashipriya Potsangbam</p>
+                            <p class="text-school-gold text-xs font-bold uppercase tracking-[0.25em] mt-1">Founder &amp; Director</p>
+
+                        </div>
+                    </div>
+
+                    <!-- Floating "Book Now" mini-card -->
+                    <div class="absolute -bottom-5 -right-6 bg-white rounded-2xl px-5 py-4 shadow-xl border border-school-mid z-10">
+                        <div class="flex items-center gap-3">
+                            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Available Now</p>
+                                <p class="text-xs font-bold text-school-navy">Appointments Open</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class="absolute bottom-7 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 animate-bounce opacity-40">
+        <span class="text-[9px] uppercase tracking-widest text-white">Scroll</span>
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PHOTO SHOWCASE — Counselling & SkillNest
+══════════════════════════════════════════ -->
+<section>
+    <div class="grid grid-cols-1 lg:grid-cols-2">
+        <!-- LEFT: Counselling -->
+        <div class="relative overflow-hidden" data-bg="{{ url_for('static', filename='img/1.jpg') }}?v={{ img_v1 }}" style="min-height:420px;">
+            <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(7,26,62,0.92) 0%,rgba(7,26,62,0.25) 55%,transparent 100%);"></div>
+            <div class="absolute inset-0 flex flex-col justify-end p-7 sm:p-10 z-10">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">Professional Counselling</p>
+                <h3 class="font-serif text-xl sm:text-3xl font-black text-white mb-2 leading-tight">Student &amp; Parent<br/>Counselling Sessions</h3>
+                <p class="text-white/60 text-sm mb-5 max-w-sm">Professional support for academic stress, behaviour, emotional growth, and family guidance.</p>
+                <a href="{{ url_for('main.book_page') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-school-gold text-school-navy font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all w-fit">Book a Session →</a>
+            </div>
+        </div>
+        <!-- RIGHT: SkillNest -->
+        <div class="relative overflow-hidden" data-bg="{{ url_for('static', filename='img/2.jpg') }}?v={{ img_v2 }}" style="min-height:420px;">
+            <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(7,26,62,0.92) 0%,rgba(7,26,62,0.25) 55%,transparent 100%);"></div>
+            <div class="absolute top-5 right-5 z-10">
+                <span class="inline-flex items-center gap-1.5 bg-red-500/90 text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Admissions Open
+                </span>
+            </div>
+            <div class="absolute inset-0 flex flex-col justify-end p-7 sm:p-10 z-10">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">Ages 6–10 · Only {{ skillnest_seats or '10' }} Seats</p>
+                <h3 class="font-serif text-xl sm:text-3xl font-black text-white mb-2 leading-tight">SkillNest<br/>After-School Club</h3>
+                <p class="text-white/60 text-sm mb-5 max-w-sm">Homework done, healthy meal, life skills &amp; authentic games — the complete after-school solution.</p>
+                <a href="{{ url_for('main.skillnest_apply_page') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-school-gold text-school-navy font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all w-fit">Apply Now →</a>
+            </div>
+        </div>
+    </div>
+    <script>document.querySelectorAll('[data-bg]').forEach(function(el){el.style.backgroundImage='url('+el.dataset.bg+')';el.style.backgroundSize='cover';el.style.backgroundPosition='center';});</script>
+</section>
+
+<!-- ══════════════════════════════════════════
+     OUR SERVICES
+══════════════════════════════════════════ -->
+<section class="py-16 sm:py-24 bg-school-light">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14">
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-school-gold mb-3 sa-fade" data-sa>What We Offer</p>
+            <h2 class="font-serif text-3xl sm:text-4xl font-black text-school-navy sa-up" data-sa data-sd="80">Guidance for Every Stage</h2>
+            <div class="w-12 h-1 bg-school-gold rounded-full mx-auto mt-5"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+
+            <!-- Card 1: Student Counselling -->
+            <div class="group relative bg-white rounded-3xl border border-school-mid overflow-hidden hover:shadow-2xl hover:border-school-gold/30 transition-all duration-300 sa-up" data-sa data-sd="0">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-school-navy to-school-gold opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="p-8">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-school-navy to-[#1a4a8a] flex items-center justify-center mb-6 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">One-on-One</p>
+                    <h3 class="font-serif text-xl font-black text-school-navy mb-3">Student Counselling</h3>
+                    <p class="text-school-muted text-sm leading-relaxed mb-6">Personalised sessions addressing academic stress, emotional challenges, and confidence building — a safe space for every student to be heard.</p>
+                    <a href="{{ url_for('main.book_page') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-school-navy text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-school-gold hover:text-school-navy transition-all duration-200">
+                        Book a Session →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2: Structured Sunday Development Programs -->
+            <div class="group relative bg-white rounded-3xl border border-school-mid overflow-hidden hover:shadow-2xl hover:border-school-gold/30 transition-all duration-300 sa-up" data-sa data-sd="80">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-school-gold via-amber-400 to-school-navy opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="p-8">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-school-gold flex items-center justify-center mb-6 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-school-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                    </div>
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">Every Sunday</p>
+                    <h3 class="font-serif text-xl font-black text-school-navy mb-3">Structured Sunday Development Programs</h3>
+                    <p class="text-school-muted text-sm leading-relaxed mb-6">SuperKids Personality Club & Future Ready Personality Program — weekly Sunday sessions building confidence, communication, leadership & emotional intelligence.</p>
+                    <a href="{{ url_for('main.sunday_programs') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-school-gold text-school-navy text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all duration-200">
+                        Explore Programs →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 3: SkillNest After Club -->
+            <div class="group relative bg-white rounded-3xl border border-school-mid overflow-hidden hover:shadow-2xl hover:border-school-gold/30 transition-all duration-300 sa-up" data-sa data-sd="160">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-school-gold to-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="p-8">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-school-gold to-amber-500 flex items-center justify-center mb-6 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-school-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-school-gold mb-2">Ages 6–10 · {{ skillnest_seats or '15' }} Seats Only</p>
+                    <h3 class="font-serif text-xl font-black text-school-navy mb-3">SkillNest After Club</h3>
+                    <p class="text-school-muted text-sm leading-relaxed mb-6">Homework done, healthy meal, life skills and authentic games — Mon to Sat, 1–5 PM. The complete after-school solution designed for working parents.</p>
+                    <a href="{{ url_for('main.skillnest') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-school-gold text-school-navy text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all duration-200">
+                        Learn More →
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STATS
+══════════════════════════════════════════ -->
+<section class="py-12 bg-school-navy">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-5 text-center">
+            {% set stats = [('500+','Families Guided'), (skillnest_seats or '10','SkillNest Seats'), ('₹'~(offer_price or '399'),'Per Session'), ('100%','Confidential')] %}
+            {% for num, label in stats %}
+            <div class="sa-up" data-sa data-sd="{{ loop.index0 * 80 }}">
+                <div class="font-serif text-3xl sm:text-4xl font-black text-school-gold mb-1">{{ num }}</div>
+                <p class="text-white/50 text-[10px] font-bold uppercase tracking-widest">{{ label }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     WHY CHOOSE US
+══════════════════════════════════════════ -->
+<section class="py-14 sm:py-20 bg-school-navy" id="why">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16 items-start">
+
+            <div class="lg:col-span-2">
+                <p class="text-[10px] font-black uppercase tracking-[0.35em] text-school-gold mb-4 sa-fade" data-sa>Why Choose Us</p>
+                <h2 class="font-serif font-black text-white leading-tight mb-3 sa-up" data-sa data-sd="80" style="font-size:clamp(2.2rem,5vw,3.2rem);">
+                    Grow Beyond<br/>
+                    <span class="text-school-gold">Academics.</span>
+                </h2>
+                <p class="text-white/40 text-xs font-bold uppercase tracking-widest mb-5 sa-fade" data-sa data-sd="120">Communication &nbsp;|&nbsp; Character &nbsp;|&nbsp; Confidence &nbsp;|&nbsp; Care</p>
+                <p class="text-white/55 text-sm leading-relaxed mb-6 sa-fade" data-sa data-sd="160">
+                    We combine academic support with life skills, character building, and personal development — setting your child up for lifelong confidence.
+                </p>
+                <blockquote class="border-l-4 border-school-gold pl-5 mb-7 sa-fade" data-sa data-sd="240">
+                    <p class="text-white/65 italic text-sm leading-relaxed">"Skills may create opportunities, but character sustains success. At Daichiro, we nurture confidence, communication, discipline, and kindness from an early age."</p>
+                    <footer class="mt-2 text-school-gold text-[10px] font-bold uppercase tracking-widest">— Sashipriya Potsangbam, Founder</footer>
+                </blockquote>
+                <a href="{{ url_for('main.book_page') }}"
+                   class="inline-flex items-center gap-2 px-7 py-3.5 bg-school-gold text-school-navy font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all hover:-translate-y-0.5 sa-fade" data-sa data-sd="320">
+                    Book a Session Now →
+                </a>
+            </div>
+
+            <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                <!-- Card 1 -->
+                <div class="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-school-gold/40 transition-all sa-fade" data-sa>
+                    <div class="w-10 h-10 rounded-xl bg-school-gold/20 flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h4 class="font-bold text-white text-sm mb-2 leading-snug">Grow Beyond Tuition &amp; Daycare</h4>
+                    <p class="text-white/45 text-xs leading-relaxed">We combine academic support with life skills, character building, and personal development — far more than just homework help.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-school-gold/40 transition-all sa-fade" data-sa>
+                    <div class="w-10 h-10 rounded-xl bg-school-gold/20 flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h4 class="font-bold text-white text-sm mb-2 leading-snug">Safe &amp; Structured Environment</h4>
+                    <p class="text-white/45 text-xs leading-relaxed">A disciplined, guided space where children grow with positive habits, strong values, and real confidence.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-school-gold/40 transition-all sa-fade" data-sa>
+                    <div class="w-10 h-10 rounded-xl bg-school-gold/20 flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                    </div>
+                    <h4 class="font-bold text-white text-sm mb-2 leading-snug">Sunday Development Programs</h4>
+                    <p class="text-white/45 text-xs leading-relaxed">SuperKids Personality Club &amp; Future Ready Personality Program — weekly sessions on confidence, communication, leadership &amp; emotional intelligence.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-school-gold/40 transition-all sa-fade" data-sa>
+                    <div class="w-10 h-10 rounded-xl bg-school-gold/20 flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    </div>
+                    <h4 class="font-bold text-white text-sm mb-2 leading-snug">Holistic Development Approach</h4>
+                    <p class="text-white/45 text-xs leading-relaxed">We focus on communication, confidence, leadership, emotional balance, and digital discipline — not just homework.</p>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-school-gold/40 transition-all sa-fade" data-sa>
+                    <div class="w-10 h-10 rounded-xl bg-school-gold/20 flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h4 class="font-bold text-white text-sm mb-2 leading-snug">Flexible Timing for Working Parents</h4>
+                    <p class="text-white/45 text-xs leading-relaxed">SkillNest runs 1pm–5pm with a convenient pick-up and drop window — designed entirely around working parents.</p>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-school-gold/40 transition-all sa-fade" data-sa>
+                    <div class="w-10 h-10 rounded-xl bg-school-gold/20 flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <h4 class="font-bold text-white text-sm mb-2 leading-snug">Parent Partnership Approach</h4>
+                    <p class="text-white/45 text-xs leading-relaxed">We work closely with parents at every step to support and celebrate each child's unique growth journey.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     MEET THE FOUNDER
+══════════════════════════════════════════ -->
+<section class="py-14 sm:py-20 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-school-light rounded-3xl overflow-hidden border border-school-mid">
+            <div class="grid grid-cols-1 md:grid-cols-3">
+                <div class="md:col-span-1" style="min-height:260px;">
+                    <img src="{{ url_for('static', filename='img/DirectorPhoto.jpg') }}" alt="Sashipriya Potsangbam"
+                         class="w-full h-full object-cover object-top"
+                         onerror="this.parentElement.style.background='#0F2D5E'">
+                </div>
+                <div class="md:col-span-2 p-6 sm:p-10 flex flex-col justify-center">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-1 sa-fade" data-sa>Meet the Founder</p>
+                    <h2 class="font-serif text-xl sm:text-2xl font-black text-school-navy mb-1 sa-up" data-sa data-sd="80">Sashipriya Potsangbam</h2>
+                    <p class="text-school-muted text-sm mb-4">Founder &amp; Director &nbsp;|&nbsp; Educator &nbsp;|&nbsp; Child Development &amp; Life Skills Mentor</p>
+                    <p class="text-school-muted text-[14px] leading-relaxed mb-5 sa-fade" data-sa data-sd="120">
+                        With a deep belief that every child deserves more than academic instruction, she built Daichiro Professional Skills Academy — a centre where <strong class="text-school-navy">holistic growth is the standard</strong>, not the exception.
+                    </p>
+                    <blockquote class="border-l-4 border-school-gold pl-4 mb-5 sa-fade" data-sa data-sd="200">
+                        <p class="text-school-navy italic text-sm font-semibold">"Skills may create opportunities, but character sustains success. At Daichiro, we nurture confidence, communication, discipline, and kindness from an early age."</p>
+                    </blockquote>
+                    <a href="{{ url_for('main.about') }}" class="inline-flex items-center text-school-navy font-bold text-xs uppercase tracking-wider hover:text-school-gold transition-colors sa-fade" data-sa data-sd="260">
+                        Read Our Story →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CTA — Book Now
+══════════════════════════════════════════ -->
+<section class="py-14 sm:py-20 bg-school-gold">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-school-navy/50 mb-3 sa-fade" data-sa>Limited Slots Available</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-black text-school-navy mb-4 sa-up" data-sa data-sd="80">
+            Your Child Deserves<br/>Clarity &amp; Confidence.
+        </h2>
+        <p class="text-school-navy/65 text-sm sm:text-base mb-8 max-w-xl mx-auto sa-fade" data-sa data-sd="160">
+            First consultation is free. Appointments only — limited slots open each week.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center sa-fade" data-sa data-sd="240">
+            <a href="{{ url_for('main.book_page') }}"
+               class="px-8 py-4 bg-school-navy text-white font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-school-text transition-all hover:-translate-y-0.5 shadow-lg text-center">
+                Book an Appointment
+            </a>
+            <a href="{{ url_for('main.skillnest') }}"
+               class="px-8 py-4 bg-white/30 text-school-navy font-bold text-sm uppercase tracking-wider rounded-xl border-2 border-school-navy/20 hover:bg-white/60 transition-all hover:-translate-y-0.5 text-center">
+                Enroll in SkillNest
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Scroll Animation JS -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                const d = parseInt(e.target.dataset.sd || 0);
+                setTimeout(() => e.target.classList.add('sa-vis'), d);
+                obs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.10, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('[data-sa]').forEach(el => obs.observe(el));
+
+    const nav = document.getElementById('main-nav');
+    if (nav) {
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('is-scrolled', window.scrollY > 80);
+        }, { passive: true });
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'employee/base_employee.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back, {{ emp.name }}{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+
+    <!-- Employee Identity Banner -->
+    <div style="background:#0C2547;border:1px solid #2D3F5C;border-radius:16px;padding:32px;display:flex;align-items:center;gap:24px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,158,11,0.15);border:2px solid rgba(245,158,11,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-size:26px;font-weight:900;color:#f59e0b;">{{ emp.name[0].upper() }}</span>
+        </div>
+        <div>
+            <h2 style="font-size:22px;font-weight:900;color:#ffffff;margin:0 0 4px;">{{ emp.name }}</h2>
+            <p style="font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.15em;margin:0 0 4px;">{{ emp.designation or 'Employee' }}</p>
+            <p style="font-size:12px;color:rgba(255,255,255,0.45);margin:0;">Username: <span style="color:rgba(255,255,255,0.7);font-family:monospace;">{{ emp.username }}</span></p>
+        </div>
+    </div>
+
+    <!-- Section Access Cards -->
+    <div>
+        <h3 style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,0.5);margin:0 0 16px;">Your Sections</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            {% if emp.has_any_perm('appt_booking_status','appt_pricing','appt_history') %}
+            <a href="{{ url_for('employee.appointments_page') }}"
+               style="background:#0C2547;border:1px solid #2D3F5C;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:all .2s;"
+               onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(12,37,71,0.8)'"
+               onmouseout="this.style.borderColor='#2D3F5C';this.style.background='#0C2547'">
+                <div style="font-size:30px;margin-bottom:12px;">📅</div>
+                <p style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#ffffff;margin:0 0 4px;">Appointments</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0;">Manage bookings</p>
+            </a>
+            {% endif %}
+
+            {% if emp.has_any_perm('skillnest_admissions','skillnest_settings') %}
+            <a href="{{ url_for('employee.skillnest_page') }}"
+               style="background:#0C2547;border:1px solid #2D3F5C;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:all .2s;"
+               onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(12,37,71,0.8)'"
+               onmouseout="this.style.borderColor='#2D3F5C';this.style.background='#0C2547'">
+                <div style="font-size:30px;margin-bottom:12px;">🎯</div>
+                <p style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#ffffff;margin:0 0 4px;">SkillNest</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0;">Manage admissions</p>
+            </a>
+            {% endif %}
+
+            {% if emp.has_any_perm('assessments_view','assessments_create_client') %}
+            <a href="{{ url_for('employee.assessments_page') }}"
+               style="background:#0C2547;border:1px solid #2D3F5C;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:all .2s;"
+               onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(12,37,71,0.8)'"
+               onmouseout="this.style.borderColor='#2D3F5C';this.style.background='#0C2547'">
+                <div style="font-size:30px;margin-bottom:12px;">🧠</div>
+                <p style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#ffffff;margin:0 0 4px;">Assessments</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0;">View student data</p>
+            </a>
+            {% endif %}
+
+            {% if emp.has_permission('gallery_view') %}
+            <a href="{{ url_for('employee.gallery') }}"
+               style="background:#0C2547;border:1px solid #2D3F5C;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:all .2s;"
+               onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(12,37,71,0.8)'"
+               onmouseout="this.style.borderColor='#2D3F5C';this.style.background='#0C2547'">
+                <div style="font-size:30px;margin-bottom:12px;">🖼️</div>
+                <p style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#ffffff;margin:0 0 4px;">Gallery</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0;">View photos</p>
+            </a>
+            {% endif %}
+
+            {% if emp.has_permission('contact_social') %}
+            <a href="{{ url_for('employee.contact_social') }}"
+               style="background:#0C2547;border:1px solid #2D3F5C;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:all .2s;"
+               onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(12,37,71,0.8)'"
+               onmouseout="this.style.borderColor='#2D3F5C';this.style.background='#0C2547'">
+                <div style="font-size:30px;margin-bottom:12px;">📞</div>
+                <p style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#ffffff;margin:0 0 4px;">Contact &amp; Social</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0;">Manage info</p>
+            </a>
+            {% endif %}
+
+            {% if not (emp.has_any_perm('appt_booking_status','appt_pricing','appt_history') or emp.has_any_perm('skillnest_admissions','skillnest_settings') or emp.has_any_perm('assessments_view','assessments_create_client') or emp.has_permission('gallery_view') or emp.has_permission('contact_social')) %}
+            <div class="col-span-4" style="text-align:center;padding:48px 0;color:rgba(255,255,255,0.4);">
+                <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+                <p style="font-weight:600;color:rgba(255,255,255,0.6);margin:0 0 4px;">No sections assigned yet.</p>
+                <p style="font-size:13px;margin:0;">Please contact your admin to get access.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

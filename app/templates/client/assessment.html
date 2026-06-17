@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicondaichiro.png') }}">
+    <title>Career Assessment - Daichiro Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script>document.documentElement.style.visibility='hidden'</script>
+    <script src="https://cdn.tailwindcss.com" onload="document.documentElement.style.visibility=''"></script>
+    <script>setTimeout(function(){document.documentElement.style.visibility=''},2000)</script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], nike: ['Anton', 'sans-serif'] },
+                    colors: { customBlack: '#0a0a0a', customWhite: '#fafafa' },
+                    boxShadow: { 'nike': '8px 8px 0px 0px rgba(0,0,0,1)', 'nike-hover': '12px 12px 0px 0px rgba(0,0,0,1)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes progress { 0%{width:0} 100%{width:100%} }
+        .animate-progress { animation: progress 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-customWhite text-customBlack font-sans antialiased">
+
+<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+
+    <!-- ── ASSESSMENT FORM ── -->
+    <div id="assessment-container" class="max-w-3xl mx-auto bg-white border-4 border-black p-8 md:p-12 shadow-nike">
+        <div class="mb-10 text-center border-b-2 border-black pb-6">
+            <h1 class="text-4xl md:text-5xl font-nike uppercase tracking-tighter text-black">Career Intelligence</h1>
+            <p class="mt-2 text-sm font-bold tracking-widest text-gray-600 uppercase">Student Career Interest & Aptitude Questionnaire</p>
+            <p class="mt-4 text-xs text-gray-500 max-w-lg mx-auto">Answer the following questions honestly. There is no right or wrong answers. This will help us understand your strengths, interests, and preferences to guide you toward suitable career options.</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 h-2 mb-8 overflow-hidden">
+            <div id="progress-bar" class="bg-black h-full transition-all duration-500 ease-out" style="width:20%"></div>
+        </div>
+
+        <form id="assessment-form" class="space-y-8">
+
+            <!-- ═══════════  STEP 1: PERSONAL INFORMATION  ═══════════ -->
+            <div class="form-step" id="step-1">
+                <h3 class="text-2xl font-bold uppercase mb-6 text-black border-b border-gray-200 pb-2">Section A — Personal Information</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold uppercase mb-1 text-black">Full Name</label>
+                        <input type="text" id="full_name" required class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="Your full name">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold uppercase mb-1 text-black">Class / Grade</label>
+                            <input type="text" id="class_grade" required class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="e.g. XII (Science)">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase mb-1 text-black">School / College / University Name</label>
+                            <input type="text" id="school_name" required class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="Your institution name">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold uppercase mb-1 text-black">Contact Number</label>
+                            <input type="tel" id="contact_number" required maxlength="10" inputmode="numeric" pattern="[5-9][0-9]{9}" class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="10-digit mobile number">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold uppercase mb-1 text-black">Email <span class="text-gray-400 text-xs">(Optional)</span></label>
+                            <input type="email" id="email" class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="email@example.com">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end">
+                    <button type="button" class="next-btn px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:-translate-y-1 transition-transform border-2 border-black">Next Step →</button>
+                </div>
+            </div>
+
+            <!-- ═══════════  STEP 2: INTERESTS  ═══════════ -->
+            <div class="form-step hidden" id="step-2">
+                <h3 class="text-2xl font-bold uppercase mb-6 text-black border-b border-gray-200 pb-2">Section B — Interests</h3>
+
+                <div class="mb-8">
+                    <p class="font-bold text-sm uppercase mb-1 text-black">1. Which activities do you enjoy the most? <span class="text-gray-400 font-normal">(Select up to 3)</span></p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Solving math problems or puzzles"><span>Solving math problems or puzzles</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Drawing, painting, or designing"><span>Drawing, painting, or designing</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Writing stories or essays"><span>Writing stories or essays</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Playing computer games or coding"><span>Playing computer games or coding</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Helping others with their problems"><span>Helping others with their problems</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Working with tools or machines"><span>Working with tools or machines</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Participating in debates or public speaking"><span>Participating in debates or public speaking</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Taking care of animals or nature"><span>Taking care of animals or nature</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Organizing events or planning tasks"><span>Organizing events or planning tasks</span></label>
+                        <label class="chk-card"><input type="checkbox" name="activities" value="Selling or promoting products/services"><span>Selling or promoting products/services</span></label>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <p class="font-bold text-sm uppercase mb-1 text-black">2. Which subjects do you enjoy the most? <span class="text-gray-400 font-normal">(Select up to 3)</span></p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Mathematics"><span>Mathematics</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Science - Physics"><span>Science - Physics</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Chemistry"><span>Chemistry</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Biology"><span>Biology</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="English"><span>English</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Languages"><span>Languages</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Computer Science"><span>Computer Science</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="IT"><span>IT</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Social Science"><span>Social Science</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="History"><span>History</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Business Studies"><span>Business Studies</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Economics"><span>Economics</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Art"><span>Art</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Music"><span>Music</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Drama"><span>Drama</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Physical Education"><span>Physical Education</span></label>
+                        <label class="chk-card"><input type="checkbox" name="subjects" value="Environmental Studies"><span>Environmental Studies</span></label>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <p class="font-bold text-sm uppercase mb-1 text-black">3. Which of these professions do you find interesting? <span class="text-gray-400 font-normal">(Select all that apply)</span></p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Doctor / Nurse"><span>Doctor / Nurse</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Engineer / Scientist"><span>Engineer / Scientist</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Teacher / Professor"><span>Teacher / Professor</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Artist / Designer"><span>Artist / Designer</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Business Owner / Entrepreneur"><span>Business Owner / Entrepreneur</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Lawyer / Judge"><span>Lawyer / Judge</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Software Developer / Game Designer"><span>Software Developer / Game Designer</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Police / Army Officer"><span>Police / Army Officer</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="Social Worker / Counselor"><span>Social Worker / Counselor</span></label>
+                        <label class="chk-card"><input type="checkbox" name="professions" value="YouTuber / Influencer / Filmmaker"><span>YouTuber / Influencer / Filmmaker</span></label>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button type="button" class="prev-btn px-8 py-3 bg-transparent text-black font-bold uppercase tracking-widest border-2 border-black hover:-translate-y-1 transition-transform">← Back</button>
+                    <button type="button" class="next-btn px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:-translate-y-1 transition-transform border-2 border-black">Next Step →</button>
+                </div>
+            </div>
+
+            <!-- ═══════════  STEP 3: APTITUDE  ═══════════ -->
+            <div class="form-step hidden" id="step-3">
+                <h3 class="text-2xl font-bold uppercase mb-2 text-black border-b border-gray-200 pb-2">Section C — Aptitude (Self-Assessment)</h3>
+                <p class="text-sm font-medium mb-6 text-gray-600">How confident do you feel in the following skills? (1 = Not confident, 5 = Very confident)</p>
+                <div class="space-y-5">
+                    <div class="apt-row"><span>Solving logical or numerical problems</span><div class="apt-radio" data-name="apt_logical"></div></div>
+                    <div class="apt-row"><span>Understanding scientific concepts</span><div class="apt-radio" data-name="apt_science"></div></div>
+                    <div class="apt-row"><span>Writing or expressing yourself clearly</span><div class="apt-radio" data-name="apt_writing"></div></div>
+                    <div class="apt-row"><span>Using computers or apps</span><div class="apt-radio" data-name="apt_computers"></div></div>
+                    <div class="apt-row"><span>Creating or designing something</span><div class="apt-radio" data-name="apt_design"></div></div>
+                    <div class="apt-row"><span>Speaking in public or leading a team</span><div class="apt-radio" data-name="apt_speaking"></div></div>
+                    <div class="apt-row"><span>Planning or organizing tasks</span><div class="apt-radio" data-name="apt_planning"></div></div>
+                    <div class="apt-row"><span>Helping others solve their problems</span><div class="apt-radio" data-name="apt_helping"></div></div>
+                    <div class="apt-row"><span>Learning new technologies quickly</span><div class="apt-radio" data-name="apt_tech"></div></div>
+                </div>
+                <div class="mt-8 flex justify-between">
+                    <button type="button" class="prev-btn px-8 py-3 bg-transparent text-black font-bold uppercase tracking-widest border-2 border-black hover:-translate-y-1 transition-transform">← Back</button>
+                    <button type="button" class="next-btn px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:-translate-y-1 transition-transform border-2 border-black">Next Step →</button>
+                </div>
+            </div>
+
+            <!-- ═══════════  STEP 4: PERSONALITY  ═══════════ -->
+            <div class="form-step hidden" id="step-4">
+                <h3 class="text-2xl font-bold uppercase mb-2 text-black border-b border-gray-200 pb-2">Section D — Personality & Values</h3>
+                <p class="text-sm font-medium mb-6 text-gray-600">Tick the statements that describe your best.</p>
+                <div class="space-y-3">
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I enjoy solving problems or challenges"><span>I enjoy solving problems or challenges</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I like to express myself creatively"><span>I like to express myself creatively</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I prefer working independently"><span>I prefer working independently</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I like working with others in a team"><span>I like working with others in a team</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I care about helping people and making a difference"><span>I care about helping people and making a difference</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I like leading and taking responsibility"><span>I like leading and taking responsibility</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I enjoy experimenting and learning how things work"><span>I enjoy experimenting and learning how things work</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I like keeping things organized and structured"><span>I like keeping things organized and structured</span></label>
+                    <label class="chk-card"><input type="checkbox" name="personality" value="I enjoy physical activity or outdoor work"><span>I enjoy physical activity or outdoor work</span></label>
+                </div>
+                <div class="mt-8 flex justify-between">
+                    <button type="button" class="prev-btn px-8 py-3 bg-transparent text-black font-bold uppercase tracking-widest border-2 border-black hover:-translate-y-1 transition-transform">← Back</button>
+                    <button type="button" class="next-btn px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:-translate-y-1 transition-transform border-2 border-black">Next Step →</button>
+                </div>
+            </div>
+
+            <!-- ═══════════  STEP 5: CAREER VISION  ═══════════ -->
+            <div class="form-step hidden" id="step-5">
+                <h3 class="text-2xl font-bold uppercase mb-3 text-black border-b border-gray-200 pb-2">Section E — Career Vision</h3>
+                <!-- Optional notice — prominent banner -->
+                <div style="margin-bottom:24px;border-radius:12px;overflow:hidden;border:2.5px solid #000;">
+                    <div style="background:#FFE600;padding:10px 18px;display:flex;align-items:center;gap:12px;border-bottom:2px solid #000;">
+                        <span style="font-size:22px;">💡</span>
+                        <span style="font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#000;">This entire section is OPTIONAL</span>
+                        <span style="margin-left:auto;background:#000;color:#FFE600;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;padding:4px 10px;border-radius:4px;white-space:nowrap;">Skip if unsure</span>
+                    </div>
+                    <div style="background:#fffde7;padding:10px 18px;">
+                        <p style="font-size:12.5px;color:#555;margin:0;line-height:1.7;">You do <strong style="color:#000;text-decoration:underline;">not</strong> need to fill this in. If you are not sure about your career goals yet, that's perfectly okay — just leave it blank and click <strong style="color:#000;">Done ✓</strong>.</p>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold uppercase mb-1 text-black">1. What career(s) are you currently considering, if any?</label>
+                        <textarea id="vision_careers" rows="2" class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="Write your thoughts..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold uppercase mb-1 text-black">2. What are your goals for the next 5 years?</label>
+                        <textarea id="vision_goals" rows="2" class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="Write your goals..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold uppercase mb-1 text-black">3. What kind of life do you want in the future? <span class="text-gray-400 font-normal text-xs">(lifestyle, impact, location)</span></label>
+                        <textarea id="vision_life" rows="2" class="w-full border-2 border-black p-3 bg-transparent text-black focus:outline-none" placeholder="Describe your ideal life..."></textarea>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-between">
+                    <button type="button" class="prev-btn px-8 py-3 bg-transparent text-black font-bold uppercase tracking-widest border-2 border-black hover:-translate-y-1 transition-transform">← Back</button>
+                    <button type="button" id="done-btn" class="px-10 py-4 bg-black text-white font-nike text-xl uppercase tracking-tighter hover:-translate-y-1 transition-transform shadow-nike border-2 border-black">Done ✓</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden text-center py-16">
+            <h2 class="text-4xl font-nike uppercase tracking-tighter text-black animate-pulse mb-6">Saving Assessment...</h2>
+            <div class="relative h-2 w-full bg-gray-200 overflow-hidden">
+                <div class="absolute top-0 left-0 h-full bg-black animate-progress"></div>
+            </div>
+            <p class="mt-6 text-sm font-bold uppercase tracking-widest text-gray-500">Saving your data securely...</p>
+        </div>
+    </div>
+
+    <!-- ── RESULTS CONTAINER ── -->
+    <div id="results-container" class="hidden text-center mt-12 mb-20 max-w-2xl mx-auto">
+        <div class="bg-white border-4 border-black p-8 md:p-12 shadow-nike">
+            <h2 class="text-4xl md:text-5xl font-nike uppercase tracking-tighter text-black mb-6">Assessment Completed!</h2>
+            <p class="text-lg font-medium text-gray-700 mb-10">Thank you for submitting your career assessment. Our team will review your profile and contact you with further guidance.</p>
+            <a href="{{ url_for('client.login') }}" class="px-10 py-4 bg-black text-white font-nike text-xl uppercase tracking-tighter hover:-translate-y-1 transition-transform shadow-nike border-2 border-black inline-block">Done ✓</a>
+        </div>
+    </div>
+</div>
+
+<!-- ── Checkbox card styles ── -->
+<style>
+.chk-card{display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border:2px solid #e5e7eb;cursor:pointer;transition:all .15s;font-size:.85rem;font-weight:600}
+.chk-card:hover{border-color:#000}
+.chk-card input:checked+span{color:#000}
+.chk-card:has(input:checked){border-color:#000;background:#f5f5f5}
+.apt-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e7eb;padding-bottom:.75rem;transition:all .2s;}
+.apt-row span{font-weight:600;font-size:.85rem;flex:1}
+.apt-row .radio-group{display:flex;gap:.75rem}
+.radio-group label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.7rem;font-weight:700;cursor:pointer}
+.radio-group input[type=radio]{accent-color:#000;width:1.1rem;height:1.1rem}
+.apt-row.error{background:#fff5f5;border-left:4px solid #ef4444;padding-left:.75rem;border-radius:4px;border-bottom:1px solid #fca5a5;}
+.apt-row.error span{color:#dc2626;font-weight:800;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s ease;}
+.step-error{display:none;background:#fef2f2;border:2px solid #fca5a5;color:#991b1b;font-weight:700;font-size:.85rem;padding:.85rem 1rem;margin-bottom:1.5rem;border-radius:4px;line-height:1.5;}
+.step-error.visible{display:block;}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // ── Generate radio buttons for aptitude section ──
+    document.querySelectorAll('.apt-radio').forEach(container => {
+        const name = container.dataset.name;
+        let html = '<div class="radio-group">';
+        for(let i = 1; i <= 5; i++){
+            html += '<label><input type="radio" name="'+name+'" value="'+i+'">'+i+'</label>';
+        }
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Auto-clear error highlight when a rating is selected
+        container.querySelectorAll('input[type=radio]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const row = container.closest('.apt-row');
+                if(row) row.classList.remove('error','shake');
+                const errEl = document.querySelector('#step-3 .step-error');
+                const remaining = document.querySelectorAll('#step-3 .apt-row.error');
+                if(remaining.length === 0 && errEl) errEl.classList.remove('visible');
+            });
+        });
+    });
+
+    // ── Multi-step logic ──
+    const steps = document.querySelectorAll('.form-step');
+    const nextBtns = document.querySelectorAll('.next-btn');
+    const prevBtns = document.querySelectorAll('.prev-btn');
+    const form = document.getElementById('assessment-form');
+    const progressBar = document.getElementById('progress-bar');
+    let currentStep = 0;
+
+    // ── Auto-save function ──
+    async function autoSaveSection(section, data, step) {
+        try {
+            const resp = await fetch("{{ url_for('client.assessment_autosave') }}", {
+                method: 'POST',
+                headers: { 'Content-Type':'application/json' },
+                body: JSON.stringify({ section, data, step })
+            });
+            const result = await resp.json();
+            if(result.success) {
+                // Show saved indicator
+                showSavedIndicator(steps[step - 1]);
+            }
+        } catch(e) {
+            console.warn('Auto-save failed:', e);
+        }
+    }
+
+    function showSavedIndicator(stepEl) {
+        let badge = stepEl.querySelector('.save-badge');
+        if(!badge) {
+            badge = document.createElement('div');
+            badge.className = 'save-badge';
+            badge.style.cssText = 'position:fixed;top:20px;right:20px;background:#000;color:#fff;padding:8px 16px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.15em;z-index:9999;transition:opacity 0.3s';
+            document.body.appendChild(badge);
+        }
+        badge.textContent = '✓ Section Saved';
+        badge.style.opacity = '1';
+        setTimeout(() => { badge.style.opacity = '0'; }, 2000);
+    }
+
+    // ── Collect section data helpers ──
+    function collectPersonalInfo() {
+        return {
+            full_name: document.getElementById('full_name').value,
+            class_grade: document.getElementById('class_grade').value,
+            school_name: document.getElementById('school_name').value,
+            contact_number: document.getElementById('contact_number').value,
+            email: document.getElementById('email').value
+        };
+    }
+    function collectInterests() {
+        return {
+            activities: getChecked('activities'),
+            subjects: getChecked('subjects'),
+            professions: getChecked('professions')
+        };
+    }
+    function collectAptitude() {
+        return {
+            logical: getRadio('apt_logical'),
+            science: getRadio('apt_science'),
+            writing: getRadio('apt_writing'),
+            computers: getRadio('apt_computers'),
+            design: getRadio('apt_design'),
+            speaking: getRadio('apt_speaking'),
+            planning: getRadio('apt_planning'),
+            helping: getRadio('apt_helping'),
+            tech: getRadio('apt_tech')
+        };
+    }
+    function collectPersonality() {
+        return getChecked('personality');
+    }
+    function collectCareerVision() {
+        return {
+            current_careers: document.getElementById('vision_careers').value,
+            five_year_goals: document.getElementById('vision_goals').value,
+            ideal_life: document.getElementById('vision_life').value
+        };
+    }
+    // Helper: get checked values (moved up for use in collectors)
+    function getChecked(name){ return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(e=>e.value); }
+    function getRadio(name){ const el = document.querySelector('input[name="'+name+'"]:checked'); return el ? el.value : ''; }
+
+    function getOrCreateError(stepEl) {
+        let err = stepEl.querySelector('.step-error');
+        if (!err) {
+            err = document.createElement('div');
+            err.className = 'step-error';
+            // Insert after the h3 heading
+            const h3 = stepEl.querySelector('h3');
+            if(h3 && h3.nextSibling) h3.parentNode.insertBefore(err, h3.nextSibling);
+            else stepEl.insertBefore(err, stepEl.firstChild);
+        }
+        return err;
+    }
+
+    function showError(stepEl, msg) {
+        const err = getOrCreateError(stepEl);
+        err.textContent = '⚠ ' + msg;
+        err.classList.add('visible');
+        err.scrollIntoView({behavior:'smooth', block:'center'});
+        setTimeout(() => err.classList.remove('visible'), 7000);
+    }
+
+    function updateView(){
+        steps.forEach((s,i) => s.classList.toggle('hidden', i !== currentStep));
+        progressBar.style.width = ((currentStep+1)/steps.length*100) + '%';
+        window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    nextBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const stepEl = steps[currentStep];
+
+            // Validate required text inputs
+            const inputs = stepEl.querySelectorAll('input[required], textarea[required]');
+            let valid = true;
+            inputs.forEach(inp => {
+                if(!inp.value.trim()){
+                    valid = false;
+                    inp.style.borderColor = '#ef4444';
+                    inp.addEventListener('input', () => inp.style.borderColor = '', {once:true});
+                }
+            });
+            if(!valid){ showError(stepEl, 'Please fill in all required fields (marked with a red border) before continuing.'); return; }
+
+            // Validate Section B: at least one activity
+            if(currentStep === 1) {
+                const activities = document.querySelectorAll('input[name="activities"]:checked');
+                if(activities.length === 0) {
+                    showError(stepEl, 'Please select at least one activity you enjoy (Question 1).');
+                    return;
+                }
+            }
+
+            // Validate Section C: ALL 9 aptitude rows must be rated
+            if(currentStep === 2) {
+                const aptNames = ['apt_logical','apt_science','apt_writing','apt_computers','apt_design','apt_speaking','apt_planning','apt_helping','apt_tech'];
+                let allRated = true;
+                // Clear previous error highlights
+                stepEl.querySelectorAll('.apt-row').forEach(r => r.classList.remove('error','shake'));
+
+                const missedRows = [];
+                for(const name of aptNames) {
+                    const selected = document.querySelector('input[name="'+name+'"]:checked');
+                    if(!selected) {
+                        allRated = false;
+                        const row = document.querySelector('[data-name="'+name+'"]').closest('.apt-row');
+                        if(row) missedRows.push(row);
+                    }
+                }
+                if(!allRated) {
+                    // Highlight and shake all missed rows
+                    missedRows.forEach(row => {
+                        row.classList.add('error');
+                        void row.offsetWidth;
+                        row.classList.add('shake');
+                    });
+                    const count = missedRows.length;
+                    showError(stepEl, count + ' skill' + (count>1?' ratings are':' rating is') + ' missing — please select a number (1–5) for the highlighted rows above.');
+                    // Scroll to first missed row
+                    missedRows[0].scrollIntoView({behavior:'smooth', block:'center'});
+                    return;
+                }
+            }
+
+            // Validate Section D: at least one personality statement
+            if(currentStep === 3) {
+                const personality = document.querySelectorAll('input[name="personality"]:checked');
+                if(personality.length === 0) {
+                    showError(stepEl, 'Please select at least one statement that describes you.');
+                    return;
+                }
+            }
+
+            if(currentStep < steps.length - 1){
+                // Auto-save the current section before advancing
+                if(currentStep === 0) autoSaveSection('personal_info', collectPersonalInfo(), 1);
+                if(currentStep === 1) autoSaveSection('interests', collectInterests(), 2);
+                if(currentStep === 2) autoSaveSection('aptitude', collectAptitude(), 3);
+                if(currentStep === 3) autoSaveSection('personality', collectPersonality(), 4);
+                
+                currentStep++; 
+                updateView();
+                
+                // Track navigation internally to ensure session resume logic works for blank pages
+                fetch("{{ url_for('client.assessment_autosave') }}", {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ section: 'progress_only', data: null, step: currentStep + 1 })
+                }).catch(()=>{});
+            }
+        });
+    });
+    prevBtns.forEach(btn => {
+        btn.addEventListener('click', () => { if(currentStep > 0){ currentStep--; updateView(); } });
+    });
+
+    // ── Real-time autosave on field change ──
+    // Text inputs & textareas
+    document.querySelectorAll('#step-1 input, #step-1 textarea').forEach(el => {
+        el.addEventListener('input', () => autoSaveSection('personal_info', collectPersonalInfo(), 1));
+    });
+    document.querySelectorAll('#step-5 textarea').forEach(el => {
+        el.addEventListener('input', () => autoSaveSection('career_vision', collectCareerVision(), 5));
+    });
+    // Checkboxes (interests, personality)
+    document.querySelectorAll('input[name="activities"], input[name="subjects"], input[name="professions"]').forEach(el => {
+        el.addEventListener('change', () => autoSaveSection('interests', collectInterests(), 2));
+    });
+    document.querySelectorAll('input[name="personality"]').forEach(el => {
+        el.addEventListener('change', () => autoSaveSection('personality', collectPersonality(), 4));
+    });
+    // Aptitude radios (rendered dynamically — use event delegation)
+    document.getElementById('step-3').addEventListener('change', (e) => {
+        if(e.target.type === 'radio') autoSaveSection('aptitude', collectAptitude(), 3);
+    });
+
+    // ── Done Button ──
+    document.getElementById('done-btn').addEventListener('click', async function() {
+        console.log('Done clicked!');
+        this.disabled = true;
+        this.textContent = 'Saving...';
+
+        form.classList.add('hidden');
+        document.getElementById('loading-state').classList.remove('hidden');
+
+        try {
+            const resp = await fetch('/client/assessment/autosave', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    section: 'final_submit',
+                    data: collectCareerVision(),
+                    step: 5
+                })
+            });
+            const result = await resp.json();
+            console.log('Submit result:', result);
+            if(result.success) {
+                document.getElementById('assessment-container').classList.add('hidden');
+                document.getElementById('results-container').classList.remove('hidden');
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else {
+                document.getElementById('loading-state').classList.add('hidden');
+                form.classList.remove('hidden');
+                this.disabled = false;
+                this.textContent = 'Done ✓';
+                alert('Error: ' + (result.error || 'Please try again.'));
+            }
+        } catch(err) {
+            console.error('Done error:', err);
+            document.getElementById('loading-state').classList.add('hidden');
+            form.classList.remove('hidden');
+            this.disabled = false;
+            this.textContent = 'Done ✓';
+            alert('Network error. Please check your connection and try again.');
+        }
+    });
+
+    // ── Resume from saved data ──
+    {% if saved_data %}
+    (function resumeSavedData() {
+        const saved = {{ saved_data | tojson }};
+        // Restore personal info
+        if(saved.personal_info) {
+            const pi = saved.personal_info;
+            if(pi.full_name) document.getElementById('full_name').value = pi.full_name;
+            if(pi.class_grade) document.getElementById('class_grade').value = pi.class_grade;
+            if(pi.school_name) document.getElementById('school_name').value = pi.school_name;
+            if(pi.contact_number) document.getElementById('contact_number').value = pi.contact_number;
+            if(pi.email) document.getElementById('email').value = pi.email;
+        }
+        // Restore interests (checkboxes)
+        if(saved.interests) {
+            ['activities','subjects','professions'].forEach(group => {
+                (saved.interests[group] || []).forEach(val => {
+                    const cb = document.querySelector('input[name="'+group+'"][value="'+val+'"]');
+                    if(cb) cb.checked = true;
+                });
+            });
+        }
+        // Restore aptitude (radio buttons)
+        if(saved.aptitude) {
+            Object.entries(saved.aptitude).forEach(([key, val]) => {
+                const radio = document.querySelector('input[name="apt_'+key+'"][value="'+val+'"]');
+                if(radio) radio.checked = true;
+            });
+        }
+        // Restore personality (checkboxes)
+        if(saved.personality && Array.isArray(saved.personality)) {
+            saved.personality.forEach(val => {
+                const cb = document.querySelector('input[name="personality"][value="'+val+'"]');
+                if(cb) cb.checked = true;
+            });
+        }
+        // Restore career vision
+        if(saved.career_vision) {
+            const cv = saved.career_vision;
+            if(cv.current_careers) document.getElementById('vision_careers').value = cv.current_careers;
+            if(cv.five_year_goals) document.getElementById('vision_goals').value = cv.five_year_goals;
+            if(cv.ideal_life) document.getElementById('vision_life').value = cv.ideal_life;
+        }
+        // Jump to resume step
+        currentStep = {{ resume_step }};
+        updateView();
+    })();
+    {% endif %}
+});
+</script>
+</body>
+</html>

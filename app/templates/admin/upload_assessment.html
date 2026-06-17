@@ -1,0 +1,161 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Upload Assessment{% endblock %}
+{% block page_title %}Scan Paper Assessment{% endblock %}
+{% block page_subtitle %}Upload photos of handwritten forms → AI digitizes → Review → Analyze{% endblock %}
+
+{% block page_content %}
+
+<div class="max-w-3xl mx-auto space-y-6">
+
+
+    <!-- Back button -->
+    <button onclick="window.location.href='{{ url_for('admin.assessments_page') }}'" class="upload-back-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        Back
+    </button>
+    <style>
+    .upload-back-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 10px 20px !important;
+        background: #0C2547 !important;
+        color: #ffffff !important;
+        font-weight: 900 !important;
+        font-size: 11px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.1em !important;
+        border: none !important;
+        cursor: pointer !important;
+        margin-bottom: 8px !important;
+    }
+    .upload-back-btn:hover { background: #C9A84C !important; color: #0C2547 !important; }
+    </style>
+
+
+    <!-- Instructions -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <h3 class="text-sm font-bold uppercase tracking-widest text-amber-400 mb-4">📷 How It Works</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="text-3xl mb-2">📸</div>
+                <p class="text-xs font-bold text-zinc-400">1. Upload Photos</p>
+                <p class="text-[10px] text-zinc-600">JPG, PNG — front & back</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-2">🤖</div>
+                <p class="text-xs font-bold text-zinc-400">2. AI Extracts Data</p>
+                <p class="text-[10px] text-zinc-600">Gemini reads handwriting</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-2">✏️</div>
+                <p class="text-xs font-bold text-zinc-400">3. Review & Edit</p>
+                <p class="text-[10px] text-zinc-600">Correct any mistakes</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-2">📊</div>
+                <p class="text-xs font-bold text-zinc-400">4. AI Analysis</p>
+                <p class="text-[10px] text-zinc-600">Career roadmap generated</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Form -->
+    <form method="POST" enctype="multipart/form-data" id="upload-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8">
+            <div id="drop-zone" class="border-2 border-dashed border-zinc-700 rounded-xl p-12 text-center cursor-pointer hover:border-amber-500 transition-colors"
+                 onclick="document.getElementById('photo-input').click()">
+                <div id="drop-icon" class="text-5xl mb-4">📷</div>
+                <p class="text-lg font-bold text-zinc-300" id="drop-text">Drop assessment photos here</p>
+                <p class="text-sm text-zinc-500 mt-2">or click to browse · JPG, PNG, WEBP accepted</p>
+                <p class="text-xs text-zinc-600 mt-1">Upload both pages (front + back) for full extraction</p>
+                <input type="file" name="photos" id="photo-input" multiple accept="image/*" class="hidden"
+                       onchange="handleFiles(this.files)">
+            </div>
+
+            <!-- Preview -->
+            <div id="preview-area" class="hidden mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
+
+            <div class="mt-6 flex justify-between items-center">
+                <p id="file-count" class="text-sm text-zinc-500"></p>
+                <button type="submit" id="scan-btn" class="hidden px-8 py-3 bg-amber-500 text-black font-bold uppercase tracking-widest rounded-lg hover:bg-amber-400 transition-colors text-sm">
+                    🔍 Scan & Digitize
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="text-5xl mb-4 animate-bounce">🤖</div>
+            <h3 class="text-xl font-bold text-white mb-2">Reading Handwriting...</h3>
+            <p class="text-sm text-zinc-400">Gemini AI is extracting data from your photos</p>
+            <div class="mt-4 w-64 h-1 bg-zinc-800 rounded overflow-hidden mx-auto">
+                <div class="h-full bg-amber-500 animate-progress"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes progress { 0%{width:0} 100%{width:100%} }
+    .animate-progress { animation: progress 8s ease-in-out; }
+    .drop-active { border-color: #f59e0b !important; background: rgba(245,158,11,0.05); }
+</style>
+
+<script>
+const dropZone = document.getElementById('drop-zone');
+const previewArea = document.getElementById('preview-area');
+const scanBtn = document.getElementById('scan-btn');
+const fileCount = document.getElementById('file-count');
+const photoInput = document.getElementById('photo-input');
+const form = document.getElementById('upload-form');
+
+// Drag and drop
+['dragenter','dragover'].forEach(e => {
+    dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drop-active'); });
+});
+['dragleave','drop'].forEach(e => {
+    dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drop-active'); });
+});
+dropZone.addEventListener('drop', ev => {
+    const dt = new DataTransfer();
+    [...ev.dataTransfer.files].forEach(f => dt.items.add(f));
+    photoInput.files = dt.files;
+    handleFiles(dt.files);
+});
+
+function handleFiles(files) {
+    if (!files.length) return;
+    previewArea.innerHTML = '';
+    previewArea.classList.remove('hidden');
+    scanBtn.classList.remove('hidden');
+    fileCount.textContent = files.length + ' photo' + (files.length > 1 ? 's' : '') + ' selected';
+
+    [...files].forEach(f => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const div = document.createElement('div');
+            div.className = 'relative rounded-lg overflow-hidden border border-zinc-700';
+            div.innerHTML = `<img src="${e.target.result}" class="w-full h-40 object-cover">
+                <div class="absolute bottom-0 inset-x-0 bg-black/70 px-2 py-1">
+                    <p class="text-[10px] text-zinc-300 truncate">${f.name}</p>
+                </div>`;
+            previewArea.appendChild(div);
+        };
+        reader.readAsDataURL(f);
+    });
+}
+
+// Show loading on submit
+form.addEventListener('submit', () => {
+    document.getElementById('loading-overlay').classList.remove('hidden');
+    scanBtn.disabled = true;
+    scanBtn.textContent = 'Scanning...';
+});
+</script>
+
+{% endblock %}

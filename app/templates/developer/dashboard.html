@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeveloperX — Dashboard · Daichiro</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:     #071a3e;
+  --navy-m:   #0F2D5E;
+  --navy-lt:  #1a3d6e;
+  --gold:     #C9A84C;
+  --gold-lt:  #f0c96e;
+  --gold-dim: rgba(201,168,76,0.12);
+  --white:    #ffffff;
+  --muted:    rgba(255,255,255,0.45);
+  --subtle:   rgba(255,255,255,0.06);
+  --border:   rgba(255,255,255,0.09);
+  --sidebar-w: 280px;
+  --header-h:  68px;
+}
+html, body { height: 100%; font-family: 'Inter', sans-serif; background: #060e22; color: #fff; -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 99px; }
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, #0a1a3a 0%, #071228 100%);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 50;
+}
+.sidebar::before {
+  content: ''; position: absolute; top: -80px; left: -80px;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.1), transparent 70%);
+  pointer-events: none;
+}
+
+/* Brand */
+.sb-brand {
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.sb-brand-row { display: flex; align-items: center; gap: 12px; }
+.sb-brand-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), #e0a830);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 18px rgba(201,168,76,0.35); flex-shrink: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 900; color: var(--navy);
+}
+.sb-brand-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 900; letter-spacing: -0.02em; }
+.sb-brand-sub { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.28em; color: var(--gold); margin-top: 2px; }
+.sb-status {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 14px; padding: 7px 12px;
+  background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 8px;
+}
+.sb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: blink 2.5s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.sb-dot-text { font-size: 10px; font-weight: 700; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; }
+
+/* Nav */
+.sb-nav { flex: 1; padding: 20px 14px; overflow-y: auto; }
+.sb-nav-section {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.3em; color: rgba(255,255,255,0.22);
+  padding: 0 10px; margin: 20px 0 8px;
+}
+.sb-nav-section:first-child { margin-top: 4px; }
+.sb-nav-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 11px;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  text-decoration: none; margin-bottom: 2px;
+  transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
+  cursor: pointer; border: none; background: transparent; width: 100%; text-align: left;
+}
+.sb-nav-link:hover { background: var(--subtle); color: #fff; }
+.sb-nav-link.active {
+  background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.07));
+  color: var(--gold-lt); border: 1px solid rgba(201,168,76,0.22);
+}
+.sb-nav-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06); flex-shrink: 0; font-size: 14px;
+  transition: all 0.22s;
+}
+.sb-nav-link.active .sb-nav-icon { background: linear-gradient(135deg, var(--gold), #e0a830); }
+
+/* User card */
+.sb-user {
+  margin: 0 14px; padding: 12px 14px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.sb-user-row { display: flex; align-items: center; gap: 10px; }
+.sb-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold), #b8841c);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 900; color: var(--navy);
+  flex-shrink: 0; box-shadow: 0 4px 12px rgba(201,168,76,0.3);
+}
+.sb-user-name { font-size: 13px; font-weight: 700; color: #fff; }
+.sb-user-role { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: var(--gold); margin-top: 1px; }
+.sb-logout {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 8px; margin-top: 10px; border-radius: 9px;
+  background: transparent; border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none; transition: all 0.2s;
+}
+.sb-logout:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+.sb-powered {
+  font-size: 8px; text-transform: uppercase; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.18); text-align: center;
+  padding: 12px 0 16px;
+}
+.sb-powered span { color: rgba(201,168,76,0.45); font-weight: 800; }
+
+/* ── Main ── */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Header */
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  height: var(--header-h);
+  background: rgba(6,14,34,0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 36px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.topbar-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.topbar-breadcrumb .active { color: var(--gold-lt); font-weight: 700; }
+.topbar-breadcrumb svg { color: rgba(255,255,255,0.2); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-pill {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--gold); background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.2);
+  padding: 5px 12px; border-radius: 100px;
+}
+
+/* Content */
+.content { padding: 36px; flex: 1; }
+.page-eyebrow { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 8px; }
+.page-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+
+/* Alert */
+.alert {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 13px 16px; border-radius: 12px; margin-bottom: 28px;
+  font-size: 13px; font-weight: 600; line-height: 1.5;
+  animation: alertIn 0.4s ease both;
+}
+@keyframes alertIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+.alert.success { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); color: var(--gold-lt); }
+.alert.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.25);  color: #fca5a5; }
+
+/* Section card */
+.section-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border); border-radius: 20px;
+  overflow: hidden; margin-bottom: 24px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.section-card:hover { border-color: rgba(201,168,76,0.2); box-shadow: 0 8px 40px rgba(0,0,0,0.25); }
+.section-head {
+  padding: 20px 28px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(15,45,94,0.15);
+}
+.section-head-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.2);
+  font-size: 16px; flex-shrink: 0;
+}
+.section-head-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 900; letter-spacing: -0.01em; }
+.section-head-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.section-body { padding: 28px; }
+
+/* Form */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } }
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.22em; color: rgba(255,255,255,0.35); margin-bottom: 8px; }
+.form-input {
+  width: 100%; padding: 13px 16px;
+  background: rgba(255,255,255,0.05); border: 1.5px solid var(--border);
+  border-radius: 11px; color: #fff; font-size: 14px; font-weight: 500;
+  font-family: 'Inter', sans-serif; outline: none;
+  transition: border-color 0.22s, background 0.22s, box-shadow 0.22s;
+}
+.form-input:focus { border-color: var(--gold); background: rgba(201,168,76,0.05); box-shadow: 0 0 0 4px rgba(201,168,76,0.1); }
+.form-input::placeholder { color: rgba(255,255,255,0.18); }
+.form-hint { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; line-height: 1.5; }
+
+/* Preview */
+.preview-bar {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 14px; padding: 9px 18px;
+  background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 100px; font-size: 12px; color: var(--muted);
+}
+.preview-bar strong { color: var(--gold-lt); font-family: monospace; font-size: 12px; }
+
+/* Info bar */
+.info-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; border-radius: 10px; margin-bottom: 22px;
+  background: rgba(15,45,94,0.3); border: 1px solid rgba(255,255,255,0.08);
+  font-size: 12px; color: var(--muted); font-weight: 500;
+}
+
+/* Buttons */
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+.btn-gold {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 24px;
+  background: linear-gradient(135deg, var(--gold), #e0a830);
+  border: none; border-radius: 10px;
+  color: var(--navy); font-size: 12px; font-weight: 900;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(201,168,76,0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(201,168,76,0.4); }
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 24px;
+  background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.22);
+  border-radius: 10px; color: #fca5a5; font-size: 12px; font-weight: 900;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(239,68,68,0.15); }
+
+/* ══ MOBILE RESPONSIVE ══ */
+#dev-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 40;
+  -webkit-tap-highlight-color: transparent;
+}
+#dev-overlay.open { display: block; }
+.sidebar {
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+}
+.sidebar.open { transform: translateX(0); }
+.sb-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  background: transparent; color: rgba(255,255,255,0.35);
+  cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+}
+.sb-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+#dev-hamburger {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 10px; border: none;
+  background: rgba(255,255,255,0.08); cursor: pointer;
+  transition: background 0.25s; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+}
+#dev-hamburger:hover { background: rgba(255,255,255,0.15); }
+.hb-d {
+  position: absolute; left: 50%;
+  width: 18px; height: 1.8px; background: #fff; border-radius: 2px;
+  transform: translateX(-50%);
+  transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.22s, top 0.32s cubic-bezier(.4,0,.2,1), width 0.28s;
+}
+.hb-d.top { top: calc(50% - 5px); }
+.hb-d.bot { top: calc(50% + 3px); width: 13px; }
+#dev-hamburger.is-open .hb-d.top { top: 50%; width: 18px; transform: translateX(-50%) rotate(45deg); }
+#dev-hamburger.is-open .hb-d.bot { top: 50%; width: 18px; transform: translateX(-50%) rotate(-45deg); }
+#dev-mobile-top {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #0a1a3a 0%, #071228 100%);
+  position: sticky; top: 0; z-index: 30;
+  border-bottom: 1px solid var(--border);
+}
+#dev-mobile-top .mob-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 900; color: #fff;
+  letter-spacing: -0.02em; flex: 1;
+}
+/* Desktop ≥1024px */
+@media (min-width: 1024px) {
+  #dev-mobile-top  { display: none !important; }
+  .sb-close        { display: none !important; }
+  .sidebar         { transform: translateX(0) !important; }
+  .main            { margin-left: var(--sidebar-w); }
+  #dev-hamburger   { display: none !important; }
+  #dev-overlay     { display: none !important; }
+  .topbar          { display: flex !important; }
+}
+/* Mobile/tablet <1024px */
+@media (max-width: 1023px) {
+  .main    { margin-left: 0 !important; }
+  .topbar  { display: none !important; }
+}
+@media (max-width: 767px)  { .content { padding: 16px !important; } }
+@media (min-width: 768px) and (max-width: 1023px) { .content { padding: 24px !important; } }
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div id="dev-overlay" onclick="closeDevSidebar()"></div>
+
+<!-- ── Sidebar ── -->
+<aside id="dev-sidebar" class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-row" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="sb-brand-icon">D</div>
+        <div>
+          <div class="sb-brand-name">Daichiro</div>
+          <div class="sb-brand-sub">Developer Portal</div>
+        </div>
+      </div>
+      <!-- Close button (mobile only) -->
+      <button class="sb-close" onclick="closeDevSidebar()" aria-label="Close">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sb-status">
+      <span class="sb-dot"></span>
+      <span class="sb-dot-text">Session Active</span>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-nav-section">Dashboard</div>
+    <div class="sb-nav-link active">
+      <div class="sb-nav-icon">⚡</div>
+      Control Panel
+    </div>
+  </nav>
+
+  <div style="padding: 0 14px; margin-bottom: 12px;">
+    <div class="sb-user">
+      <div class="sb-user-row">
+        <div class="sb-avatar">D</div>
+        <div>
+          <div class="sb-user-name">Developer</div>
+          <div class="sb-user-role">Site Owner</div>
+        </div>
+      </div>
+      <a href="{{ url_for('developer.logout') }}" class="sb-logout">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </a>
+    </div>
+  </div>
+  <p class="sb-powered">Powered by <span>ARTORYX</span></p>
+</aside>
+
+<!-- ── Main ── -->
+<div id="dev-main" class="main">
+
+  <!-- Mobile topbar (hidden ≥1024px) -->
+  <div id="dev-mobile-top">
+    <button id="dev-hamburger" onclick="toggleDevSidebar()" aria-label="Open menu">
+      <span class="hb-d top"></span>
+      <span class="hb-d bot"></span>
+    </button>
+    <span class="mob-title">Control Panel</span>
+  </div>
+
+  <!-- Desktop topbar (hidden <1024px via CSS) -->
+  <div class="topbar">
+    <nav class="topbar-breadcrumb">
+      <span>DeveloperX</span>
+      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <span class="active">Dashboard</span>
+    </nav>
+    <div class="topbar-right">
+      <span class="topbar-pill">Owner Access</span>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <p class="page-eyebrow">Site Owner Panel</p>
+    <h1 class="page-title">Control Panel</h1>
+    <p class="page-sub">Manage your public site credit and developer credentials.</p>
+
+    <!-- Alerts -->
+
+    <!-- Footer Credit -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-icon">⚡</div>
+        <div>
+          <div class="section-head-title">Footer Credit</div>
+          <div class="section-head-sub">Controls the "Powered by" text displayed on all public site pages</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="info-bar">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Changes reflect immediately across all public pages.
+        </div>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="credit">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Credit Name</label>
+              <input type="text" name="credit_text" id="credit-inp" class="form-input" value="{{ credit_text }}" placeholder="ARTORYX" maxlength="60">
+              <p class="form-hint">Shown after "Powered by" in the footer</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Credit URL <span style="font-weight:500;text-transform:none;letter-spacing:0;opacity:.6">(Optional)</span></label>
+              <input type="url" name="credit_link" class="form-input" value="{{ credit_link }}" placeholder="https://artoryx.com">
+              <p class="form-hint">Leave blank to remove hyperlink</p>
+            </div>
+          </div>
+          <div class="preview-bar">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Preview: Powered by &nbsp;<strong id="credit-preview">{{ credit_text }}</strong>
+          </div>
+          <div class="btn-row" style="margin-top:22px;">
+            <button type="submit" class="btn-gold">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Change Password -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-icon">🔑</div>
+        <div>
+          <div class="section-head-title">Change Password</div>
+          <div class="section-head-sub">Update your developer portal login password</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="password">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" name="current_password" class="form-input" required placeholder="Enter current password" autocomplete="current-password">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" name="new_password" class="form-input" required placeholder="Min. 6 characters" autocomplete="new-password" minlength="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" name="confirm_password" class="form-input" required placeholder="Repeat password" autocomplete="new-password">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn-gold">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Credit preview
+const inp = document.getElementById('credit-inp');
+const prev = document.getElementById('credit-preview');
+if (inp && prev) inp.addEventListener('input', () => { prev.textContent = inp.value || 'ARTORYX'; });
+
+// Sidebar toggle
+function toggleDevSidebar() {
+  const btn     = document.getElementById('dev-hamburger');
+  const sidebar = document.getElementById('dev-sidebar');
+  const overlay = document.getElementById('dev-overlay');
+  const isOpen  = sidebar.classList.contains('open');
+  if (isOpen) {
+    sidebar.classList.remove('open'); overlay.classList.remove('open'); btn.classList.remove('is-open');
+    document.body.style.overflow = '';
+  } else {
+    sidebar.classList.add('open'); overlay.classList.add('open'); btn.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeDevSidebar() {
+  const btn = document.getElementById('dev-hamburger');
+  const sidebar = document.getElementById('dev-sidebar');
+  const overlay = document.getElementById('dev-overlay');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('open');
+  if (btn)    btn.classList.remove('is-open');
+  document.body.style.overflow = '';
+}
+window.addEventListener('resize', function() {
+  if (window.innerWidth >= 1024) {
+    const ov = document.getElementById('dev-overlay');
+    if (ov) ov.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+</script>
+</body>
+</html>

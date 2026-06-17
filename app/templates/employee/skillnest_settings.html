@@ -1,0 +1,251 @@
+{% extends "employee/base_employee.html" %}
+
+{% block title %}SkillNest Settings{% endblock %}
+{% block page_title %}SkillNest Settings{% endblock %}
+{% block page_subtitle %}Configuration{% endblock %}
+
+{% block page_content %}
+
+<style>
+.sn-page .sn-white { color: #ffffff !important; }
+.sn-input {
+    width:100%; padding:11px 16px;
+    background:#18181b; border:1.5px solid #3f3f46;
+    border-radius:12px;
+    font-size:.875rem; font-weight:600;
+    transition:border-color .2s, box-shadow .2s;
+    outline:none;
+    color:#e4e4e7 !important;
+}
+.sn-input::placeholder { color:#52525b !important; }
+.sn-input:focus { border-color:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,.12); }
+
+/* Toggle switch */
+.toggle-wrap { display:flex; align-items:center; gap:12px; cursor:pointer; }
+.toggle-track {
+    position:relative; width:46px; height:26px;
+    background:#3f3f46; border-radius:999px;
+    border:1px solid #52525b;
+    transition:background .25s, border-color .25s;
+    flex-shrink:0;
+}
+.toggle-thumb {
+    position:absolute; top:3px; left:3px;
+    width:18px; height:18px; border-radius:50%;
+    background:#71717a; transition:transform .25s, background .25s;
+}
+input[type=checkbox].toggle-input { display:none; }
+input[type=checkbox].toggle-input:checked + .toggle-track { background:#f59e0b; border-color:#d97706; }
+input[type=checkbox].toggle-input:checked + .toggle-track .toggle-thumb { transform:translateX(20px); background:#fff; }
+</style>
+
+<div class="sn-page">
+
+<!-- Back button -->
+<a href="{{ url_for('employee.skillnest_page') }}"
+   class="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-xl"
+   style="background:#18181b;border:1px solid #27272a;color:#a1a1aa;font-size:.875rem;font-weight:700;text-decoration:none;transition:border-color .2s,color .2s;"
+   onmouseover="this.style.borderColor='#f59e0b';this.style.color='#f59e0b';"
+   onmouseout="this.style.borderColor='#27272a';this.style.color='#a1a1aa';">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Back to SkillNest
+</a>
+
+<!-- Settings Card -->
+<div class="mb-6 rounded-2xl overflow-hidden"
+     style="background:linear-gradient(135deg,#1c1917 0%,#18181b 60%,#1c1917 100%);border:1px solid #3f3f46;">
+    <div class="h-0.5 w-full" style="background:linear-gradient(90deg,transparent,#f59e0b 40%,#fbbf24 60%,transparent);"></div>
+    <div class="p-7">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:rgba(245,158,11,.15);">
+                <svg style="color:#f59e0b;width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+            <div>
+                <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.3em;color:#d97706;margin-bottom:2px;">Configuration</p>
+                <h3 class="sn-white" style="font-size:1.25rem;font-weight:900;line-height:1;">SkillNest Settings</h3>
+            </div>
+        </div>
+
+        <form action="{{ url_for('employee.skillnest_set_settings') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+
+            <!-- Monthly Fee -->
+            <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #27272a;">
+                <label style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#a1a1aa;margin-bottom:8px;display:block;">
+                    💰 Monthly Fee (₹)
+                </label>
+                <input type="number" name="fee" value="{{ admission_fee or '' }}" placeholder="e.g. 4000" min="0" class="sn-input" style="margin-bottom:8px;">
+                {% if admission_fee %}
+                <p style="font-size:12px;font-weight:900;color:#f59e0b;">₹{{ admission_fee }}<span style="color:#52525b;font-weight:500;"> /month — current</span></p>
+                {% else %}
+                <p style="font-size:12px;color:#52525b;">No fee set yet</p>
+                {% endif %}
+            </div>
+
+            <!-- Show Monthly Fee Toggle -->
+            <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #27272a;">
+                <label style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#a1a1aa;margin-bottom:12px;display:block;">
+                    👁 Show Monthly Fee on Public Page
+                </label>
+                <label class="toggle-wrap" style="margin-bottom:12px;">
+                    <input type="checkbox" name="show_monthly_fee" value="1" class="toggle-input"
+                        id="toggle-show-monthly-fee" {% if show_monthly_fee != '0' %}checked{% endif %}>
+                    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                    <span id="monthly-fee-label" style="font-size:.875rem;font-weight:900;color:{% if show_monthly_fee != '0' %}#f59e0b{% else %}#71717a{% endif %};">
+                        {% if show_monthly_fee != '0' %}Visible{% else %}Hidden{% endif %}
+                    </span>
+                </label>
+                <p style="font-size:10px;color:#52525b;line-height:1.5;">When off, the <span style="color:#a1a1aa;font-weight:700;">"Monthly Fee: ₹…"</span> badge is hidden from applicants.</p>
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+
+            <!-- Admission (One-time) Fee -->
+            <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #27272a;">
+                <label style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#a1a1aa;margin-bottom:8px;display:block;">
+                    🏷 Admission / Registration Fee (₹)
+                </label>
+                <input type="number" name="admission_reg_fee" value="{{ admission_reg_fee or '' }}" placeholder="e.g. 500" min="0" class="sn-input" style="margin-bottom:8px;">
+                {% if admission_reg_fee %}
+                <p style="font-size:12px;font-weight:900;color:#34d399;">₹{{ admission_reg_fee }}<span style="color:#52525b;font-weight:500;"> — one-time</span></p>
+                {% else %}
+                <p style="font-size:12px;color:#52525b;">Not set — leave blank to hide</p>
+                {% endif %}
+            </div>
+
+            <!-- Total Seats -->
+            <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #27272a;">
+                <label style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#a1a1aa;margin-bottom:8px;display:block;">
+                    🪑 Total Seats (Capacity)
+                </label>
+                <input type="number" name="total_seats" value="{{ total_seats or '' }}" placeholder="e.g. 10" min="1" class="sn-input" style="margin-bottom:8px;">
+                {% if total_seats %}
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;">
+                    <span style="color:#f87171;">{{ seats_taken }} taken</span>
+                    <span style="color:#3f3f46;">·</span>
+                    <span style="color:{% if seats_left == 0 %}#f87171{% else %}#34d399{% endif %};">{{ seats_left }} left</span>
+                    <span style="color:#3f3f46;">/ {{ total_seats }}</span>
+                </div>
+                {% else %}
+                <p style="font-size:12px;color:#52525b;">Not configured yet</p>
+                {% endif %}
+            </div>
+
+            <!-- Show Seats Toggle -->
+            <div class="rounded-xl p-4" style="background:#09090b;border:1px solid #27272a;">
+                <label style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#a1a1aa;margin-bottom:12px;display:block;">
+                    👁 Show Seats Left on Public Page
+                </label>
+                <label class="toggle-wrap" style="margin-bottom:12px;">
+                    <input type="checkbox" name="show_seats" value="1" class="toggle-input"
+                        id="toggle-show-seats" {% if show_seats == '1' %}checked{% endif %}>
+                    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                    <span id="toggle-label" style="font-size:.875rem;font-weight:900;color:{% if show_seats == '1' %}#f59e0b{% else %}#71717a{% endif %};">
+                        {% if show_seats == '1' %}Visible{% else %}Hidden{% endif %}
+                    </span>
+                </label>
+                <p style="font-size:10px;color:#52525b;line-height:1.5;">When on, applicants see <span style="color:#a1a1aa;font-weight:700;">"X seats left"</span> on the apply page.</p>
+            </div>
+        </div>
+
+        <!-- Admission Closure Row -->
+        <div class="rounded-xl p-4 mt-4 flex items-start gap-5" id="admission-status-card"
+             style="background:#09090b;border:1px solid #27272a;transition:background .3s,border-color .3s;">
+            <div class="flex-1">
+                <p id="admission-status-eyebrow" style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#a1a1aa;margin-bottom:6px;">
+                    🔒 Admission Status
+                </p>
+                <p id="admission-status-text" style="font-size:.875rem;font-weight:900;color:#d4d4d8;margin-bottom:4px;">
+                    Admissions are <span id="admission-status-val" style="color:#34d399;">Open</span>
+                </p>
+                <p style="font-size:11px;color:#52525b;line-height:1.5;">Closing blocks new online applications and walk-ins. Admin can still force-add via manual form.</p>
+            </div>
+            <label class="toggle-wrap" style="flex-shrink:0;padding-top:4px;">
+                <input type="checkbox" name="admission_closed" value="1" class="toggle-input"
+                    id="toggle-admission-closed" {% if admission_closed == '1' %}checked{% endif %}>
+                <div class="toggle-track" id="closed-track">
+                    <div class="toggle-thumb" id="closed-thumb"></div>
+                </div>
+                <span id="toggle-closed-label" style="font-size:.875rem;font-weight:900;">Open</span>
+            </label>
+        </div>
+
+        <button type="submit"
+            class="inline-flex items-center gap-2 px-7 py-3 rounded-xl mt-5"
+            style="background:#f59e0b;color:#000;font-weight:900;font-size:.875rem;text-transform:uppercase;letter-spacing:.1em;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+            Save Settings
+        </button>
+        </form>
+    </div>
+</div>
+
+</div>
+
+<script>
+const toggleInput = document.getElementById('toggle-show-seats');
+const toggleLabel = document.getElementById('toggle-label');
+if (toggleInput && toggleLabel) {
+    toggleInput.addEventListener('change', () => {
+        toggleLabel.textContent = toggleInput.checked ? 'Visible' : 'Hidden';
+        toggleLabel.style.color = toggleInput.checked ? '#f59e0b' : '#71717a';
+    });
+}
+
+const monthlyFeeInput = document.getElementById('toggle-show-monthly-fee');
+const monthlyFeeLabel = document.getElementById('monthly-fee-label');
+if (monthlyFeeInput && monthlyFeeLabel) {
+    monthlyFeeInput.addEventListener('change', () => {
+        monthlyFeeLabel.textContent = monthlyFeeInput.checked ? 'Visible' : 'Hidden';
+        monthlyFeeLabel.style.color = monthlyFeeInput.checked ? '#f59e0b' : '#71717a';
+    });
+}
+
+const closedInput  = document.getElementById('toggle-admission-closed');
+const closedTrack  = document.getElementById('closed-track');
+const closedThumb  = document.getElementById('closed-thumb');
+const closedLabel  = document.getElementById('toggle-closed-label');
+const closedCard   = document.getElementById('admission-status-card');
+const closedEyebrow= document.getElementById('admission-status-eyebrow');
+const closedVal    = document.getElementById('admission-status-val');
+
+function syncClosedToggle() {
+    const on = closedInput && closedInput.checked;
+    if (closedTrack) {
+        closedTrack.style.background     = on ? '#ef4444' : '#3f3f46';
+        closedTrack.style.borderColor    = on ? '#dc2626' : '#52525b';
+    }
+    if (closedThumb) {
+        closedThumb.style.transform  = on ? 'translateX(20px)' : '';
+        closedThumb.style.background = on ? '#fff' : '#71717a';
+    }
+    if (closedLabel) {
+        closedLabel.textContent  = on ? 'Closed' : 'Open';
+        closedLabel.style.color  = on ? '#f87171' : '#71717a';
+    }
+    if (closedCard) {
+        closedCard.style.background   = on ? 'rgba(127,29,29,.3)' : '#09090b';
+        closedCard.style.borderColor  = on ? 'rgba(239,68,68,.4)' : '#27272a';
+        closedCard.style.borderWidth  = on ? '1.5px' : '1px';
+    }
+    if (closedEyebrow) closedEyebrow.style.color = on ? '#f87171' : '#a1a1aa';
+    if (closedVal) {
+        closedVal.textContent = on ? 'Closed' : 'Open';
+        closedVal.style.color = on ? '#f87171' : '#34d399';
+    }
+}
+syncClosedToggle();
+if (closedInput) closedInput.addEventListener('change', syncClosedToggle);
+</script>
+
+{% endblock %}

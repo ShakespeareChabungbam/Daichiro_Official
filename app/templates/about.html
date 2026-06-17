@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}About Us — Daichiro Professional Skills Academy{% endblock %}
+
+{% block content %}
+
+{% set dir_img = url_for('static', filename='img/DirectorPhoto.jpg') %}
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="relative bg-school-navy overflow-hidden pt-24 sm:pt-32 pb-20 sm:pb-28 px-4">
+    <!-- Dot grid -->
+    <div class="absolute inset-0 opacity-[0.045]" style="background-image: radial-gradient(circle, #C9A84C 1px, transparent 1px); background-size: 36px 36px;"></div>
+    <!-- Glow blobs -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-school-gold rounded-full opacity-[0.06] blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-school-gold rounded-full opacity-[0.04] blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+        <p class="inline-block text-[10px] font-black uppercase tracking-[0.45em] text-school-gold bg-school-gold/10 border border-school-gold/25 rounded-full px-5 py-2 mb-6">About Daichiro</p>
+        <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight mb-6">
+            We Don't Just<br/>Teach Skills.
+            <span class="text-school-gold block mt-1">We Shape Character.</span>
+        </h1>
+        <p class="text-white/50 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+            A holistic development centre committed to nurturing confident, disciplined, and future-ready young individuals.
+        </p>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ABOUT STORY + MISSION
+══════════════════════════════════════════ -->
+<section class="py-16 sm:py-24 bg-white px-4">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+
+            <!-- Left: Story -->
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-school-gold mb-3">Who We Are</p>
+                <h2 class="font-serif text-3xl sm:text-4xl font-black text-school-navy leading-tight mb-8">
+                    Daichiro Professional<br/><span class="text-school-gold">Skills Academy</span>
+                </h2>
+
+                <div class="space-y-5 text-school-muted text-[15px] leading-relaxed">
+                    <p>
+                        Daichiro Professional Skills Academy is a <strong class="text-school-navy">holistic development centre</strong> committed to nurturing confident, disciplined, and future-ready young individuals. We believe education should go beyond textbook; building communication skills, character strength, leadership qualities, and emotional balance.
+                    </p>
+                    <p>
+                        Through structured programs like <strong class="text-school-navy">SkillNest After Club</strong>, we provide homework support alongside life skills training, value education, authentic games, and digital discipline awareness in a safe and guided environment.
+                    </p>
+                    <p>
+                        Our mission is to bridge the gap between academics and real-life readiness, while supporting parents in raising responsible, confident, and compassionate children.
+                    </p>
+                </div>
+
+                <!-- Quote -->
+                <div class="mt-10 relative pl-6 border-l-4 border-school-gold">
+                    <p class="font-serif text-xl text-school-navy font-black italic leading-snug">
+                        "At Daichiro, we don't just teach skills —
+                        <span class="text-school-gold"> We shape character.</span>"
+                    </p>
+                    <p class="mt-3 text-[10px] font-bold uppercase tracking-widest text-school-muted">— Sashipriya Potsangbam, Founder</p>
+                </div>
+            </div>
+
+            <!-- Right: Stats + Mission -->
+            <div class="space-y-5">
+                <!-- Stats grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-school-navy rounded-2xl p-6 text-center group hover:scale-[1.02] transition-transform">
+                        <p class="font-serif text-4xl font-black text-school-gold mb-1">500+</p>
+                        <p class="text-white/55 text-[10px] font-black uppercase tracking-widest">Families Guided</p>
+                    </div>
+                    <div class="bg-school-gold rounded-2xl p-6 text-center group hover:scale-[1.02] transition-transform">
+                        <p class="font-serif text-4xl font-black text-school-navy mb-1">15</p>
+                        <p class="text-school-navy/65 text-[10px] font-black uppercase tracking-widest">SkillNest Seats</p>
+                    </div>
+                    <div class="bg-school-light border border-school-mid rounded-2xl p-6 text-center group hover:scale-[1.02] transition-transform">
+                        <p class="font-serif text-4xl font-black text-school-navy mb-1">100%</p>
+                        <p class="text-school-muted text-[10px] font-black uppercase tracking-widest">Confidential</p>
+                    </div>
+                    <div class="bg-school-light border border-school-mid rounded-2xl p-6 text-center group hover:scale-[1.02] transition-transform">
+                        <p class="font-serif text-4xl font-black text-school-navy mb-1">₹399</p>
+                        <p class="text-school-muted text-[10px] font-black uppercase tracking-widest">Per Session</p>
+                    </div>
+                </div>
+
+                <!-- Mission box -->
+                <div class="bg-school-navy rounded-2xl p-7">
+                    <p class="text-[10px] font-black uppercase tracking-[0.35em] text-school-gold mb-3">Our Mission</p>
+                    <p class="text-white/65 text-sm leading-relaxed mb-6">
+                        To bridge academic and real-life skills by providing structured after-school support, life skills training, communication development, and parent-guided growth programs.
+                    </p>
+                    <div class="grid grid-cols-2 gap-3 pt-5 border-t border-white/10">
+                        {% for val in ['Communication', 'Character', 'Confidence', 'Care'] %}
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-2 h-2 rounded-full bg-school-gold flex-shrink-0"></div>
+                            <span class="font-bold text-white text-sm">{{ val }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     WHAT WE STAND FOR (Values strip)
+══════════════════════════════════════════ -->
+<section class="bg-school-gold py-12 px-4">
+    <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+
+            <!-- PURPOSE-DRIVEN -->
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-14 h-14 rounded-2xl bg-school-navy flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="12" cy="12" r="7"/>
+                        <line x1="12" y1="1" x2="12" y2="5"/>
+                        <line x1="12" y1="19" x2="12" y2="23"/>
+                        <line x1="1" y1="12" x2="5" y2="12"/>
+                        <line x1="19" y1="12" x2="23" y2="12"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-black text-school-navy text-[11px] uppercase tracking-widest">Purpose-Driven</p>
+                    <p class="text-school-navy/60 text-xs mt-1 leading-snug">Every child has unique strengths</p>
+                </div>
+            </div>
+
+            <!-- HOLISTIC GROWTH -->
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-14 h-14 rounded-2xl bg-school-navy flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                        <path d="M12 6v6l4 2"/>
+                        <path d="M8 14s1 2 4 2 4-2 4-2"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-black text-school-navy text-[11px] uppercase tracking-widest">Holistic Growth</p>
+                    <p class="text-school-navy/60 text-xs mt-1 leading-snug">Beyond academics — whole person</p>
+                </div>
+            </div>
+
+            <!-- PARENT PARTNERSHIP -->
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-14 h-14 rounded-2xl bg-school-navy flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-black text-school-navy text-[11px] uppercase tracking-widest">Parent Partnership</p>
+                    <p class="text-school-navy/60 text-xs mt-1 leading-snug">Families at the heart of care</p>
+                </div>
+            </div>
+
+            <!-- SAFE SPACE -->
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-14 h-14 rounded-2xl bg-school-navy flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-black text-school-navy text-[11px] uppercase tracking-widest">Safe Space</p>
+                    <p class="text-school-navy/60 text-xs mt-1 leading-snug">Non-judgmental, always confidential</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     MEET THE FOUNDER
+══════════════════════════════════════════ -->
+<section class="py-16 sm:py-24 bg-school-light px-4">
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-14">
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-school-gold mb-3">Leadership</p>
+            <h2 class="font-serif text-3xl sm:text-4xl font-black text-school-navy">Meet the Founder</h2>
+            <div class="w-12 h-1 bg-school-gold rounded-full mx-auto mt-5"></div>
+        </div>
+
+        <div class="bg-white rounded-3xl overflow-hidden border border-school-mid shadow-xl">
+            <div class="grid grid-cols-1 md:grid-cols-5">
+                <!-- Photo -->
+                <div class="md:col-span-2 relative" style="min-height:340px;">
+                    <img src="{{ dir_img }}" alt="Founder — Sashipriya Potsangbam"
+                         class="w-full h-full object-cover object-top absolute inset-0"
+                         onerror="this.parentElement.style.background='#0F2D5E'">
+                    <!-- Overlay gradient -->
+                    <div class="absolute inset-0 md:hidden" style="background:linear-gradient(to top, rgba(7,26,62,0.7) 0%, transparent 60%);"></div>
+                </div>
+                <!-- Content -->
+                <div class="md:col-span-3 p-8 sm:p-12 flex flex-col justify-center">
+                    <p class="text-[9px] font-black uppercase tracking-[0.35em] text-school-gold mb-2">Founder &amp; Director &nbsp;|&nbsp; Educator &nbsp;|&nbsp; Child Development &amp; Life Skills Mentor</p>
+                    <h3 class="font-serif text-2xl sm:text-3xl font-black text-school-navy mb-1">Sashipriya Potsangbam</h3>
+                    <p class="text-school-muted text-sm mb-6">{{ site_location_address or 'Old Lambulane, Opp. G.P. College, Imphal' }}</p>
+
+                    <div class="space-y-4 text-school-muted text-[14px] leading-relaxed mb-8">
+                        <p>
+                            With a deep belief that every child deserves more than academic instruction, she established Daichiro Professional Skills Academy — a space where <strong class="text-school-navy">holistic growth</strong> is the standard, not the exception.
+                        </p>
+                        <p>
+                            Through years of working with students and families, the vision became clear: build a centre where children learn to communicate, lead, and grow into responsible, compassionate individuals.
+                        </p>
+                    </div>
+
+                    <!-- Full quote from brochure -->
+                    <div class="border-l-4 border-school-gold pl-5 bg-school-gold/5 rounded-r-xl py-4 pr-4">
+                        <p class="text-school-navy italic text-sm font-semibold leading-relaxed">
+                            "Skills may create opportunities, but character sustains success. At Daichiro, we nurture confidence, communication, discipline, and kindness from an early age."
+                        </p>
+                        <p class="mt-3 text-[10px] font-bold uppercase tracking-widest text-school-muted">— Sashipriya Potsangbam</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CTA
+══════════════════════════════════════════ -->
+<section class="py-16 sm:py-20 bg-school-navy px-4 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle, #C9A84C 1px, transparent 1px); background-size: 36px 36px;"></div>
+    <div class="relative z-10 max-w-2xl mx-auto text-center">
+        <p class="text-[10px] font-black uppercase tracking-[0.35em] text-school-gold mb-3">Get Started</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-black text-white mb-4">
+            Ready to Give Your Child<br/>the Daichiro Advantage?
+        </h2>
+        <p class="text-white/50 text-sm mb-8 max-w-md mx-auto">
+            Book a confidential counselling session or apply to SkillNest today.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="{{ url_for('main.book_page') }}"
+               class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-school-gold text-school-navy font-black text-sm uppercase tracking-wider rounded-xl hover:bg-amber-400 transition-all hover:-translate-y-0.5 shadow-lg shadow-school-gold/20">
+                Book a Session →
+            </a>
+            <a href="{{ url_for('main.skillnest') }}"
+               class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 border border-white/20 text-white font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-white/20 transition-all">
+                Explore SkillNest
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

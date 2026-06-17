@@ -1,0 +1,787 @@
+
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║           T H E   D A I C H I R O   P L A T F O R M              ║
+║                                                                  ║
+║             Executive Website Operations Manual                  ║
+║                                                                  ║
+║       "Your complete master guide to managing, automating,       ║
+║              and securing your business online."                 ║
+║                                                                  ║
+║                  Prepared Exclusively For:                       ║
+║              DAICHIRO Professional Skills Academy                ║
+║                                                                  ║
+║                     Website: daichiro.in                         ║
+║                                                                  ║
+║               Designed & Developed by: ARTORYX                   ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                        TABLE OF CONTENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  PAGE 02 ........ Welcome & How This Manual Works
+  PAGE 03 ........ What Powers This Website (Technology Overview)
+  PAGE 04 ........ The Four Types of People on This Website
+  PAGE 05 ........ SECTION 1: Public Visitors (No Login Needed)
+  PAGE 06 ........ SECTION 2: Admin Login & Dashboard
+  PAGE 07 ........ SECTION 2A: Managing Counseling Appointments
+  PAGE 08 ........ SECTION 2B: Pricing, Packages & Vacation Mode
+  PAGE 09 ........ SECTION 2C: The AI Gemini Brain (Career Reports)
+  PAGE 10 ........ SECTION 2D: The Career Assessment System
+  PAGE 11 ........ SECTION 2E: Scanning Handwritten Paper Forms
+  PAGE 12 ........ SECTION 2F: SkillNest Admissions Management
+  PAGE 13 ........ SECTION 3: Employee / Staff Login
+  PAGE 14 ........ SECTION 4: Student / Client Login (Exam Portal)
+  PAGE 15 ........ Safety, Backups & Data Protection
+  PAGE 16 ........ Quick Reference & Troubleshooting
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 02]              WELCOME & HOW THIS MANUAL WORKS
+════════════════════════════════════════════════════════════════════
+
+Hello and welcome!
+
+This is your complete guide to operating the DAICHIRO website. This 
+manual has been written so that even someone with zero technology 
+experience can understand how every part of this platform works.
+
+HOW TO READ THIS MANUAL:
+━━━━━━━━━━━━━━━━━━━━━━━
+Think of this website like a modern office building with different 
+floors. Each floor has a specific purpose and only certain people 
+can enter. This manual will walk you through every floor, every room, 
+and every button you need to know.
+
+You do NOT need to understand code. You do NOT need to call a 
+developer for everyday tasks. This manual explains everything in 
+plain business language.
+
+WHAT THIS WEBSITE DOES FOR YOUR BUSINESS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Allows clients to book counseling sessions online, 24 hours a day.
+• Allows parents to apply for SkillNest admissions directly online.
+• Lets students take a detailed 5-part career assessment on any device.
+• Uses Artificial Intelligence (Google Gemini) in two powerful ways:
+  (1) Reads and analyzes each student's digital assessment answers 
+      and automatically generates a personalized career roadmap 
+      for you to share with the family.
+  (2) Scans handwritten paper assessment forms — if a student fills 
+      out a physical paper form instead of using a computer, simply 
+      take a photo and upload it. The AI reads the handwriting, 
+      extracts all the answers, and saves them digitally for you.
+• Gives you total control over pricing, staff access, and all records.
+• Protects your business data with daily backups and a Trash Bin 
+  so nothing is ever accidentally lost forever.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 03]        WHAT POWERS THIS WEBSITE (Technology Overview)
+════════════════════════════════════════════════════════════════════
+
+Imagine your website is a high-end restaurant. Even if you don't 
+cook, it helps to understand what kitchen tools are being used so 
+you can appreciate why the food (your website) is so exceptional.
+
+Here is what is powering your DAICHIRO platform:
+
+┌─────────────────────────────────────────────────────────────────┐
+│  COMPONENT             TECHNOLOGY USED       WHAT IT DOES       │
+├─────────────────────────────────────────────────────────────────┤
+│  The Engine            Python                Runs all logic     │
+│  The Server Framework  Flask + Gunicorn      Handles web traffic│
+│  The Database          PostgreSQL            Stores all records │
+│  The Look & Design     Tailwind CSS          Makes it beautiful │
+│  The Artificial Brain  Google Gemini AI      Reads & analyzes   │
+│  The Hosting Building  AWS EC2 (Amazon)      Keeps it online    │
+│  Password Security     Bcrypt Hashing        Encrypts passwords │
+│  Invoice Emails        SMTP Email Server     Sends PDF invoices │
+│  Form Protection       CSRF Tokens           Stops hackers      │
+│  Login Rate Limiter    Flask-Limiter         Blocks brute force │
+└─────────────────────────────────────────────────────────────────┘
+
+IMPORTANT NOTE ABOUT AWS EC2:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Your website is hosted on Amazon Web Services (AWS EC2). While AWS 
+is very powerful, you may occasionally see the website go offline or 
+temporarily unavailable. Do not panic — this is sometimes a planned 
+security reset mechanism built in by the developers to protect your 
+system and re-stabilize performance. The website will return online 
+automatically.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 04]        THE FOUR TYPES OF PEOPLE ON THIS WEBSITE
+════════════════════════════════════════════════════════════════════
+
+Your website is intelligently designed to serve four completely 
+different types of visitors. Each type sees a completely different 
+part of the website:
+
+╔═══════════════════════════════════════════════════════════════╗
+║  TYPE 1: PUBLIC VISITOR                                       ║
+║  Who:    Parents, students, anyone browsing from Google       ║
+║  Login:  NOT REQUIRED                                         ║
+║  Access: daichiro.in (main website)                           ║
+╠═══════════════════════════════════════════════════════════════╣
+║  TYPE 2: ADMIN (You, the business head)                       ║
+║  Who:    The person who runs DAICHIRO                         ║
+║  Login:  REQUIRED — Master Username & Password                ║
+║  Access: daichiro.in/admin/login                              ║
+╠═══════════════════════════════════════════════════════════════╣
+║  TYPE 3: EMPLOYEE / STAFF                                     ║
+║  Who:    Teachers, receptionists, counselors on your team     ║
+║  Login:  REQUIRED — Staff Username & Password                 ║
+║  Access: daichiro.in/admin/login (same login page as Admin)   ║
+╠═══════════════════════════════════════════════════════════════╣
+║  TYPE 4: CLIENT / STUDENT                                     ║
+║  Who:    Students taking the DAICHIRO career assessment       ║
+║  Login:  REQUIRED — Temporary credentials from your staff     ║
+║  Access: daichiro.in/client/login                             ║
+╚═══════════════════════════════════════════════════════════════╝
+
+The system knows automatically which type of user you are and sends 
+you to the correct area the moment you log in. You cannot accidentally 
+end up in the wrong place.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 05]          SECTION 1: PUBLIC VISITORS (No Login Needed)
+════════════════════════════════════════════════════════════════════
+
+Anyone who visits daichiro.in lands here. They do not need any 
+account or password. This is the "shop window" of your business.
+
+WHAT PUBLIC VISITORS CAN DO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. HOMEPAGE (daichiro.in)
+   Visitors see your brand, your mission, and your key services. 
+   They can immediately click to Book a Counseling Session or 
+   explore the SkillNest program.
+
+2. ABOUT US PAGE (daichiro.in/about)
+   A dedicated page explaining the DAICHIRO story, the academy's 
+   vision, and the professional background of the founders.
+
+3. BOOK A COUNSELING SESSION (daichiro.in/book)
+   Visitors choose from two session types:
+   
+   • Single Session — One counseling appointment (Student Session,
+     Parent Session, or Parent-Child Joint Session).
+   • Complete Package — All 3 session types bundled together.
+   
+   They fill in their Name, Mobile Number, WhatsApp Number, and 
+   Email, then submit their booking request. The fee displayed is 
+   exactly what you have set from your Admin dashboard.
+   
+   After submitting, they land on a "Booking Confirmed" page.
+   Their appointment record appears immediately in your Admin 
+   panel for you to follow up.
+
+4. SKILLNEST ADMISSIONS (daichiro.in/skillnest/apply)
+   Parents complete a detailed admission application for their 
+   child covering student information, parent/guardian details, 
+   academic & learning needs, behaviour & health context and 
+   program preferences.
+   
+   After submission, you receive the application in your Admin 
+   panel under "SkillNest." The program's seat count does NOT 
+   decrease until YOU personally approve the application.
+
+5. SUNDAY PROGRAMS (daichiro.in/sunday-programs)
+   A dedicated promotional page for weekend workshops, events, 
+   and community activities run by DAICHIRO.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 06]              SECTION 2: ADMIN LOGIN & DASHBOARD
+════════════════════════════════════════════════════════════════════
+
+This is your master control room. Everything about your business 
+operations is managed from here.
+
+HOW TO LOG IN:
+━━━━━━━━━━━━━
+  1. Open your browser and go to: daichiro.in/admin/login
+  2. Type your Admin Username and Password.
+  3. Click "Log In". You will arrive at your Dashboard.
+
+SECURITY: The system only allows 5 login attempts per minute from 
+the same device. After 5 wrong attempts, it temporarily blocks 
+that device. This stops hackers from guessing your password.
+
+IF YOU FORGET YOUR PASSWORD:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. On the login page, click "Forgot Password".
+  2. Enter the email address linked to your Admin account.
+  3. You will receive a secure reset link by email.
+  4. This link expires automatically in exactly 30 minutes.
+     After 30 minutes, it becomes invalid for your safety.
+  5. Click the link, set a new strong password, and log back in.
+
+YOUR DASHBOARD AT A GLANCE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Once inside, your dashboard shows you everything in real time:
+  • All counseling appointments (newest first)
+  • All registered student clients
+  • All submitted career assessments
+  • Your current Gemini AI status (active or not)
+
+YOUR LEFT-SIDE MENU (Navigation):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+All major sections are one click away in the sidebar:
+  • Dashboard (Home overview)
+  • Appointments (Bookings, Pricing, Vacation Mode)
+  • Assessments (Student exams and AI career reports)
+  • SkillNest (After-school admissions management)
+  • Gemini AI Settings (Your AI brain configuration)
+  • Profile (Change your username, password, or email)
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 07]       SECTION 2A: MANAGING COUNSELING APPOINTMENTS
+════════════════════════════════════════════════════════════════════
+
+When a visitor books a counseling session on your website, the 
+record appears here instantly. You do not need to manually track 
+anything in a notebook anymore.
+
+HOW TO VIEW APPOINTMENTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Click "Appointments" in the left menu.
+  2. Click "Appointment History" to see every booking.
+  3. Each booking shows the client's Name, Mobile, WhatsApp, 
+     Email, Package chosen, and Payment Status.
+
+MARKING A PAYMENT AS PAID:
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+When a client pays offline (cash or bank transfer), you can 
+manually update their record:
+  1. Find the appointment in the list.
+  2. Click "Mark as Paid" next to their name.
+  3. Their status will immediately change from "Pending" to "Paid."
+
+SENDING AN INVOICE BY EMAIL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After a session, you can send the client a professional PDF 
+receipt straight from the system:
+  1. Find the appointment in the history list.
+  2. Click the "Send Invoice" button.
+  3. The system emails a professionally formatted PDF invoice to 
+     the client's email address automatically. You do not need 
+     to prepare anything manually.
+
+DELETING OLD APPOINTMENTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+The system automatically removes appointments that are older than 
+90 days to keep your dashboard clean and fast.
+You can also manually delete any appointment by clicking "Delete."
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 08]       SECTION 2B: PRICING, PACKAGES & VACATION MODE
+════════════════════════════════════════════════════════════════════
+
+You have full control over your prices and availability without 
+needing to contact a developer for any of it.
+
+MANAGING YOUR COUNSELING FEES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Go to: Appointments > Pricing Management.
+  2. You can set and update:
+     • Single Session Fee (Base price)
+     • Single Session Offer Price (Discounted price shown to public)
+     • Complete Package Fee (Base price)
+     • Complete Package Offer Price (Discounted price shown to public)
+     • Offer Label: The name for the discount (e.g., "Diwali Special")
+     • Offer Expiry Date: When the offer price automatically stops 
+       displaying and reverts to the base price.
+  3. Click "Save" and your website reflects the change instantly.
+
+IMPORTANT: When a client books an appointment, the system 
+"locks" the price at the exact moment of booking. Even if you 
+change the price later, their original booking price stays the same.
+
+TURNING ON VACATION MODE ("Close Bookings"):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If you are going out of town, on a break, or simply not taking 
+new clients for a period, you can stop all new bookings instantly:
+  1. Go to: Appointments > Booking Status.
+  2. Toggle the switch to "Bookings Closed."
+  3. You can type a custom message for visitors to see 
+     (e.g., "Closed for holidays. Back on 15th April.").
+  4. Set an optional "Re-open Date" for clients to know when 
+     to come back. The website will display this information.
+
+To re-open bookings, simply toggle the switch back to "Open."
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 09]      SECTION 2C: THE AI GEMINI BRAIN (Career Reports)
+════════════════════════════════════════════════════════════════════
+
+This is the most powerful and unique feature of your platform. 
+The DAICHIRO website is connected directly to Google's most 
+advanced Artificial Intelligence: Gemini.
+
+WHAT THE AI DOES:
+━━━━━━━━━━━━━━━━
+After a student completes their 5-part career assessment, the AI 
+reads all of their answers — their interests, their academic 
+aptitude scores, their personality traits, and their career vision 
+— and then generates a completely personalized report for them.
+
+The AI has been given a special professional identity: it acts as 
+a "Senior Professional Psychologist and Career Counselor with 25+ 
+years of experience in India, specializing in adolescent guidance."
+
+WHAT THE REPORT INCLUDES:
+━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. PROFILE SUMMARY: A 4-sentence personal summary that directly 
+     addresses the student by their own first name and references 
+     their specific answers. It is never generic.
+
+  2. CAREER PATHWAYS (3 Options with Fit Percentage):
+     For example: "Engineering (78% Fit)" with 3 specific recommended 
+     actions. Local North-East India institutions are suggested 
+     alongside top pan-India colleges.
+
+  3. PERSONALIZED 5-YEAR ROADMAP: A year-by-year plan from Year 1 
+     to Year 5, each with a theme (e.g., "Foundation", "Growth", 
+     "Specialization") and 3 specific milestones to achieve.
+
+MANAGING THE AI KEY:
+━━━━━━━━━━━━━━━━━━━
+  1. Go to: Gemini AI Settings in your left menu.
+  2. To activate the AI, you enter your Google Gemini API Key here.
+  3. SECURITY: Before saving, the system asks you to re-confirm 
+     your ADMIN password. This prevents anyone from changing 
+     this critical setting without your permission.
+  4. You can also choose which Gemini model to use:
+     • gemini-2.5-flash (Recommended — fast and smart)
+     • gemini-2.5-pro (Most powerful, slower)
+     • gemini-2.0-flash (Older, stable)
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 10]         SECTION 2D: THE CAREER ASSESSMENT SYSTEM
+════════════════════════════════════════════════════════════════════
+
+This section is the heart of the DAICHIRO career counseling service. 
+Every student completes a structured assessment, and you use the 
+AI-generated report to provide professional career guidance.
+
+UNDERSTANDING THE ASSESSMENT STAGES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Your Assessments page organizes every student record into clear groups:
+
+  🔄 IN PROGRESS   — The student is currently logged in and taking 
+                     the assessment right now, or they started and 
+                     have not finished yet.
+
+  ⏳ PENDING AI    — The student has finished and submitted their 
+                     assessment. The AI has NOT analyzed it yet. 
+                     You need to click "Analyze" to start the AI.
+
+  🧠 AI COMPLETE   — The AI has fully analyzed the assessment. 
+                     The career report and roadmap are ready for 
+                     you to view and discuss with the family.
+
+  🗑️ TRASH BIN    — Assessments you have soft-deleted. They are 
+                     safely stored here and can be restored.
+
+HOW TO RUN THE AI ANALYSIS ON A STUDENT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Go to "Assessments" in your left menu.
+  2. Click on the "Pending AI Analysis" group.
+  3. Find the student's assessment card.
+  4. Click the "Analyze with AI" button.
+  5. Wait a few seconds. The AI reads all 5 sections of the 
+     student's answers and generates the full report.
+  6. The assessment moves to the "AI Analysis Complete" group.
+  7. Click "View Report" to see the full roadmap.
+
+HOW TO PRINT THE REPORT AS A PDF:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Open a completed assessment (AI Complete group).
+  2. Click "Download PDF" or "Print Report."
+  3. A clean, professionally formatted PDF is generated that you 
+     can print and hand to the family during your consultation.
+
+CREATING A STUDENT ACCOUNT (Client Login Credentials):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. On the Assessments page, click "Create Client."
+  2. Optionally, enter the student's name for your own reference.
+  3. The system instantly generates a random Username 
+     (e.g., student_74293) and a temporary Password.
+  4. A confirmation message appears on screen showing these 
+     credentials. Your staff writes them down and hands them 
+     to the student on paper.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 11]       SECTION 2E: SCANNING HANDWRITTEN PAPER FORMS
+════════════════════════════════════════════════════════════════════
+
+Some students prefer to fill out their career assessment on a 
+physical paper form instead of using a computer. DAICHIRO has a 
+solution for this as well — it uses AI to convert handwritten 
+papers into digital records instantly.
+
+WHEN WOULD YOU USE THIS?
+━━━━━━━━━━━━━━━━━━━━━━━━
+When a student fills out the DAICHIRO "Student Career Interest & 
+Aptitude Questionnaire" on paper and hands it to you physically.
+
+HOW IT WORKS STEP BY STEP:
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  STEP 1: Go to Assessments → click "Upload Assessment / Scan Paper."
+  STEP 2: Take a clear photo of the student's paper form using your 
+          phone camera or a webcam. Upload the photo(s).
+           • You can upload MULTIPLE photos if the form has 2 pages.
+           • The system automatically compresses images so they 
+             upload quickly even on a slow internet connection.
+  STEP 3: The Google Gemini AI "reads" the photo. It looks at:
+           • The student's handwritten personal details
+           • Which checkboxes were ticked in the Interests section
+           • Which circles were filled in the Aptitude rating (1–5)
+           • Which personality statements were selected
+           • The student's handwritten Career Vision answers
+  STEP 4: A "Review Scanned Data" page appears. You can see exactly 
+          what the AI extracted from the handwriting. If the AI 
+          misread something, you can manually correct it here.
+  STEP 5: Click "Save & Analyze." The corrected data is saved into 
+          your database AND the AI immediately generates the full 
+          career report. The assessment goes straight to 
+          "AI Analysis Complete."
+
+NOTE: If you are not satisfied with the AI analysis result, you 
+can always click "Re-Analyze" on any assessment at any time to 
+run the AI again and get a fresh report.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 12]         SECTION 2F: SKILLNEST ADMISSIONS MANAGEMENT
+════════════════════════════════════════════════════════════════════
+
+SkillNest is your after-school club for children (Ages 6–10). 
+This section of the admin panel lets you manage every aspect of 
+admissions without a single piece of physical paperwork.
+
+VIEWING NEW APPLICATIONS:
+━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Click "SkillNest" in your left menu.
+  2. All submitted applications are listed with the child's name, 
+     parent contact number, status (Pending / Approved / Rejected), 
+     and the date of application.
+
+APPROVING OR REJECTING AN APPLICATION:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Click on an application to open the full detail.
+  2. Review the child's information, academic needs, health notes, 
+     and timing preferences provided by the parent.
+  3. Click "Approve" to confirm the admission.
+     — IMPORTANT: Only upon approval does the program's seat 
+       count decrease by one. A pending application does NOT 
+       reduce your available capacity. You are always in control.
+  4. Click "Reject" if the application cannot be accepted.
+
+CONFIGURING SKILLNEST SETTINGS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Go to SkillNest → Settings.
+  2. From here you can adjust:
+     • Monthly Fee: The monthly program fee displayed publicly.
+     • Admission Registration Fee: A one-time joining fee.
+     • Total Seats: The maximum capacity of the program.
+     • Show Seats to Public: Toggle whether visitors can see 
+       how many seats are left (creates urgency).
+     • Close Admissions: Instantly stop all new applications 
+       with one click if your program is full or on break.
+
+ADDING AN ADMISSION MANUALLY:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If a parent calls you on the phone or walks in and applies in 
+person, you can manually add their admission record by clicking 
+"Add Admission" and filling out the form yourself.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 13]             SECTION 3: EMPLOYEE / STAFF LOGIN
+════════════════════════════════════════════════════════════════════
+
+Your team members (receptionists, teachers, counselors) can each 
+have their own secure login. They assist with daily operations 
+but cannot access your sensitive business or financial data.
+
+HOW STAFF MEMBERS LOG IN:
+━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Your staff go to: daichiro.in/admin/login
+     (This is the SAME login page as your Admin login.)
+  2. They type their assigned Staff Username and Password.
+  3. The system recognizes them as an Employee (not Admin) and 
+     sends them to the Employee Dashboard automatically.
+
+FIRST LOGIN — MANDATORY PASSWORD CHANGE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The very first time a new staff member logs in, the website will 
+freeze their screen and force them to create a new, private 
+password before they can do anything else.
+
+The new password must include:
+  ✓ At least 8 characters
+  ✓ At least one UPPERCASE letter
+  ✓ At least one lowercase letter
+  ✓ At least one number
+  ✓ At least one special character (e.g., ! @ # $)
+
+You do not have to worry about setting this up — the system 
+enforces it automatically.
+
+WHAT STAFF CAN DO (Based on Permissions You Set):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You control exactly what each employee can access. Possible areas:
+  • Appointments — View and manage counseling bookings.
+  • Assessments — Help manage student assessment records.
+  • SkillNest — View and manage after-school admissions.
+  • Gallery — Access to media or gallery management.
+
+The PRIMARY use-case for employees is to quickly generate new 
+student login credentials:
+  1. Staff clicks "Create Client" in their portal.
+  2. The system generates a random Username (e.g., student_82051) 
+     and a temporary Password automatically.
+  3. Staff writes these down and hands them to the student 
+     on a small slip of paper. The process takes under 5 seconds.
+
+CREATING A NEW EMPLOYEE ACCOUNT (Done by Admin):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Go to your Admin panel → click "Employees."
+  2. Click "Add New Employee."
+  3. Enter their Name, Designation, Email, Phone, and select 
+     which permission areas they should have access to.
+  4. Give them the generated credentials to log in.
+     They will be forced to change their password on first login.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 14]       SECTION 4: STUDENT / CLIENT LOGIN (Exam Portal)
+════════════════════════════════════════════════════════════════════
+
+This is the private portal where students log in to complete their 
+DAICHIRO career assessment. The experience is designed to be 
+simple and smooth for any age group.
+
+HOW STUDENTS ACCESS THE EXAM PORTAL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. The student receives a Username and temporary Password 
+     from your receptionist or staff member (on a slip of paper).
+  2. They open a browser (on phone, tablet, or laptop) and go to:
+     daichiro.in/client/login
+  3. They type in their temporary credentials and click "Login."
+
+MANDATORY PASSWORD CHANGE (First Login):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Immediately after logging in for the first time, the student is 
+redirected to a password creation screen. They must set their own 
+private password before the exam starts.
+
+This ensures that even your own staff cannot access a student's 
+private exam once it has begun.
+
+THE 5-PART CAREER ASSESSMENT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The student is guided through five sections, one at a time:
+
+  SECTION A — Personal Information
+  The student confirms their name, class/grade, school name, and 
+  contact details.
+
+  SECTION B — Interests & Hobbies
+  The student selects from three grids:
+    • Activities they enjoy (e.g., "Drawing, painting or designing")
+    • Favourite Academic Subjects (e.g., "Mathematics", "Biology")
+    • Professions they find interesting (e.g., "Doctor / Nurse")
+
+  SECTION C — Aptitude Self-Assessment (Rating 1 to 5)
+  The student rates themselves on 9 key skills from 1 (Not Confident) 
+  to 5 (Very Confident). Skills include logical thinking, writing, 
+  computer skills, leadership, creativity, and more.
+
+  SECTION D — Personality & Values
+  The student selects statements that best describe their character 
+  (e.g., "I like leading and taking responsibility").
+
+  SECTION E — Career Vision (Written Answers)
+  The student writes short answers about:
+    • What careers are they currently considering?
+    • Where do they see themselves in 5 years?
+    • What does their ideal future life look like?
+
+THE AUTO-SAVE "NEVER LOSE WORK" SYSTEM:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Every few seconds, the website silently saves the student's 
+progress in the background. This means:
+
+  • If their internet drops — their answers are safe.
+  • If they accidentally close the browser — their answers are safe.
+  • If their laptop battery dies — their answers are safe.
+
+When they log back in, they are automatically returned to exactly 
+where they stopped. They do not lose a single answer.
+
+AFTER SUBMITTING THE EXAM:
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Once the student clicks "Submit" on the final section:
+  1. Their completed assessment is saved to your database.
+  2. Their temporary login credentials are automatically deleted 
+     for security. They cannot log back in with the same password.
+  3. Their exam appears in your Admin panel under 
+     "Pending AI Analysis" — ready for you to run the AI report.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 15]           SAFETY, BACKUPS & DATA PROTECTION
+════════════════════════════════════════════════════════════════════
+
+Your platform has been engineered with enterprise-level protections 
+to ensure your business data is never at risk.
+
+DATA BACKUP SYSTEM:
+━━━━━━━━━━━━━━━━━━
+The server runs an automated script (db_backup.sh) that creates 
+a complete copy of your entire database on a regular schedule. 
+If anything goes wrong at the server level, your student records, 
+appointments, and admissions can be fully restored from these copies.
+
+THE TRASH BIN (Accident Recovery):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If you accidentally delete a student assessment, it does NOT 
+permanently disappear. Instead:
+  1. The deleted assessment moves to the "Trash Bin" folder.
+  2. You can go to: Assessments → Trash Bin.
+  3. Click "Restore" to fully recover the assessment.
+  4. Only when you click "Permanently Delete" or "Empty Trash" 
+     does the record get removed forever.
+
+AUTOMATED SELF-CLEANING (Keeping the System Fast):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The system automatically removes old data to keep the website 
+running fast. This happens silently in the background:
+  • Appointments older than 90 days are auto-deleted.
+  • Assessments older than 90 days are auto-deleted.
+  • Temporary student client accounts that were created 3 hours 
+    ago but never used are automatically removed every 15 minutes.
+
+HACKER PROTECTION:
+━━━━━━━━━━━━━━━━━
+  • Login Rate Limiting: Only 5 login attempts per minute are 
+    allowed. Anyone trying to guess your password repeatedly 
+    is automatically blocked.
+  • Session Security: All login sessions expire after 1 hour of 
+    inactivity. If you forget to log out, no one else can access 
+    your account from the same browser.
+  • Password Encryption: All passwords (yours, staff, and students) 
+    are stored using Bcrypt — a military-grade encryption method. 
+    Even the developers cannot see them.
+  • CSRF Protection: Every form on the website has an invisible 
+    security token that prevents hackers from submitting fake forms.
+  • HTTPS Only: The website forces all traffic through secure 
+    HTTPS, meaning all data between you and the website is 
+    encrypted while in transit.
+
+
+
+
+════════════════════════════════════════════════════════════════════
+[PAGE 16]             QUICK REFERENCE & TROUBLESHOOTING
+════════════════════════════════════════════════════════════════════
+
+QUICK REFERENCE TABLE:
+━━━━━━━━━━━━━━━━━━━━━━
+  TASK                                WHERE TO GO
+  ──────────────────────────────────────────────────────────────
+  View counseling bookings            Appointments > History
+  Change counseling fee               Appointments > Pricing
+  Close bookings temporarily          Appointments > Booking Status
+  Send an invoice to a client         Appointments > History > Invoice
+  View all student assessments        Assessments (left menu)
+  Run AI analysis on a student        Assessments > Pending > Analyze
+  View a student's career roadmap     Assessments > AI Complete > View
+  Scan a paper form                   Assessments > Upload Assessment
+  Print a career report as PDF        Assessment Detail > Download PDF
+  Create a student login              Assessments > Create Client
+  Approve SkillNest application       SkillNest > [Student] > Approve
+  Close SkillNest admissions          SkillNest > Settings
+  Add a new staff member              Employees > Add New Employee
+  Change AI settings                  Gemini AI Settings
+  Reset your own password             Profile > Change Password
+  Recover deleted assessment          Assessments > Trash Bin > Restore
+
+TROUBLESHOOTING:
+━━━━━━━━━━━━━━━
+  Q: A student says they cannot log in.
+  A: Their temporary password expires after 3 hours if unused. 
+     Go to Assessments > Create Client and generate new credentials.
+
+  Q: The AI analysis says "API Error" or "Retry Required."
+  A: Go to Gemini AI Settings and check that your API key is 
+     correctly saved and not expired.
+
+  Q: The website is showing offline or loading slowly.
+  A: This can occasionally happen with AWS EC2 as part of the 
+     system's protection cycle. Wait a few minutes and try again. 
+     If it continues, contact your developer.
+
+  Q: I deleted a student's assessment by mistake.
+  A: Go to Assessments > Trash Bin and click "Restore" on that 
+     student's record.
+
+  Q: A parent says their SkillNest application was not received.
+  A: Go to SkillNest and check if the application appears there. 
+     If admissions were closed at the time, the application would 
+     not have gone through and you should ask them to reapply.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔══════════════════════════════════════════════════════════════════╗
+║                        END OF MANUAL                             ║
+║                                                                  ║
+║        DAICHIRO Professional Skills Academy — daichiro.in        ║
+║                                                                  ║
+║        This website was designed & developed by: ARTORYX         ║
+║     This manual was prepared exclusively for the DAICHIRO team.  ║
+╚══════════════════════════════════════════════════════════════════╝

@@ -1,0 +1,389 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════
+   DAICHIRO ACADEMY — Professional School Theme
+   Public website styles only (admin unchanged)
+══════════════════════════════════════════ */
+
+/* Google Fonts weight helpers */
+@layer utilities {
+    .text-shadow-nike {
+        text-shadow: 4px 4px 0px rgba(0,0,0,1);
+    }
+    .font-display {
+        font-family: 'Playfair Display', Georgia, serif;
+    }
+}
+
+/* ── Animations ─────────────────────────── */
+@keyframes progress {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+}
+.animate-progress {
+    animation: progress 2s infinite ease-in-out;
+}
+
+@keyframes scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.97); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.fade-in-scale {
+    animation: fadeInScale 0.6s ease-out forwards;
+}
+
+/* ── Global Body ────────────────────────── */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #F5F7FA;
+    color: #1A2B4A;
+}
+
+/* ── School Navbar ──────────────────────── */
+#main-nav {
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #E8ECF0;
+    box-shadow: 0 2px 16px rgba(15,45,94,0.07);
+}
+#main-nav.is-scrolled {
+    box-shadow: 0 4px 24px rgba(15,45,94,0.12);
+}
+
+/* ── School section headings ────────────── */
+.section-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #C9A84C;
+}
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    color: #0F2D5E;
+    line-height: 1.2;
+}
+
+/* ── School card style ──────────────────── */
+.school-card {
+    background: #ffffff;
+    border: 1px solid #E8ECF0;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(15,45,94,0.07);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.school-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(15,45,94,0.14);
+}
+
+/* ── School button styles ───────────────── */
+.btn-school-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #0F2D5E;
+    color: #ffffff;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    transition: background 0.2s, transform 0.15s;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn-school-primary:hover {
+    background: #1A3F7A;
+    transform: translateY(-1px);
+}
+
+.btn-school-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #C9A84C;
+    color: #0F2D5E;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    transition: background 0.2s, transform 0.15s;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn-school-gold:hover {
+    background: #B8943C;
+    transform: translateY(-1px);
+}
+
+.btn-school-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 28px;
+    background: transparent;
+    color: #0F2D5E;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    border: 2px solid #0F2D5E;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn-school-outline:hover {
+    background: #0F2D5E;
+    color: #ffffff;
+}
+
+/* ── Gradient text gold ─────────────────── */
+.text-gradient-gold {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ── School divider with label ──────────── */
+.school-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #C9A84C;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+.school-divider::before,
+.school-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #C9A84C55, transparent);
+}
+
+/* ── School stat box ────────────────────── */
+.stat-box {
+    text-align: center;
+    padding: 24px 16px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #E8ECF0;
+    box-shadow: 0 2px 16px rgba(15,45,94,0.06);
+}
+.stat-box .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 3rem;
+    color: #0F2D5E;
+    line-height: 1;
+}
+.stat-box .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: #6B7A8D;
+    margin-top: 6px;
+}
+
+/* ── Datetime picker ────────────────────── */
+.custom-datetime::-webkit-calendar-picker-indicator {
+    filter: invert(0);
+    opacity: 0.5;
+    cursor: pointer;
+}
+.dark .custom-datetime::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+/* ── Shadow utilities ───────────────────── */
+.shadow-nike       { box-shadow: 8px 8px 0px 0px #0a0a0a; }
+.dark .shadow-nike { box-shadow: 8px 8px 0px 0px #fafafa; }
+
+.hover\:shadow-nike-hover:hover       { box-shadow: 12px 12px 0px 0px #0a0a0a; }
+.dark .hover\:shadow-nike-hover:hover { box-shadow: 12px 12px 0px 0px #fafafa; }
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE OVERRIDES — Mobile Phone & iPad/Tablet
+   All public pages handled here in one place.
+   phone  : ≤ 639px
+   tablet : 640px – 1023px (iPad portrait & landscape)
+══════════════════════════════════════════════════════ */
+
+/* 1. Base font scaling */
+@media (max-width: 639px)  { html { font-size: 87.5%;  } }
+@media (min-width: 640px) and (max-width: 1023px) { html { font-size: 93.75%; } }
+
+/* 2. Prevent horizontal overflow */
+html, body { overflow-x: hidden; max-width: 100vw; }
+img, video, iframe { max-width: 100%; height: auto; }
+
+/* 3. Section vertical spacing */
+@media (max-width: 639px) {
+    .py-20 { padding-top: 1.75rem !important; padding-bottom: 1.75rem !important; }
+    .py-28 { padding-top: 2rem !important;   padding-bottom: 2rem !important;   }
+    .py-16 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+    .py-12 { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+    .pt-20 { padding-top: 1.75rem !important; }
+    .pt-28 { padding-top: 2rem !important;   }
+    .pb-20 { padding-bottom: 1.75rem !important; }
+    .mb-16 { margin-bottom: 1.5rem !important; }
+    .mb-14 { margin-bottom: 1.25rem !important; }
+    .mb-12 { margin-bottom: 1rem !important; }
+    .mb-10 { margin-bottom: 0.875rem !important; }
+    .gap-16 { gap: 1.5rem !important; }
+    .gap-12 { gap: 1.25rem !important; }
+    .gap-10 { gap: 1rem !important; }
+    /* Service card grid gap */
+    .gap-7  { gap: 0.875rem !important; }
+    .gap-6  { gap: 0.75rem !important; }
+    /* Section intro text spacing */
+    .mt-14  { margin-top: 1.25rem !important; }
+    .mt-10  { margin-top: 0.875rem !important; }
+    /* Director section accent blocks */
+    .-bottom-6 { bottom: -0.75rem !important; }
+    .-right-6  { right:  -0.75rem !important; }
+    .-top-6    { top:    -0.75rem !important; }
+    .-left-6   { left:   -0.75rem !important; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+    .py-20 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+    .py-28 { padding-top: 3.5rem !important; padding-bottom: 3.5rem !important; }
+    .gap-16 { gap: 2rem !important; }
+    .gap-7  { gap: 1.25rem !important; }
+}
+
+/* 4. Hero sections */
+@media (max-width: 639px) {
+    #hero,
+    section[class*="min-h-screen"] { min-height: auto !important; padding-top: 3rem; padding-bottom: 3rem; }
+}
+
+/* 5. Service / pillar cards */
+@media (max-width: 639px) {
+    .service-card,
+    .pillar-card  { padding: 1.1rem 1rem !important; }
+    .service-card > div:first-child { width: 2.5rem; height: 2.5rem; margin-bottom: 0.75rem; }
+    .pillar-card  > div:first-child { width: 2.5rem; height: 2.5rem; }
+}
+
+/* 6. Stats section large numbers */
+@media (max-width: 639px) {
+    .counter-num { font-size: 2.25rem !important; }
+    /* Impact numbers on navy strip */
+    section.bg-school-navy .font-serif.text-5xl,
+    section.bg-school-navy .font-serif.text-6xl { font-size: 2.25rem !important; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+    section.bg-school-navy .font-serif.text-5xl,
+    section.bg-school-navy .font-serif.text-6xl { font-size: 3rem !important; }
+}
+
+/* 7. Process steps: 2-col on tablet */
+@media (min-width: 640px) and (max-width: 1023px) {
+    .grid-cols-1.md\:grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* 8. Director / founder photo */
+@media (max-width: 639px) {
+    [style*="aspect-ratio: 3/4"] {
+        max-height: 420px !important;
+    }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+    [style*="aspect-ratio: 3/4"] {
+        max-height: 400px !important;
+    }
+}
+
+/* 9. Photo showcase panels (1.jpg / 2.jpg split) */
+@media (max-width: 639px) {
+    [style*="min-height:460px"] { min-height: 280px !important; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+    [style*="min-height:460px"] { min-height: 360px !important; }
+}
+
+/* 10. Section titles */
+@media (max-width: 639px) {
+    .section-title { font-size: 1.65rem !important; line-height: 1.2 !important; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+    .section-title { font-size: 2.1rem !important; }
+}
+
+/* 11. Testimonial cards */
+@media (max-width: 639px)  { .testimonial-card { padding: 1.1rem !important; } }
+@media (min-width: 640px) and (max-width: 1023px) { .testimonial-card { padding: 1.5rem !important; } }
+
+/* 12. Footer — 2-col layout on iPad, 1-col on phone */
+@media (max-width: 639px) {
+    footer { padding-top: 2.5rem !important; padding-bottom: 1.5rem !important; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+    footer .md\:col-span-2 { grid-column: span 2; }
+}
+
+/* 13. Book page package cards */
+@media (max-width: 639px) {
+    .pkg-card { padding: 1.25rem 1rem !important; }
+}
+
+/* 14. Marquee strip text */
+@media (max-width: 639px) {
+    .overflow-hidden.bg-school-gold span.font-serif { font-size: 0.85rem !important; }
+}
+
+/* 15. Minimum touch target size (Apple HIG: 44px) */
+@media (max-width: 1023px) {
+    a, button { min-height: 44px; }
+    /* Exception: small pill/badge links that should stay compact */
+    a[class*="text-\[9px\]"],
+    a[class*="text-\[10px\]"] { min-height: auto; }
+}
+
+/* 16. Daily step card (SkillNest) */
+@media (max-width: 639px) {
+    .daily-step { padding: 0.875rem 1rem !important; gap: 0.75rem !important; }
+}
+
+/* 17. Quarter cards (SkillNest) */
+@media (max-width: 639px) {
+    .quarter-card { padding: 1.25rem 1rem !important; }
+}
+
+/* 18. Form section bodies */
+@media (max-width: 639px) {
+    .form-section-body { padding: 1rem !important; }
+    .form-section-header { padding: 0.875rem 1rem !important; }
+}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Processing Payment - Daichiro Academy{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-customWhite dark:bg-customBlack flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full text-center space-y-12">
+        
+        <h2 class="text-4xl font-nike uppercase tracking-tighter text-black dark:text-white animate-pulse">Processing...</h2>
+        
+        <div class="relative h-2 w-full bg-gray-200 dark:bg-zinc-800 overflow-hidden">
+            <div class="absolute top-0 left-0 h-full bg-black dark:bg-white animate-progress"></div>
+        </div>
+        
+        <p class="text-lg font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400" id="status-text">
+            Connecting to secure gateway Gateway...
+        </p>
+
+    </div>
+
+    <script>
+        // Mock payment flow simulation
+        const messages = [
+            "Authorizing payment...",
+            "Encrypting data...",
+            "Confirming transaction..."
+        ];
+        
+        let i = 0;
+        const statusText = document.getElementById('status-text');
+        
+        setInterval(() => {
+            if(i < messages.length) {
+                statusText.innerText = messages[i];
+                i++;
+            }
+        }, 800);
+
+        setTimeout(() => {
+            window.location.href = "{{ url_for('main.payment_success', appt_id=appt_id) }}";
+        }, 3000);
+    </script>
+</section>
+{% endblock %}

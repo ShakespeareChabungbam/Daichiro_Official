@@ -1,0 +1,109 @@
+{% extends 'employee/base_employee.html' %}
+{% block title %}SkillNest{% endblock %}
+{% block page_title %}SkillNest{% endblock %}
+{% block page_subtitle %}Student Admission Manager{% endblock %}
+
+{% block page_content %}
+
+<style>
+.hub-card {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 28px;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+}
+.hub-card:hover { transform: translateY(-4px); }
+.hub-card .card-overlay {
+    position: absolute; inset: 0; opacity: 0; transition: opacity .3s;
+}
+.hub-card:hover .card-overlay { opacity: 1; }
+</style>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+    <!-- ── ADMISSIONS RECORDS ─────────────────── -->
+    {% if emp.has_permission('skillnest_admissions') %}
+    {% set total    = admissions|length %}
+    {% set pending  = admissions|selectattr('status','equalto','pending')|list|length %}
+    {% set approved = admissions|selectattr('status','equalto','approved')|list|length %}
+
+    <a href="{{ url_for('employee.skillnest_records_page') }}" class="hub-card"
+       style="background:linear-gradient(145deg,#0d2218 0%,#071510 100%);border:1.5px solid rgba(52,211,153,.25);box-shadow:0 4px 24px rgba(52,211,153,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(52,211,153,.12) 0%,transparent 70%);"></div>
+        <div style="position:relative;z-index:10;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(52,211,153,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+                <svg style="width:26px;height:26px;" fill="none" stroke="#34d399" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+            <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35em;color:#34d399;display:block;margin-bottom:6px;">Admissions</span>
+            <span style="font-size:18px;font-weight:900;color:#ffffff;display:block;margin-bottom:6px;">All Records</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.5);display:block;margin-bottom:20px;line-height:1.5;">View, approve, reject and manage student admissions</span>
+            <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">
+                <div>
+                    <span style="font-size:28px;font-weight:900;color:#34d399;display:block;line-height:1;">{{ total }}</span>
+                    <span style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);display:block;margin-top:3px;">Total</span>
+                </div>
+                <div style="width:1px;height:32px;background:rgba(255,255,255,.08);"></div>
+                <div>
+                    <span style="font-size:22px;font-weight:900;color:#fbbf24;display:block;line-height:1;">{{ pending }}</span>
+                    <span style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);display:block;margin-top:3px;">Pending</span>
+                </div>
+                <div style="width:1px;height:32px;background:rgba(255,255,255,.08);"></div>
+                <div>
+                    <span style="font-size:22px;font-weight:900;color:#34d399;display:block;line-height:1;">{{ approved }}</span>
+                    <span style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);display:block;margin-top:3px;">Approved</span>
+                </div>
+            </div>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:8px 14px;border-radius:10px;background:rgba(52,211,153,.15);color:#34d399;">
+                View Records →
+            </span>
+        </div>
+    </a>
+
+    <!-- ── ADD NEW ADMISSION ───────────────────── -->
+    <a href="{{ url_for('employee.skillnest_add_admission_page') }}" class="hub-card"
+       style="background:linear-gradient(145deg,#201800 0%,#140f00 100%);border:1.5px solid rgba(251,191,36,.25);box-shadow:0 4px 24px rgba(251,191,36,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(251,191,36,.12) 0%,transparent 70%);"></div>
+        <div style="position:relative;z-index:10;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(251,191,36,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+                <svg style="width:26px;height:26px;" fill="none" stroke="#fbbf24" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v16m8-8H4"/>
+                </svg>
+            </div>
+            <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35em;color:#fbbf24;display:block;margin-bottom:6px;">New Entry</span>
+            <span style="font-size:18px;font-weight:900;color:#ffffff;display:block;margin-bottom:6px;">Add New Admission</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.5);display:block;margin-bottom:20px;line-height:1.5;">Walk-in / manual entry · register a new student</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:8px 14px;border-radius:10px;background:rgba(251,191,36,.15);color:#fbbf24;">
+                Add Student →
+            </span>
+        </div>
+    </a>
+    {% endif %}
+
+    <!-- ── SETTINGS & SEATS ───────────────────── -->
+    {% if emp.has_permission('skillnest_settings') %}
+    <a href="{{ url_for('employee.skillnest_settings_page') }}" class="hub-card"
+       style="background:linear-gradient(145deg,#071525 0%,#040d18 100%);border:1.5px solid rgba(96,165,250,.25);box-shadow:0 4px 24px rgba(96,165,250,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(96,165,250,.12) 0%,transparent 70%);"></div>
+        <div style="position:relative;z-index:10;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(96,165,250,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+                <svg style="width:26px;height:26px;" fill="none" stroke="#60a5fa" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+            </div>
+            <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35em;color:#60a5fa;display:block;margin-bottom:6px;">Configuration</span>
+            <span style="font-size:18px;font-weight:900;color:#ffffff;display:block;margin-bottom:6px;">Settings &amp; Seats</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.5);display:block;margin-bottom:20px;line-height:1.5;">Manage seat capacity, batches and program settings</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:8px 14px;border-radius:10px;background:rgba(96,165,250,.15);color:#60a5fa;">
+                Manage Settings →
+            </span>
+        </div>
+    </a>
+    {% endif %}
+
+</div>
+{% endblock %}

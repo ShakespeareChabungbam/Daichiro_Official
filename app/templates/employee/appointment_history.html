@@ -1,0 +1,1103 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}Appointment History{% endblock %}
+{% block page_title %}Appointment History{% endblock %}
+{% block page_subtitle %}{{ appointments|length }} Total Bookings{% endblock %}
+
+{% block page_content %}
+<style>
+/* ── Print / PDF styles ── */
+@media print {
+  body * { visibility: hidden !important; }
+  #invoice-print, #invoice-print * { visibility: visible !important; }
+  #invoice-print { position: fixed; inset: 0; background: #fff; padding: 40px; z-index: 9999; }
+}
+.modal-backdrop { backdrop-filter: blur(6px); }
+</style>
+
+<a href="{{ url_for('employee.appointments_page') }}"
+   class="inline-flex items-center gap-2 mb-6 text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Back to Appointments
+</a>
+
+<!-- ── Manual Invoice Button ── -->
+<style>
+@keyframes mi-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.mi-btn {
+  position:relative; display:inline-flex; align-items:center; gap:10px;
+  padding:12px 28px; border:none; border-radius:14px; cursor:pointer;
+  background: linear-gradient(135deg, #C9A84C 0%, #f0c96a 40%, #C9A84C 60%, #a88732 100%);
+  background-size: 200% auto;
+  color:#0F2D5E; font-size:11px; font-weight:900; letter-spacing:.14em; text-transform:uppercase;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.35), 0 0 0 1px rgba(201,168,76,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: transform .2s, box-shadow .2s;
+  overflow:hidden;
+}
+.mi-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201,168,76,0.5), 0 0 0 1px rgba(201,168,76,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+  animation: mi-shimmer 1.5s ease infinite;
+}
+.mi-btn:active { transform: translateY(0); }
+.mi-btn::after {
+  content:''; position:absolute; top:0; left:-100%; width:50%; height:100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition: left .5s ease;
+}
+.mi-btn:hover::after { left:120%; }
+</style>
+<div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+  <button class="mi-btn" onclick="openManualInvoiceModal()">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width:2.2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+    </svg>
+    <span>Manual Invoice</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="opacity:.6">
+      <path d="M12 2l2.09 6.26L20 9.27l-5 3.64L16.18 20 12 16.77 7.82 20 9 12.91l-5-3.64 5.91-1.01z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ── Search + Filter Bar ── -->
+<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+
+    <!-- Row 1: Search input + sort -->
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <!-- Search input -->
+        <div style="flex:1;min-width:220px;">
+            <input id="ah-search" type="text" placeholder="Search by name, mobile, package…"
+                   style="display:block;width:100%;background:#18181b;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:.875rem;font-weight:500;padding:.65rem 1rem;border-radius:.75rem;outline:none;transition:border-color .2s;box-sizing:border-box;"
+                   onfocus="this.style.borderColor='#60a5fa';"
+                   onblur="this.style.borderColor='#3f3f46';"
+                   oninput="applyHistoryFilters()">
+        </div>
+        <!-- Sort buttons -->
+        <div style="display:flex;border-radius:10px;overflow:hidden;border:1.5px solid #3f3f46;flex-shrink:0;">
+            <button id="ah-sort-newest" onclick="setHistorySort('newest')"
+                    style="background:#27272a;color:#60a5fa;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;padding:.55rem 1rem;border:none;cursor:pointer;border-right:1px solid #3f3f46;transition:background .15s;">↓ Newest</button>
+            <button id="ah-sort-oldest" onclick="setHistorySort('oldest')"
+                    style="background:transparent;color:#71717a;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;padding:.55rem 1rem;border:none;cursor:pointer;transition:background .15s;">↑ Oldest</button>
+        </div>
+        <!-- Count -->
+        <span id="ah-count" style="font-size:10px;font-weight:700;color:#52525b;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;"></span>
+    </div>
+
+    <!-- Row 2: Filter chips -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="chip-all" onclick="setHistoryFilter('all')"
+                style="padding:5px 14px;border-radius:999px;background:#27272a;color:#e4e4e7;border:1.5px solid #3f3f46;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:all .15s;">All</button>
+        <button id="chip-session" onclick="setHistoryFilter('session')"
+                style="padding:5px 14px;border-radius:999px;background:transparent;color:#71717a;border:1.5px solid #3f3f46;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:all .15s;">Session</button>
+        <button id="chip-package" onclick="setHistoryFilter('package')"
+                style="padding:5px 14px;border-radius:999px;background:transparent;color:#71717a;border:1.5px solid #3f3f46;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:all .15s;">★ Package</button>
+    </div>
+</div>
+
+<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead style="background:#000000;">
+                <tr>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#ffffff;">#</th>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#ffffff;">Full Name</th>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#ffffff;">Package</th>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#ffffff;">Mobile</th>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#C9A84C;">Offer Amt</th>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#C9A84C;">Original Amt</th>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#ffffff;">Booked On</th>
+                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-widest" style="color:#ffffff;">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-800">
+                {% for appt in appointments %}
+                {% set is_package = appt.package and ('recommended' in appt.package.lower() or 'complete' in appt.package.lower() or 'package' in appt.package.lower()) %}
+                {# ── Use price locked at booking time; fall back to current price for old records ── #}
+                {% if appt.fees_paid and '|' in appt.fees_paid %}
+                  {% set stored_offer = appt.fees_paid.split('|')[0] %}
+                  {% set stored_orig  = appt.fees_paid.split('|')[1] %}
+                {% elif appt.fees_paid %}
+                  {% set stored_offer = appt.fees_paid %}
+                  {% set stored_orig  = (package_fee if is_package else session_fee) %}
+                {% else %}
+                  {% set stored_offer = (package_offer if is_package else session_offer) %}
+                  {% set stored_orig  = (package_fee if is_package else session_fee) %}
+                {% endif %}
+                <tr class="ah-row hover:bg-amber-500/10 transition-colors"
+                    data-name="{{ appt.name | lower }}"
+                    data-mobile="{{ appt.mobile or '' }}"
+                    data-pkg="{{ 'package' if is_package else 'session' }}"
+                    data-date="{{ appt.created_at.strftime('%Y%m%d%H%M%S') if appt.created_at else '0' }}"
+                    data-email="{{ appt.email or '' }}"
+                    data-send-url="{{ url_for('employee.send_invoice', appt_id=appt.id) }}"
+                    data-name="{{ appt.name | e }}">
+                    <td class="px-5 py-4 text-sm text-zinc-500 font-bold">{{ loop.index }}</td>
+                    <td class="px-5 py-4 text-sm font-bold text-white">{{ appt.name }}</td>
+                    <td class="px-5 py-4">
+                        {% if is_package %}
+                        <span class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-full bg-amber-400/15 text-amber-400 border border-amber-700/40">★ Package</span>
+                        {% elif appt.package %}
+                        <span class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-full bg-zinc-700 text-zinc-300 border border-zinc-600">Session</span>
+                        {% else %}
+                        <span class="text-zinc-600 text-xs">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-4 text-sm text-zinc-400 font-medium">
+                        {% if appt.mobile %}
+                        <a href="tel:{{ appt.mobile }}" class="hover:text-amber-400 transition-colors">{{ appt.mobile }}</a>
+                        {% else %}
+                        <span class="text-zinc-600">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-4">
+                        {% if appt.fees_paid and '|' in appt.fees_paid %}
+                          <span class="text-sm font-black text-emerald-400">₹{{ appt.fees_paid.split('|')[0] }}</span>
+                        {% elif appt.fees_paid %}
+                          <span class="text-sm font-black text-emerald-400">₹{{ appt.fees_paid }}</span>
+                        {% else %}
+                          <span class="text-xs text-zinc-500">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-4">
+                        {% if appt.fees_paid and '|' in appt.fees_paid %}
+                          <span class="text-sm font-bold text-zinc-400 line-through">₹{{ appt.fees_paid.split('|')[1] }}</span>
+                        {% else %}
+                          <span class="text-xs text-zinc-500">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-4 text-sm text-zinc-500 whitespace-nowrap">{{ appt.created_at | to_ist }}</td>
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-2">
+                            <!-- View Details -->
+                            <button onclick="openDetails({{ loop.index0 }})"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                View
+                            </button>
+                            <!-- Receipt Preview (PDF) -->
+                            <button onclick="openReceiptModal({{ loop.index0 }})"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500/20 hover:bg-amber-500 hover:text-black text-amber-400 border border-amber-600/30 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                PDF
+                            </button>
+                            <!-- Email Invoice (always active, admin can enter any email) -->
+                            <button onclick="openEmailModal('{{ appt.id }}', {{ loop.index0 }})"
+                                title="{% if appt.email %}Send invoice to {{ appt.email }}{% else %}Compose invoice email{% endif %}"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-500/20 hover:bg-blue-600 hover:text-white text-blue-400 border border-blue-600/30 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                Mail
+                            </button>
+                            <!-- Delete -->
+                            <button onclick="confirmDelete({{ appt.id }}, '{{ appt.name | e }}')"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/10 hover:bg-red-600 hover:text-white text-red-400 border border-red-600/20 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="px-6 py-12 text-center text-sm text-zinc-500 italic">No appointments yet.</td>
+                </tr>
+                <tr id="ah-empty-row" style="display:none;">
+                    <td colspan="7" class="px-6 py-12 text-center text-sm text-zinc-500 italic">No matching records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ══ Delete Confirmation Modal ══ -->
+<div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm"
+     onclick="if(event.target===this) closeDelete()">
+    <div class="bg-zinc-900 border border-zinc-700/60 rounded-2xl w-full max-w-sm mx-4 shadow-2xl overflow-hidden">
+        <div class="p-6">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-11 h-11 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest text-red-400 mb-0.5">Delete Booking</p>
+                    <h3 class="text-base font-black text-white">Are you sure?</h3>
+                </div>
+            </div>
+            <p class="text-sm text-zinc-400 mb-6">This will permanently delete the booking for <span id="delete-name" class="text-white font-bold"></span>. This action cannot be undone.</p>
+            <form id="delete-form" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="flex gap-3">
+                    <button type="submit"
+                        class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-black uppercase tracking-widest transition-colors">
+                        Delete
+                    </button>
+                    <button type="button" onclick="closeDelete()"
+                        class="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold uppercase tracking-widest transition-colors border border-zinc-700">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Receipt Preview Modal (Yellow Paper) ══ -->
+<div id="receipt-modal" class="fixed inset-0 z-[60] hidden items-center justify-center"
+     style="background:rgba(0,0,0,0.88);backdrop-filter:blur(10px)"
+     onclick="if(event.target===this) closeReceiptModal()">
+  <div style="width:100%;max-width:530px;margin:16px;display:flex;flex-direction:column;gap:10px;max-height:95vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px">
+      <div>
+        <p style="color:#C9A84C;font-size:10px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;margin-bottom:2px">Receipt Preview</p>
+        <p style="color:rgba(255,255,255,0.35);font-size:11px;margin:0">Edit any field before printing</p>
+      </div>
+      <button onclick="closeReceiptModal()" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+
+    <!-- Professional Receipt -->
+    <div id="receipt-printable" style="background:#ffffff;border:1.5px solid #1a2a4a;border-radius:6px;padding:22px 26px;position:relative;overflow:hidden;font-family:'Times New Roman',Times,serif;box-shadow:0 24px 60px rgba(0,0,0,0.65)">
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:900;color:#1a2a4a;opacity:0.03;pointer-events:none;white-space:nowrap;letter-spacing:-2px">DAICHIRO</div>
+      <!-- Header -->
+      <div style="display:flex;align-items:center;gap:14px;border-bottom:2px solid #1a2a4a;padding-bottom:12px;margin-bottom:14px">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Daichiro Logo" style="width:58px;height:58px;object-fit:contain;border-radius:6px;flex-shrink:0">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:14px;font-weight:900;color:#1a2a4a;letter-spacing:.06em;font-family:Arial,sans-serif">DAICHIRO PROFESSIONAL SKILLS ACADEMY</div>
+          <div style="font-size:9px;color:#555;margin-top:3px;font-family:Arial,sans-serif;letter-spacing:.04em">{{ (site_location_address or "Old Lambulane, Imphal") | upper }}</div>
+        </div>
+      </div>
+      <!-- Sl No | Title | Date -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:14px">
+        <div style="font-size:11px;color:#333;font-family:Arial,sans-serif">Sl. No. <input id="r-sl-no" style="color:#cc0000;font-size:14px;font-weight:900;border:none;background:transparent;width:80px;outline:none;border-bottom:1px solid #bbb;font-family:serif"></div>
+        <div style="font-size:17px;font-style:italic;font-family:cursive,serif;color:#1a2a4a;text-align:center">Money Receipt</div>
+        <div style="font-size:11px;color:#333;font-family:Arial,sans-serif">Date <input id="r-date" style="border:none;background:transparent;border-bottom:1px dotted #999;outline:none;width:80px;font-size:11px;color:#333;font-family:serif"></div>
+      </div>
+      <!-- Received from -->
+      <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:12px;border-bottom:1px solid #ddd;padding-bottom:4px">
+        <span style="font-size:11px;color:#1a2a4a;font-style:italic;font-weight:700;white-space:nowrap;font-family:Arial,sans-serif">Received with thanks from</span>
+        <input id="r-from" type="text" style="flex:1;min-width:0;width:100%;border:none;background:transparent;outline:none;font-size:12px;color:#111;padding:0 4px;font-family:serif">
+      </div>
+      <div style="border-bottom:1px solid #ddd;margin-bottom:12px;height:14px"></div>
+      <!-- Amount in words -->
+      <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:12px;border-bottom:1px solid #ddd;padding-bottom:4px">
+        <span style="font-size:11px;color:#333;white-space:nowrap;font-family:Arial,sans-serif">a sum of Rupees</span>
+        <input id="r-amount-words" type="text" style="flex:1;min-width:0;width:100%;border:none;background:transparent;outline:none;font-size:12px;color:#111;padding:0 4px;font-family:serif">
+        <span style="font-size:11px;color:#333;font-family:Arial,sans-serif">only</span>
+      </div>
+      <!-- On account of -->
+      <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:20px;border-bottom:1px solid #ddd;padding-bottom:4px">
+        <span style="font-size:11px;color:#333;white-space:nowrap;font-family:Arial,sans-serif">on account of</span>
+        <input id="r-account" type="text" style="flex:1;min-width:0;width:100%;border:none;background:transparent;outline:none;font-size:12px;color:#111;padding:0 4px;font-family:serif">
+      </div>
+      <!-- Amount box + Receiver -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="background:#1a2a4a;border-radius:18px;padding:4px 12px;display:flex;align-items:center"><span style="color:#fff;font-size:14px;font-weight:700">₹</span></div>
+          <input id="r-amount-figure" type="text" style="border:1px solid #1a2a4a;border-radius:4px;padding:4px 10px;font-size:14px;font-weight:700;color:#1a2a4a;background:transparent;width:80px;outline:none;font-family:serif">
+        </div>
+        <div style="text-align:right;font-size:12px;color:#333;font-family:Arial,sans-serif">Receiver<div style="border-bottom:1.5px solid #1a2a4a;width:90px;margin-top:20px;margin-left:auto"></div></div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex;gap:10px">
+      <button onclick="printReceipt()" style="flex:1;padding:13px;background:linear-gradient(135deg,#C9A84C,#f0c96a);border:none;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#000;cursor:pointer">🖨 Print / Download PDF</button>
+      <button onclick="closeReceiptModal()" style="padding:13px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.6);cursor:pointer">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Email Compose Modal ══ -->
+<div id="email-compose-modal" class="fixed inset-0 z-[60] hidden items-center justify-center"
+     style="background:rgba(0,0,0,0.88);backdrop-filter:blur(10px)"
+     onclick="if(event.target===this) closeEmailModal()">
+  <div style="width:100%;max-width:480px;margin:16px;background:#18181b;border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;max-height:92vh;overflow-y:auto">
+    <!-- Header -->
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <p style="color:#60a5fa;font-size:10px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;margin:0 0 3px">Compose Invoice Email</p>
+        <h3 style="color:#fff;font-size:16px;font-weight:900;margin:0">Send Receipt to Client</h3>
+      </div>
+      <button onclick="closeEmailModal()" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <form id="email-compose-form" method="POST" action="">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div style="padding:18px 24px;display:flex;flex-direction:column;gap:14px">
+
+        <!-- To -->
+        <div>
+          <label style="color:#9ca3af;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;display:block;margin-bottom:6px">To (Email Address)</label>
+          <input id="compose-to" name="custom_to_email" type="email" placeholder="client@example.com"
+            style="width:100%;background:#27272a;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:13px;padding:10px 14px;border-radius:10px;outline:none;box-sizing:border-box"
+            onfocus="this.style.borderColor='#60a5fa'" onblur="this.style.borderColor='#3f3f46'">
+        </div>
+
+        <!-- Subject -->
+        <div>
+          <label style="color:#9ca3af;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;display:block;margin-bottom:6px">Subject</label>
+          <input id="compose-subject" name="custom_subject" type="text"
+            style="width:100%;background:#27272a;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:13px;padding:10px 14px;border-radius:10px;outline:none;box-sizing:border-box"
+            onfocus="this.style.borderColor='#60a5fa'" onblur="this.style.borderColor='#3f3f46'">
+        </div>
+
+        <!-- Invoice Summary -->
+        <div style="background:#27272a;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 16px">
+          <p style="color:#71717a;font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;margin:0 0 10px">Invoice Summary</p>
+          <div id="compose-summary" style="display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:12px;align-items:center"></div>
+        </div>
+
+        <!-- Staff Note -->
+        <div>
+          <label style="color:#9ca3af;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;display:block;margin-bottom:6px">Personal Note <span style="color:#52525b;font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <textarea id="compose-note" name="custom_note" rows="3" placeholder="Add a personal message to the client…"
+            style="width:100%;background:#27272a;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:13px;padding:10px 14px;border-radius:10px;outline:none;resize:vertical;box-sizing:border-box;font-family:inherit"
+            onfocus="this.style.borderColor='#60a5fa'" onblur="this.style.borderColor='#3f3f46'"></textarea>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div style="padding:0 24px 20px;display:flex;gap:10px">
+        <button type="submit" style="flex:1;padding:13px;background:#2563eb;border:none;border-radius:12px;color:#fff;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer">✉ Send Invoice</button>
+        <button type="button" onclick="closeEmailModal()" style="padding:13px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.6);cursor:pointer">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ Manual Invoice Modal ══ -->
+<div id="manual-invoice-modal" class="fixed inset-0 z-[60] hidden items-center justify-center"
+     style="background:rgba(0,0,0,0.88);backdrop-filter:blur(10px)"
+     onclick="if(event.target===this) closeManualInvoiceModal()">
+  <div style="width:100%;max-width:480px;margin:16px;background:#18181b;border:1px solid rgba(99,102,241,0.25);border-radius:20px;overflow:hidden;max-height:92vh;overflow-y:auto">
+    <!-- Header -->
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <p style="color:#818cf8;font-size:10px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;margin:0 0 3px">Manual Invoice</p>
+        <h3 style="color:#fff;font-size:16px;font-weight:900;margin:0">Send Custom Receipt</h3>
+      </div>
+      <button onclick="closeManualInvoiceModal()" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <form id="manual-invoice-form" method="POST" action="{{ url_for('employee.send_manual_invoice') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div style="padding:18px 24px;display:flex;flex-direction:column;gap:14px">
+
+        <!-- To -->
+        <div>
+          <label style="color:#9ca3af;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;display:block;margin-bottom:6px">To (Email Address) <span style="color:#ef4444;font-size:10px">*</span></label>
+          <input id="mi-to" name="manual_to_email" type="email" placeholder="client@example.com" required
+            style="width:100%;background:#27272a;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:13px;padding:10px 14px;border-radius:10px;outline:none;box-sizing:border-box"
+            onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'">
+        </div>
+
+        <!-- Subject -->
+        <div>
+          <label style="color:#9ca3af;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;display:block;margin-bottom:6px">Subject</label>
+          <input id="mi-subject" name="manual_subject" type="text" placeholder="Your Appointment Receipt — Daichiro Academy"
+            style="width:100%;background:#27272a;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:13px;padding:10px 14px;border-radius:10px;outline:none;box-sizing:border-box"
+            onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'">
+        </div>
+
+        <!-- Invoice Summary -->
+        <div style="background:#27272a;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 16px">
+          <p style="color:#71717a;font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;margin:0 0 10px">Invoice Summary</p>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:12px;align-items:center">
+            {% set miStyle = 'background:#18181b;border:1px solid #3f3f46;color:#e4e4e7;font-size:12px;padding:5px 10px;border-radius:7px;outline:none;width:100%;box-sizing:border-box;font-family:inherit' %}
+            <span style="color:#71717a;font-weight:600;white-space:nowrap">Name</span>
+            <input name="manual_name" placeholder="Client full name"
+              style="background:#18181b;border:1px solid #3f3f46;color:#e4e4e7;font-size:12px;padding:5px 10px;border-radius:7px;outline:none;width:100%;box-sizing:border-box;font-family:inherit"
+              onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'">
+            <span style="color:#71717a;font-weight:600;white-space:nowrap">Package</span>
+            <input name="manual_package" placeholder="e.g. Recommended Package — Counselling"
+              style="background:#18181b;border:1px solid #3f3f46;color:#e4e4e7;font-size:12px;padding:5px 10px;border-radius:7px;outline:none;width:100%;box-sizing:border-box;font-family:inherit"
+              onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'">
+            <span style="color:#71717a;font-weight:600;white-space:nowrap">Amount</span>
+            <input name="manual_amount" placeholder="₹899"
+              style="background:#18181b;border:1px solid #3f3f46;color:#34d399;font-weight:700;font-size:12px;padding:5px 10px;border-radius:7px;outline:none;width:100%;box-sizing:border-box;font-family:inherit"
+              onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'">
+            <span style="color:#71717a;font-weight:600;white-space:nowrap">Date</span>
+            <input name="manual_booked" placeholder="29 Mar 2026, 10:00 AM"
+              style="background:#18181b;border:1px solid #3f3f46;color:#e4e4e7;font-size:12px;padding:5px 10px;border-radius:7px;outline:none;width:100%;box-sizing:border-box;font-family:inherit"
+              onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'">
+            <span style="color:#71717a;font-weight:600;white-space:nowrap">Ref No.</span>
+            <input name="manual_ref" placeholder="INV-0001"
+              style="background:#18181b;border:1px solid #3f3f46;color:#C9A84C;font-weight:700;font-size:12px;padding:5px 10px;border-radius:7px;outline:none;width:100%;box-sizing:border-box;font-family:inherit"
+              onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'">
+
+          </div>
+        </div>
+
+        <!-- Personal Note -->
+        <div>
+          <label style="color:#9ca3af;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;display:block;margin-bottom:6px">Personal Note <span style="color:#52525b;font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <textarea id="mi-note" name="manual_note" rows="3" placeholder="Add a personal message to the client…"
+            style="width:100%;background:#27272a;border:1.5px solid #3f3f46;color:#e4e4e7;font-size:13px;padding:10px 14px;border-radius:10px;outline:none;resize:vertical;box-sizing:border-box;font-family:inherit"
+            onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#3f3f46'"></textarea>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div style="padding:0 24px 20px;display:flex;gap:10px">
+        <button type="submit" id="mi-submit-btn"
+          style="flex:1;padding:13px;background:linear-gradient(135deg,#6366f1,#4f46e5);border:none;border-radius:12px;color:#fff;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer">
+          ✉ Send Invoice
+        </button>
+        <button type="button" onclick="closeManualInvoiceModal()"
+          style="padding:13px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.6);cursor:pointer">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ View Details Modal ══ -->
+<div id="details-modal" class="fixed inset-0 z-50 hidden items-center justify-center"
+     style="background:rgba(0,0,0,0.85);backdrop-filter:blur(12px)"
+     onclick="if(event.target===this) closeDetails()">
+
+    <div class="relative w-full max-w-sm mx-4 rounded-3xl overflow-hidden"
+         style="background:#0c1d3f;border:1px solid rgba(201,168,76,0.2);box-shadow:0 40px 100px rgba(0,0,0,0.9),0 0 60px rgba(201,168,76,0.05)">
+
+        <!-- gold orb decoration -->
+        <div class="absolute pointer-events-none"
+             style="top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.18) 0%,transparent 70%)"></div>
+        <div class="absolute pointer-events-none"
+             style="bottom:-40px;left:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,0.07) 0%,transparent 70%)"></div>
+
+        <!-- ── HEADER ── -->
+        <div style="padding:28px 24px 20px;position:relative">
+
+            <!-- close X -->
+            <button onclick="closeDetails()"
+                style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5)">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- avatar row -->
+            <div style="display:flex;align-items:center;gap:16px">
+                <div id="modal-avatar"
+                     style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#C9A84C,#f5d98a);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#000;flex-shrink:0;box-shadow:0 8px 24px rgba(201,168,76,0.35)">
+                </div>
+                <div>
+                    <p style="font-size:9px;font-weight:900;letter-spacing:0.3em;text-transform:uppercase;color:rgba(201,168,76,0.65);margin-bottom:4px">Appointment</p>
+                    <h3 id="modal-title"
+                        style="font-size:20px;font-weight:900;line-height:1.2;margin:0 0 6px;color:#ffffff"></h3>
+                    <span id="modal-pkg-badge"
+                          style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:900;letter-spacing:0.15em;text-transform:uppercase"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- gold divider -->
+        <div style="height:1px;margin:0 24px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent)"></div>
+
+        <!-- ── AMOUNT BLOCK ── -->
+        <div id="modal-amount-block"
+             style="margin:18px 24px;border-radius:16px;padding:16px 18px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:space-between">
+            <div>
+                <p id="modal-amount-label"
+                   style="font-size:9px;font-weight:900;letter-spacing:0.3em;text-transform:uppercase;color:rgba(201,168,76,0.6);margin-bottom:4px">Amount Due</p>
+                <p id="modal-amount"
+                   style="font-size:30px;font-weight:900;margin:0;color:#C9A84C"></p>
+            </div>
+            <div id="modal-original-block" style="display:none;text-align:right">
+                <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:4px">Regular</p>
+                <p id="modal-original"
+                   style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.35);text-decoration:line-through"></p>
+            </div>
+        </div>
+
+        <!-- ── INFO ROWS ── -->
+        <div style="padding:0 16px 8px">
+
+            <!-- WhatsApp -->
+            <div id="modal-whatsapp-row" style="display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;margin-bottom:4px;background:rgba(255,255,255,0.03)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg viewBox="0 0 24 24" width="16" height="16" style="fill:#25D366" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.570-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                </div>
+                <div>
+                    <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,168,76,0.5);margin:0 0 2px">WhatsApp</p>
+                    <a id="modal-whatsapp" href="#" target="_blank"
+                       style="font-size:14px;font-weight:700;color:#4ade80;text-decoration:none"></a>
+                </div>
+            </div>
+
+            <!-- Mobile -->
+            <div id="modal-mobile-row" style="display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;margin-bottom:4px;background:rgba(255,255,255,0.03)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="16" height="16" fill="none" stroke="#60a5fa" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                </div>
+                <div>
+                    <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,168,76,0.5);margin:0 0 2px">Mobile</p>
+                    <a id="modal-mobile" href="#"
+                       style="font-size:14px;font-weight:700;color:#ffffff;text-decoration:none"></a>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div id="modal-email-row" style="display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;margin-bottom:4px;background:rgba(255,255,255,0.03)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="16" height="16" fill="none" stroke="#a78bfa" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <div style="flex:1;min-width:0">
+                    <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,168,76,0.5);margin:0 0 2px">Email</p>
+                    <p id="modal-email"
+                       style="font-size:13px;font-weight:700;color:#ffffff;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></p>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div id="modal-address-row" style="display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;margin-bottom:4px;background:rgba(255,255,255,0.03)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="16" height="16" fill="none" stroke="#fb7185" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,168,76,0.5);margin:0 0 2px">Address</p>
+                    <p id="modal-address"
+                       style="font-size:14px;font-weight:700;color:#ffffff;margin:0"></p>
+                </div>
+            </div>
+
+            <!-- Booked On -->
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;margin-bottom:4px;background:rgba(255,255,255,0.03)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="16" height="16" fill="none" stroke="#C9A84C" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                    <p style="font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,168,76,0.5);margin:0 0 2px">Booked On</p>
+                    <p id="modal-booked"
+                       style="font-size:14px;font-weight:700;color:#ffffff;margin:0"></p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- gold divider -->
+        <div style="height:1px;margin:8px 24px 0;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent)"></div>
+
+        <!-- ── ACTIONS ── -->
+        <div style="padding:16px 24px 24px;display:flex;gap:10px">
+            <button onclick="printInvoiceFromModal()"
+                style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 0;border-radius:14px;background:linear-gradient(135deg,#C9A84C,#f0c96a);border:none;cursor:pointer;font-size:11px;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#000;box-shadow:0 8px 24px rgba(201,168,76,0.35)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                PDF Invoice
+            </button>
+            <button onclick="closeDetails()"
+                style="padding:13px 20px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Hidden Invoice Print Area (Nike-style) ══ -->
+<div id="invoice-print" style="display:none; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; background:#ffffff; color:#000;">
+  <div style="max-width:680px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column;">
+
+    <!-- TOP BLACK BAR -->
+    <div style="background:#000; padding:0 48px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:28px 0; border-bottom:1px solid #222;">
+        <div>
+          <div style="font-size:26px; font-weight:900; letter-spacing:-0.04em; color:#fff; text-transform:uppercase; line-height:1;">DAICHIRO</div>
+          <div style="font-size:8.5px; font-weight:600; letter-spacing:0.28em; color:#888; text-transform:uppercase; margin-top:5px;">Professional Skills Academy</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:8.5px; font-weight:700; letter-spacing:0.25em; color:#555; text-transform:uppercase;">Invoice</div>
+          <div id="inv-date" style="font-size:15px; font-weight:900; color:#fff; margin-top:4px; letter-spacing:-0.01em;"></div>
+          <div id="inv-inv-no" style="font-size:9px; font-weight:600; color:#555; margin-top:3px; letter-spacing:0.15em;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLED TO -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; background:#000; padding:24px 48px 36px;">
+      <div>
+        <div style="font-size:8px; font-weight:800; letter-spacing:0.3em; color:#555; text-transform:uppercase; margin-bottom:10px;">Billed To</div>
+        <div id="inv-name" style="font-size:19px; font-weight:900; color:#fff; letter-spacing:-0.02em; line-height:1.1;"></div>
+        <div style="margin-top:8px; display:flex; flex-direction:column; gap:3px;">
+          <div id="inv-mobile-line" style="font-size:11px; color:#aaa; font-weight:500;"></div>
+          <div id="inv-email-line" style="font-size:11px; color:#aaa; font-weight:500;"></div>
+          <div id="inv-address-line" style="font-size:11px; color:#aaa; font-weight:500;"></div>
+        </div>
+      </div>
+      <div style="text-align:right; display:flex; flex-direction:column; justify-content:flex-end;">
+        <div style="font-size:8px; font-weight:800; letter-spacing:0.3em; color:#555; text-transform:uppercase; margin-bottom:6px;">Total Due</div>
+        <div id="inv-hero-amount" style="font-size:40px; font-weight:900; color:#fff; letter-spacing:-0.04em; line-height:1;"></div>
+      </div>
+    </div>
+
+    <!-- WHITE BODY -->
+    <div style="flex:1; padding:40px 48px;">
+
+      <!-- DIVIDER LABEL -->
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+        <div style="width:20px; height:3px; background:#000;"></div>
+        <div style="font-size:8px; font-weight:800; letter-spacing:0.3em; text-transform:uppercase; color:#999;">Service Details</div>
+        <div style="flex:1; height:1px; background:#e5e5e5;"></div>
+      </div>
+
+      <!-- ITEMS TABLE -->
+      <table style="width:100%; border-collapse:collapse; margin-bottom:0;">
+        <thead>
+          <tr style="border-bottom:2px solid #000;">
+            <th style="text-align:left; padding:0 0 12px; font-size:8.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.22em; color:#000;">Description</th>
+            <th style="text-align:center; padding:0 0 12px; font-size:8.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.22em; color:#000;">Qty</th>
+            <th style="text-align:right; padding:0 0 12px; font-size:8.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.22em; color:#000;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #e5e5e5;">
+            <td style="padding:20px 0;" id="inv-desc">
+              <div id="inv-desc-main" style="font-size:15px; font-weight:800; color:#000; letter-spacing:-0.01em;"></div>
+              <div style="font-size:11px; color:#888; margin-top:3px; font-weight:500;">Daichiro Professional Skills Academy</div>
+            </td>
+            <td style="padding:20px 0; text-align:center; font-size:14px; font-weight:700; color:#555;">1</td>
+            <td style="padding:20px 0; text-align:right;">
+              <span id="inv-amount" style="font-size:17px; font-weight:900; color:#000; letter-spacing:-0.02em;"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- TOTAL ROW -->
+      <div style="display:flex; justify-content:flex-end; margin-top:0; padding-top:16px; border-top:none;">
+        <div style="min-width:240px;">
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #e5e5e5;">
+            <span style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.1em;">Regular Price</span>
+            <span id="inv-subtotal" style="font-size:11px; font-weight:700; color:#555;"></span>
+          </div>
+          <div id="inv-discount-row" style="display:none; justify-content:space-between; padding:6px 0; border-bottom:1px solid #e5e5e5;">
+            <span style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.1em;">Offer Discount</span>
+            <span id="inv-discount-val" style="font-size:11px; font-weight:700; color:#16a34a;"></span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; padding:12px 0 0; margin-top:4px; border-top:3px solid #000;">
+            <span style="font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:0.18em;">Total</span>
+            <span id="inv-total" style="font-size:22px; font-weight:900; letter-spacing:-0.03em;"></span>
+          </div>
+        </div>
+      </div>
+
+
+
+
+    </div>
+
+    <!-- BOTTOM BLACK FOOTER -->
+    <div style="background:#000; padding:20px 48px; display:flex; align-items:center; justify-content:space-between;">
+      <div style="font-size:9px; font-weight:900; letter-spacing:0.2em; text-transform:uppercase; color:#fff;">DAICHIRO</div>
+      <div style="font-size:9px; color:#555; font-weight:500;">daichiro.academy@gmail.com &nbsp;·&nbsp; {{ site_location_address or 'Old Lambulane, Imphal' }}</div>
+      <div style="font-size:9px; font-weight:700; letter-spacing:0.1em; color:#555; text-transform:uppercase;">Thank You</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══ Data Store ══ -->
+<script>
+const appts = [
+    {% for appt in appointments %}
+    {% set is_package = appt.package and ('recommended' in appt.package.lower() or 'complete' in appt.package.lower() or 'package' in appt.package.lower()) %}
+    {# Use price locked at booking time; fall back to live price for old records #}
+    {% if appt.fees_paid and '|' in appt.fees_paid %}
+      {% set offer_fee = appt.fees_paid.split('|')[0] %}
+      {% set orig_fee  = appt.fees_paid.split('|')[1] %}
+    {% elif appt.fees_paid %}
+      {% set offer_fee = appt.fees_paid %}
+      {% set orig_fee  = (package_fee if is_package else session_fee) %}
+    {% else %}
+      {% set offer_fee = (package_offer if is_package else session_offer) %}
+      {% set orig_fee  = (package_fee if is_package else session_fee) %}
+    {% endif %}
+    {
+        apptId: {{ appt.id }},
+        invNo: {{ ('INV-%04d' % appt.id) | tojson }},
+        name: {{ appt.name | tojson }},
+        mobile: {{ (appt.mobile or '') | tojson }},
+        email: {{ (appt.email or '') | tojson }},
+        address: {{ (appt.address or '') | tojson }},
+        package: {{ (appt.package or 'Single Session') | tojson }},
+        isPackage: {{ 'true' if is_package else 'false' }},
+        originalFee: {{ orig_fee | tojson if orig_fee else 'null' }},
+        offerFee: {{ offer_fee | tojson if offer_fee else 'null' }},
+        whatsapp: {{ (appt.whatsapp or '') | tojson }},
+        bookedOn: {{ (appt.created_at | to_ist if appt.created_at else '—') | tojson }},
+
+        paymentStatus: {{ (appt.payment_status or 'Pending') | tojson }},
+    }{{ ',' if not loop.last }}
+    {% endfor %}
+];
+
+function confirmDelete(apptId, name) {
+    document.getElementById('delete-name').textContent = name;
+    document.getElementById('delete-form').action = `/employee/appointments/${apptId}/delete`;
+    const m = document.getElementById('delete-modal');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+}
+function closeDelete() {
+    const m = document.getElementById('delete-modal');
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+}
+
+// ── Receipt Preview Modal ────────────────────────────────────────
+function amountToWords(n) {
+    if (!n || isNaN(n)) return '';
+    n = parseInt(n);
+    if (n === 0) return 'Zero';
+    const ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+    const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+    if (n < 20) return ones[n];
+    if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? ' ' + ones[n%10] : '');
+    if (n < 1000) return ones[Math.floor(n/100)] + ' Hundred' + (n%100 ? ' ' + amountToWords(n%100) : '');
+    if (n < 100000) return amountToWords(Math.floor(n/1000)) + ' Thousand' + (n%1000 ? ' ' + amountToWords(n%1000) : '');
+    return n.toString();
+}
+
+function escH(s) { const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
+
+function openReceiptModal(idx) {
+    const a = appts[idx];
+    const eff = a.offerFee || a.originalFee || '';
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('r-sl-no').value = a.invNo;
+    document.getElementById('r-date').value  = dateStr;
+    document.getElementById('r-from').value  = a.name || '';
+    document.getElementById('r-amount-words').value = eff ? amountToWords(eff) : '';
+    document.getElementById('r-account').value = a.isPackage ? 'Recommended Package — Counselling' : 'Single Counselling Session';
+    document.getElementById('r-amount-figure').value = eff ? eff : '';
+    const m = document.getElementById('receipt-modal');
+    m.classList.remove('hidden'); m.classList.add('flex');
+}
+function closeReceiptModal() {
+    const m = document.getElementById('receipt-modal');
+    m.classList.add('hidden'); m.classList.remove('flex');
+}
+function printReceipt() {
+    const sl   = document.getElementById('r-sl-no').value;
+    const dt   = document.getElementById('r-date').value;
+    const frm  = document.getElementById('r-from').value;
+    const wds  = document.getElementById('r-amount-words').value;
+    const acc  = document.getElementById('r-account').value;
+    const fig  = document.getElementById('r-amount-figure').value;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Money Receipt — Daichiro</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Times New Roman',Times,serif;background:#f0f2f5;display:flex;justify-content:center;padding:20px}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:210mm 110mm;margin:8mm}}
+.rc{background:#ffffff;border:1.5px solid #1a2a4a;padding:22px 28px;width:100%;max-width:580px;position:relative}
+.wm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:90px;font-weight:900;color:#1a2a4a;opacity:0.03;white-space:nowrap}
+.hdr{display:flex;align-items:center;gap:14px;border-bottom:2px solid #1a2a4a;padding-bottom:12px;margin-bottom:14px}
+.logo{width:56px;height:56px;flex-shrink:0}
+.ai{flex:1;text-align:center}
+.an{font-size:14px;font-weight:900;color:#1a2a4a;letter-spacing:.06em;font-family:Arial,sans-serif}.ad{font-size:9px;color:#555;margin-top:3px;font-family:Arial,sans-serif;letter-spacing:.04em}
+.r1{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sl{font-size:11px;color:#333;font-family:Arial,sans-serif}.sv{color:#cc0000;font-size:14px;font-weight:900}
+.mt{font-size:19px;font-style:italic;font-family:cursive,serif;color:#1a2a4a}
+.dt{font-size:11px;color:#333;font-family:Arial,sans-serif}
+.ln{display:flex;align-items:baseline;gap:6px;margin-bottom:12px;border-bottom:1px solid #ddd;padding-bottom:4px}
+.lb{font-size:11px;color:#333;white-space:nowrap;font-family:Arial,sans-serif}.fv{font-size:12px;color:#111;flex:1}
+.eb{border-bottom:1px solid #ddd;margin-bottom:12px;height:14px}
+.bt{display:flex;align-items:flex-end;justify-content:space-between;margin-top:10px}
+.ap{background:#1a2a4a;border-radius:18px;padding:5px 14px;display:inline-flex;align-items:center}
+.rs{color:#fff;font-size:14px;font-weight:700}
+.ab{font-size:14px;font-weight:700;color:#1a2a4a;border:1.5px solid #1a2a4a;border-radius:4px;padding:4px 12px;min-width:70px;text-align:center}
+.rv{text-align:right;font-size:12px;color:#333;font-family:Arial,sans-serif}.sl2{border-bottom:1.5px solid #1a2a4a;width:90px;margin-top:22px;margin-left:auto}
+</style></head><body>
+<div class="rc"><div class="wm">DAICHIRO</div>
+<div class="hdr"><div class="logo"><img src="https://daichiro.in/static/img/logo.png" style="width:56px;height:56px;object-fit:contain;border-radius:4px" alt="Daichiro"></div>
+<div class="ai"><div class="an">DAICHIRO PROFESSIONAL SKILLS ACADEMY</div><div class="ad">{{ (site_location_address or "Old Lambulane, Imphal") | upper }}</div></div></div>
+<div class="r1"><div class="sl">Sl. No. <span class="sv">${escH(sl)}</span></div><div class="mt">Money Receipt</div><div class="dt">Date &nbsp;${escH(dt)}</div></div>
+<div class="ln"><span class="lb" style="font-style:italic;color:#1a2a4a;font-weight:700">Received with thanks from</span><span class="fv">${escH(frm)}</span></div>
+<div class="eb"></div>
+<div class="ln"><span class="lb">a sum of Rupees</span><span class="fv">${escH(wds)}</span><span class="lb">only</span></div>
+<div class="ln"><span class="lb">on account of</span><span class="fv">${escH(acc)}</span></div>
+<div class="bt"><div style="display:flex;align-items:center;gap:8px"><div class="ap"><span class="rs">₹</span></div><div class="ab">${escH(fig)}</div></div>
+<div class="rv">Receiver<div class="sl2"></div></div></div></div></body></html>`;
+    const win = window.open('','_blank','width=680,height=480');
+    if (!win) { alert('Popup blocked — please allow popups for this site.'); return; }
+    win.document.open(); win.document.write(html); win.document.close();
+    win.onload = function(){ win.focus(); win.print(); };
+    setTimeout(()=>{ try{ win.focus(); win.print(); }catch(e){} }, 700);
+}
+
+// ── Email Compose Modal ──────────────────────────────────────────
+function openEmailModal(apptId, idx) {
+    const a = appts[idx];
+    const eff = a.offerFee || a.originalFee || '';
+    const pkg = a.isPackage ? 'Recommended Package — Counselling' : 'Single Counselling Session';
+    document.getElementById('compose-to').value = a.email || '';
+    document.getElementById('compose-subject').value = 'Your Appointment Receipt — Daichiro Academy (' + a.invNo + ')';
+    document.getElementById('compose-note').value = '';
+    const sumEl = document.getElementById('compose-summary');
+    const inputStyle = 'background:#18181b;border:1px solid #3f3f46;color:#e4e4e7;font-size:12px;padding:5px 10px;border-radius:7px;outline:none;width:100%;box-sizing:border-box;font-family:inherit';
+    sumEl.innerHTML =
+        `<span style="color:#71717a;font-weight:600;white-space:nowrap">Name</span><input name="ov_name" id="em-name" value="${escH(a.name)}" style="${inputStyle}">` +
+        `<span style="color:#71717a;font-weight:600;white-space:nowrap">Package</span><input name="ov_package" id="em-pkg" value="${escH(pkg)}" style="${inputStyle}">` +
+        `<span style="color:#71717a;font-weight:600;white-space:nowrap">Amount</span><input name="ov_amount" id="em-amt" value="${eff ? '\u20b9'+eff : ''}" style="${inputStyle};color:#34d399;font-weight:700">` +
+        `<span style="color:#71717a;font-weight:600;white-space:nowrap">Booked On</span><input name="ov_booked" id="em-date" value="${escH(a.bookedOn)}" style="${inputStyle}">` +
+        `<span style="color:#71717a;font-weight:600;white-space:nowrap">Ref No.</span><input name="ov_ref" id="em-ref" value="${escH(a.invNo)}" style="${inputStyle};color:#C9A84C;font-weight:700">`;
+    // add focus highlight to all summary inputs
+    sumEl.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('focus', () => { inp.style.borderColor='#60a5fa'; });
+        inp.addEventListener('blur',  () => { inp.style.borderColor='#3f3f46'; });
+    });
+    document.getElementById('email-compose-form').action = `/admin/appointments/${apptId}/send-invoice`;
+    const m = document.getElementById('email-compose-modal');
+    m.classList.remove('hidden'); m.classList.add('flex');
+}
+function closeEmailModal() {
+    const m = document.getElementById('email-compose-modal');
+    m.classList.add('hidden'); m.classList.remove('flex');
+}
+
+function openManualInvoiceModal() {
+    // Reset all fields
+    document.getElementById('manual-invoice-form').reset();
+    const m = document.getElementById('manual-invoice-modal');
+    m.classList.remove('hidden'); m.classList.add('flex');
+    document.getElementById('mi-to').focus();
+}
+function closeManualInvoiceModal() {
+    const m = document.getElementById('manual-invoice-modal');
+    m.classList.add('hidden'); m.classList.remove('flex');
+}
+
+let currentIdx = -1;
+
+function row(label, val) {
+    if (!val) return '';
+    return `<div style="display:flex; gap:12px; align-items:flex-start;">
+        <span style="min-width:110px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#71717a; padding-top:2px;">${label}</span>
+        <span style="font-size:14px; font-weight:600; color:#e4e4e7; flex:1;">${val}</span>
+    </div>`;
+}
+
+function openDetails(idx) {
+    currentIdx = idx;
+    const a = appts[idx];
+
+    // Avatar initials
+    const initials = a.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    document.getElementById('modal-avatar').textContent = initials;
+    document.getElementById('modal-title').textContent = a.name;
+
+    // Package badge
+    const badge = document.getElementById('modal-pkg-badge');
+    if (a.isPackage) {
+        badge.textContent = '★ Recommended Package';
+        badge.className = 'px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md bg-amber-400/20 text-amber-400 border border-amber-500/30';
+    } else {
+        badge.textContent = 'Single Session';
+        badge.className = 'px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md bg-zinc-700 text-zinc-300 border border-zinc-600';
+    }
+
+    // Amount
+    const hasOffer = a.offerFee && a.offerFee !== a.originalFee;
+    const effective = hasOffer ? a.offerFee : a.originalFee;
+    document.getElementById('modal-amount').textContent = effective ? `₹${effective}` : '—';
+    const isPaid = a.paymentStatus && a.paymentStatus.toLowerCase() === 'paid';
+    const amtLabel = document.getElementById('modal-amount-label');
+    const amtEl    = document.getElementById('modal-amount');
+    if (isPaid) {
+        amtLabel.textContent = '✓ Amount Paid';
+        amtLabel.style.color = '#34d399';
+        amtEl.style.color    = '#34d399';
+    } else {
+        amtLabel.textContent = 'Amount Due';
+        amtLabel.style.color = 'rgba(201,168,76,0.6)';
+        amtEl.style.color    = '#C9A84C';
+    }
+    const origBlock = document.getElementById('modal-original-block');
+    if (hasOffer && a.originalFee) {
+        origBlock.style.display = 'block';
+        document.getElementById('modal-original').textContent = `₹${a.originalFee}`;
+    } else {
+        origBlock.style.display = 'none';
+    }
+
+    // Mobile
+    const mobileRow = document.getElementById('modal-mobile-row');
+    const mobileEl  = document.getElementById('modal-mobile');
+    if (a.mobile) {
+        mobileRow.style.display = 'flex';
+        mobileEl.href = `tel:${a.mobile}`;
+        mobileEl.textContent = a.mobile;
+    } else { mobileRow.style.display = 'none'; }
+
+    // Email
+    const emailRow = document.getElementById('modal-email-row');
+    if (a.email) {
+        emailRow.style.display = 'flex';
+        document.getElementById('modal-email').textContent = a.email;
+    } else { emailRow.style.display = 'none'; }
+
+    // WhatsApp
+    const waRow = document.getElementById('modal-whatsapp-row');
+    const waEl  = document.getElementById('modal-whatsapp');
+    if (a.whatsapp) {
+        waRow.style.display = 'flex';
+        waEl.href = `https://wa.me/91${a.whatsapp.replace(/\D/g,'')}`;
+        waEl.textContent = a.whatsapp;
+    } else { waRow.style.display = 'none'; }
+
+    // Address
+    const addrRow = document.getElementById('modal-address-row');
+    if (a.address) {
+        addrRow.style.display = 'flex';
+        document.getElementById('modal-address').textContent = a.address;
+    } else { addrRow.style.display = 'none'; }
+
+    // Booked On
+    document.getElementById('modal-booked').textContent = a.bookedOn;
+
+    const dm = document.getElementById('details-modal');
+    dm.style.display = 'flex';
+}
+
+function closeDetails() {
+    const dm = document.getElementById('details-modal');
+    dm.style.display = 'none';
+    currentIdx = -1;
+}
+
+function buildInvoice(idx) {
+    const a = appts[idx];
+    const pkg = a.isPackage ? 'Recommended Package — Counselling' : 'Single Counselling Session';
+    const invNo = `INV-${String(idx + 1).padStart(4, '0')}`;
+
+    // Determine effective (payable) amount and whether there's an offer
+    const hasOffer   = a.offerFee && a.offerFee !== a.originalFee;
+    const effective  = hasOffer ? a.offerFee : a.originalFee;
+    const effStr     = effective ? `₹${effective}` : 'As agreed';
+    const origStr    = a.originalFee ? `₹${a.originalFee}` : null;
+
+    document.getElementById('inv-date').textContent = a.bookedOn.split(',')[0];
+    document.getElementById('inv-inv-no').textContent = invNo;
+    document.getElementById('inv-name').textContent = a.name;
+    document.getElementById('inv-mobile-line').textContent = a.mobile ? `+91 ${a.mobile}` : '';
+    document.getElementById('inv-email-line').textContent = a.email || '';
+    document.getElementById('inv-address-line').textContent = a.address || '';
+    document.getElementById('inv-desc-main').textContent = pkg;
+
+    // Amount column: show original strikethrough + offer if offer exists
+    const amtEl = document.getElementById('inv-amount');
+    if (hasOffer && origStr) {
+        amtEl.innerHTML = `<span style="text-decoration:line-through; color:#aaa; font-size:13px; font-weight:600;">${origStr}</span> <span style="font-size:17px; font-weight:900;">${effStr}</span>`;
+    } else {
+        amtEl.textContent = effStr;
+    }
+
+    // Hero amount (top-right big number) = effective price
+    document.getElementById('inv-hero-amount').textContent = effStr;
+
+    // Subtotal row = original price
+    document.getElementById('inv-subtotal').textContent = origStr || effStr;
+
+    // Offer discount row (show only if offer exists)
+    const discRow = document.getElementById('inv-discount-row');
+    const discVal = document.getElementById('inv-discount-val');
+    if (hasOffer && a.originalFee && a.offerFee) {
+        const saving = parseInt(a.originalFee) - parseInt(a.offerFee);
+        discRow.style.display = 'flex';
+        discVal.textContent = `−₹${saving}`;
+    } else {
+        discRow.style.display = 'none';
+    }
+
+    // GST row: removed (not applicable)
+    document.getElementById('inv-total').textContent = effStr;
+}
+
+function printInvoice(idx) {
+    // Open the editable yellow-paper receipt modal instead of directly printing
+    openReceiptModal(idx);
+}
+
+function printInvoiceFromModal() {
+    if (currentIdx < 0) return;
+    closeDetails();
+    setTimeout(() => openReceiptModal(currentIdx), 200);
+}
+
+// ── Keyboard shortcuts ───────────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeReceiptModal();
+        closeEmailModal();
+        closeManualInvoiceModal();
+        closeDetails();
+        closeDelete();
+    }
+});
+
+// ── History Filter / Sort ────────────────────────────────────────
+let ahFilter = 'all';
+let ahSort   = 'newest';
+
+function applyHistoryFilters() {
+    const q    = (document.getElementById('ah-search').value || '').trim().toLowerCase();
+    const rows = [...document.querySelectorAll('.ah-row')];
+    let   vis  = 0;
+
+    rows.forEach(r => {
+        const name   = (r.dataset.name   || '');
+        const mobile = (r.dataset.mobile || '');
+        const pkg    = (r.dataset.pkg    || '');
+        const search = !q || name.includes(q) || mobile.includes(q) || pkg.includes(q);
+        const filter = ahFilter === 'all' || pkg === ahFilter;
+        r.style.display = (search && filter) ? '' : 'none';
+        if (search && filter) vis++;
+    });
+
+    // Sort visible rows by inserting them back in order
+    const tbody = rows[0] && rows[0].parentElement;
+    if (tbody) {
+        const visible = rows.filter(r => r.style.display !== 'none');
+        visible.sort((a, b) => {
+            const da = a.dataset.date || '0';
+            const db = b.dataset.date || '0';
+            return ahSort === 'newest' ? db.localeCompare(da) : da.localeCompare(db);
+        });
+        const emptyRow = document.getElementById('ah-empty-row');
+        visible.forEach(r => tbody.insertBefore(r, emptyRow));
+        if (emptyRow) emptyRow.style.display = vis === 0 ? '' : 'none';
+    }
+
+    const countEl = document.getElementById('ah-count');
+    if (countEl) countEl.textContent = vis + ' of ' + rows.length;
+}
+
+function setHistoryFilter(f) {
+    ahFilter = f;
+    const chips = { all: 'chip-all', session: 'chip-session', package: 'chip-package' };
+    Object.entries(chips).forEach(([k, id]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const active = k === f;
+        el.style.background  = active ? '#27272a' : 'transparent';
+        el.style.color       = active ? '#e4e4e7' : '#71717a';
+        el.style.borderColor = active ? '#60a5fa' : '#3f3f46';
+    });
+    applyHistoryFilters();
+}
+
+function setHistorySort(s) {
+    ahSort = s;
+    const nBtn = document.getElementById('ah-sort-newest');
+    const oBtn = document.getElementById('ah-sort-oldest');
+    if (s === 'newest') {
+        nBtn.style.background = '#27272a'; nBtn.style.color = '#60a5fa';
+        oBtn.style.background = 'transparent'; oBtn.style.color = '#71717a';
+    } else {
+        oBtn.style.background = '#27272a'; oBtn.style.color = '#60a5fa';
+        nBtn.style.background = 'transparent'; nBtn.style.color = '#71717a';
+    }
+    applyHistoryFilters();
+}
+
+// Init
+applyHistoryFilters();
+</script>
+
+{% endblock %}

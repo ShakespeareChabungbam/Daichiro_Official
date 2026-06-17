@@ -1,0 +1,250 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Manual Assessment Entry{% endblock %}
+{% block page_title %}Manual Entry{% endblock %}
+{% block page_subtitle %}Admin — Enter Assessment Data{% endblock %}
+
+{% block page_content %}
+
+<form method="POST" action="{{ url_for('admin.manual_assessment') }}" class="max-w-4xl mx-auto space-y-6">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <!-- Info bar -->
+    <div style="background:#5b21b6; border:1px solid #7c3aed; padding:12px 20px; display:flex; align-items:center; gap:12px; margin-bottom:4px;">
+        <span style="font-size:20px;">✍️</span>
+        <p style="font-size:12px; color:#ffffff; font-weight:600; margin:0;">Fill in student details below. Use <strong style="color:#fbbf24;">Save Only</strong> to store data now and run AI later, or <strong style="color:#fbbf24;">Save &amp; Analyse</strong> to run AI immediately.</p>
+    </div>
+
+    <!-- ── A: Personal Info ── -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-zinc-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-white text-black text-[10px] font-black flex items-center justify-center">A</span>
+            <p class="text-sm font-black uppercase tracking-widest text-white">Personal Information</p>
+        </div>
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for field, label, ph in [
+                ('full_name',      'Full Name *',      'e.g. Rohan Sharma'),
+                ('class_grade',    'Class / Grade',    'e.g. XII (Science)'),
+                ('school_name',    'School Name',      'e.g. E.K. Higher Secondary School'),
+                ('contact_number', 'Contact Number',   'e.g. 9876543210'),
+                ('email',          'Email Address',    'e.g. student@email.com'),
+            ] %}
+            <div class="{{ 'sm:col-span-2' if loop.index == 3 else '' }}">
+                <label class="block text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1.5">{{ label }}</label>
+                <input type="text" name="{{ field }}" placeholder="{{ ph }}"
+                    class="w-full px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-xl text-white text-sm font-semibold placeholder-zinc-700 focus:outline-none focus:border-zinc-400 transition-all">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ── B: Interests ── -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-zinc-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-white text-black text-[10px] font-black flex items-center justify-center">B</span>
+            <p class="text-sm font-black uppercase tracking-widest text-white">Interests</p>
+        </div>
+        <div class="p-6 space-y-6">
+
+            <!-- Activities -->
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-3">Activities Enjoyed</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                    {% for item in [
+                        'Solving math problems or puzzles',
+                        'Drawing, painting, or designing',
+                        'Writing stories or essays',
+                        'Playing computer games or coding',
+                        'Helping others with their problems',
+                        'Working with tools or machines',
+                        'Participating in debates or public speaking',
+                        'Taking care of animals or nature',
+                        'Organizing events or planning tasks',
+                        'Selling or promoting products/services'
+                    ] %}
+                    <label class="flex items-center gap-2.5 cursor-pointer group">
+                        <input type="checkbox" name="activities" value="{{ item }}"
+                            class="w-4 h-4 accent-amber-400 rounded">
+                        <span class="text-xs text-zinc-400 group-hover:text-school-gold transition-colors">{{ item }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Subjects -->
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-3">Favourite Subjects</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-2 gap-x-4">
+                    {% for item in ['Mathematics','Science - Physics','Chemistry','Biology','English','Languages',
+                        'Computer Science / IT','Social Science','History','Business Studies','Economics',
+                        'Art','Music','Drama','Physical Education','Environmental Studies'] %}
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" name="subjects" value="{{ item }}"
+                            class="w-4 h-4 accent-amber-400 rounded">
+                        <span class="text-xs text-zinc-400 group-hover:text-school-gold transition-colors">{{ item }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Professions -->
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-3">Professions of Interest</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                    {% for item in [
+                        'Doctor / Nurse','Engineer / Scientist','Teacher / Professor',
+                        'Artist / Designer','Business Owner / Entrepreneur','Lawyer / Judge',
+                        'Software Developer / Game Designer','Police / Army Officer',
+                        'Social Worker / Counselor','YouTuber / Influencer / Filmmaker'
+                    ] %}
+                    <label class="flex items-center gap-2.5 cursor-pointer group">
+                        <input type="checkbox" name="professions" value="{{ item }}"
+                            class="w-4 h-4 accent-amber-400 rounded">
+                        <span class="text-xs text-zinc-400 group-hover:text-school-gold transition-colors">{{ item }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── C: Aptitude ── -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-zinc-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-white text-black text-[10px] font-black flex items-center justify-center">C</span>
+            <p class="text-sm font-black uppercase tracking-widest text-white">Aptitude Self-Assessment <span class="text-zinc-600 font-semibold normal-case tracking-normal text-xs ml-2">1 = Not Confident · 5 = Very Confident</span></p>
+        </div>
+        <div class="p-6 space-y-4">
+            {% for key, label in [
+                ('apt_logical',   'Solving logical / numerical problems'),
+                ('apt_science',   'Understanding scientific concepts'),
+                ('apt_writing',   'Writing or expressing yourself clearly'),
+                ('apt_computers', 'Using computers or apps'),
+                ('apt_design',    'Creating or designing something'),
+                ('apt_speaking',  'Speaking in public or leading a team'),
+                ('apt_planning',  'Planning or organizing tasks'),
+                ('apt_helping',   'Helping others solve their problems'),
+                ('apt_tech',      'Learning new technologies quickly'),
+            ] %}
+            <div class="flex items-center justify-between gap-4">
+                <span class="text-xs text-zinc-400 font-semibold flex-1">{{ label }}</span>
+                <div class="flex gap-1 flex-shrink-0" id="apt-grp-{{ key }}">
+                    {% for v in [1,2,3,4,5] %}
+                    <input type="radio" name="{{ key }}" value="{{ v }}" class="hidden apt-radio" id="{{ key }}_{{ v }}">
+                    <div class="apt-btn w-9 h-9 flex items-center justify-center rounded-lg border text-xs font-black transition-all cursor-pointer select-none"
+                         data-for="{{ key }}" data-val="{{ v }}"
+                         onclick="selectApt('{{ key }}', {{ v }})">
+                        {{ v }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ── D: Personality ── -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-zinc-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-white text-black text-[10px] font-black flex items-center justify-center">D</span>
+            <p class="text-sm font-black uppercase tracking-widest text-white">Personality &amp; Values</p>
+        </div>
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+            {% for item in [
+                'I enjoy working in teams more than alone',
+                'I prefer structured routines over flexible schedules',
+                'I like taking risks and trying new things',
+                'I enjoy helping and supporting others',
+                'I feel energized when leading a group',
+                'I prefer working with ideas rather than physical things',
+                'I value financial security in my career',
+                'Making a positive impact on society matters to me',
+                'I enjoy creative work more than routine tasks',
+                'I learn better by doing than by reading',
+            ] %}
+            <label class="flex items-center gap-2.5 cursor-pointer group">
+                <input type="checkbox" name="personality" value="{{ item }}"
+                    class="w-4 h-4 accent-amber-400 rounded">
+                <span class="text-xs text-zinc-400 group-hover:text-school-gold transition-colors">{{ item }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ── E: Career Vision ── -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-zinc-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-white text-black text-[10px] font-black flex items-center justify-center">E</span>
+            <p class="text-sm font-black uppercase tracking-widest text-white">Career Vision</p>
+        </div>
+        <div class="p-6 space-y-4">
+            {% for name, label, ph in [
+                ('vision_careers', 'Currently Considering Careers', 'e.g. Engineer, Doctor, Designer…'),
+                ('vision_goals',   '5-Year Goals', 'Where do you see yourself in 5 years?'),
+                ('vision_life',    'Ideal Future Life', 'Describe your ideal lifestyle and work environment…'),
+            ] %}
+            <div>
+                <label class="block text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1.5">{{ label }}</label>
+                <textarea name="{{ name }}" rows="2" placeholder="{{ ph }}"
+                    class="w-full px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-xl text-white text-sm font-semibold placeholder-zinc-700 focus:outline-none focus:border-zinc-400 transition-all resize-none"></textarea>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ── Save buttons ── -->
+    <div class="flex gap-3 pb-6">
+        <a href="{{ url_for('admin.assessments_page') }}"
+           class="px-6 py-3 bg-zinc-900 border border-zinc-700 text-zinc-400 font-black uppercase tracking-widest text-xs rounded-xl hover:bg-school-gold/15 hover:text-school-gold transition-all no-underline">
+            ← Cancel
+        </a>
+        <button type="submit" name="action" value="save"
+            class="flex-1 py-3 bg-zinc-800 border border-zinc-600 text-blue-600 font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-700 transition-all">
+            💾 Save Only
+        </button>
+        <button type="submit" name="action" value="analyze"
+            class="flex-1 py-3 bg-white text-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-amber-400 transition-all">
+            🧠 Save &amp; Analyse with AI
+        </button>
+    </div>
+
+</form>
+
+<style>
+.apt-btn {
+    border-color: #3f3f46; /* zinc-700 */
+    color: #71717a;        /* zinc-500 */
+    background: transparent;
+}
+.apt-btn:hover {
+    border-color: #71717a;
+    color: #ffffff;
+}
+.apt-btn.selected {
+    background: #fbbf24;   /* amber-400 */
+    color: #000000;
+    border-color: #fbbf24;
+}
+</style>
+
+<script>
+function selectApt(key, val) {
+    // Check the hidden radio
+    const radio = document.getElementById(key + '_' + val);
+    if (radio) radio.checked = true;
+    // Update button visuals
+    document.querySelectorAll('.apt-btn[data-for="' + key + '"]').forEach(function(btn) {
+        if (parseInt(btn.dataset.val) === val) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+}
+
+// Set initial visual state from pre-checked radios
+document.querySelectorAll('.apt-radio:checked').forEach(function(radio) {
+    selectApt(radio.name, parseInt(radio.value));
+});
+</script>
+
+{% endblock %}

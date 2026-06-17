@@ -1,0 +1,277 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}Edit Admission — SkillNest{% endblock %}
+{% block page_title %}Edit Admission{% endblock %}
+{% block page_subtitle %}{{ a.child_name }} — {{ a.status|title }}{% endblock %}
+{% block page_content %}
+<div class="max-w-3xl mx-auto">
+
+    <form method="POST" action="{{ url_for('employee.skillnest_edit', admission_id=a.id) }}" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <!-- ── SECTION 01: Student Information ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-zinc-800 px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Section 01</span>
+                <span class="text-white font-bold text-sm">Student Information</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">
+                        Full Name of the Student <span class="text-red-400">*</span>
+                    </label>
+                    <input name="child_name" type="text" required value="{{ a.child_name }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                {% set parts = a.dob.split('/') if a.dob else ('', '', '') %}
+                {% set d = parts[0] if parts|length == 3 else '' %}
+                {% set m = parts[1] if parts|length == 3 else '' %}
+                {% set y = parts[2] if parts|length == 3 else '' %}
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Date of Birth</label>
+                    <div class="flex gap-2">
+                        <select name="dob_day" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-amber-400">
+                            <option value="">Day</option>
+                            {% for day in range(1,32) %}<option value="{{ day }}" {% if day|string == d %}selected{% endif %}>{{ day }}</option>{% endfor %}
+                        </select>
+                        <select name="dob_month" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-amber-400">
+                            <option value="">Month</option>
+                            {% for month,n in [(1,'Jan'),(2,'Feb'),(3,'Mar'),(4,'Apr'),(5,'May'),(6,'Jun'),(7,'Jul'),(8,'Aug'),(9,'Sep'),(10,'Oct'),(11,'Nov'),(12,'Dec')] %}
+                            <option value="{{ month }}" {% if month|string == m %}selected{% endif %}>{{ n }}</option>{% endfor %}
+                        </select>
+                        <select name="dob_year" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-amber-400">
+                            <option value="">Year</option>
+                            {% for year in range(current_year, 1950, -1) %}<option value="{{ year }}" {% if year|string == y %}selected{% endif %}>{{ year }}</option>{% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Age</label>
+                    <input id="child_age_field" name="child_age" type="number" min="1" max="100" value="{{ a.child_age or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Gender</label>
+                    <div class="flex gap-5 pt-1">
+                        {% for g in ['Male','Female','Other'] %}
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                            <input type="radio" name="gender" value="{{ g }}" class="accent-amber-400" {% if a.gender == g %}checked{% endif %}> {{ g }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Class / Grade</label>
+                    <input name="class_grade" type="text" value="{{ a.class_grade or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">School Name</label>
+                    <input name="school_name" type="text" value="{{ a.school_name or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION 02: Parent Details ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-zinc-800 px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Section 02</span>
+                <span class="text-white font-bold text-sm">Parent / Guardian Details</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Father's Name</label>
+                    <input name="father_name" type="text" value="{{ a.father_name or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Mother's Name</label>
+                    <input name="mother_name" type="text" value="{{ a.mother_name or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Contact Number (Primary) <span class="text-red-400">*</span></label>
+                    <input name="parent_mobile" type="tel" required value="{{ a.parent_mobile }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Alternate Contact Number</label>
+                    <input name="alt_contact" type="tel" value="{{ a.alt_contact or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Email Address</label>
+                    <input name="parent_email" type="email" value="{{ a.parent_email or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Home Address</label>
+                    <input name="address" type="text" value="{{ a.address or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION 03: Academic Details ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-zinc-800 px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Section 03</span>
+                <span class="text-white font-bold text-sm">Academic & Learning Details</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Subjects Needing Help</label>
+                    <input name="subjects_help" type="text" value="{{ a.subjects_help or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Homework support required?</label>
+                    <div class="flex gap-5">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                            <input type="radio" name="homework_support" value="Yes" class="accent-amber-400" {% if a.homework_support == 'Yes' %}checked{% endif %}> Yes
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                            <input type="radio" name="homework_support" value="No" class="accent-amber-400" {% if a.homework_support == 'No' %}checked{% endif %}> No
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Child's Strengths</label>
+                    <textarea name="child_strengths" rows="2"
+                              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors resize-none">{{ a.child_strengths or '' }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Areas to Improve</label>
+                    <textarea name="areas_to_improve" rows="2"
+                              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors resize-none">{{ a.areas_to_improve or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION 04: Behaviour & Health ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-zinc-800 px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Section 04</span>
+                <span class="text-white font-bold text-sm">Behaviour & Health Details</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Behaviour Traits</label>
+                    <input name="child_behavior" type="text" value="{{ a.child_behavior or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Medical / Allergy</label>
+                    <input name="medical_condition" type="text" value="{{ a.medical_condition or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION 05: Program & Admin overrides (New) ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-zinc-800 px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-zinc-400 font-bold uppercase tracking-widest">Section 05</span>
+                <span class="text-white font-bold text-sm">Program & Administration</span>
+                <span class="ml-auto text-xs text-amber-500 font-bold uppercase tracking-wider border border-amber-900 rounded px-2 py-0.5 bg-amber-900/30">Overrides</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">Batch Assigned</label>
+                    <input name="batch_assigned" type="text" value="{{ a.batch_assigned or '' }}" placeholder="e.g. Beginners A"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-amber-300 font-bold focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Preferred Timing</label>
+                    <input name="preferred_timing" type="text" value="{{ a.preferred_timing or '' }}"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Evening Snack Required?</label>
+                    <select name="evening_snack" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors">
+                        <option value="" {% if not a.evening_snack %}selected{% endif %}>— Select —</option>
+                        <option value="Yes" {% if a.evening_snack == 'Yes' %}selected{% endif %}>Yes</option>
+                        <option value="No" {% if a.evening_snack == 'No' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">Fees Paid (Amount / Details)</label>
+                    <input name="fees_paid" type="text" value="{{ a.fees_paid or '' }}" placeholder="e.g. Rs 5000 via UPI"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-emerald-300 font-bold focus:outline-none focus:border-amber-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">Payment Status <span class="text-zinc-500 font-normal lowercase">(For Dashboard Badging)</span></label>
+                    <select name="payment_status" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-amber-300 font-bold focus:outline-none focus:border-amber-400">
+                        <option value="" {% if not a.payment_status %}selected{% endif %}>— Select —</option>
+                        <option value="Paid" {% if a.payment_status == 'Paid' %}selected{% endif %}>Paid</option>
+                        <option value="Unpaid" {% if a.payment_status == 'Unpaid' %}selected{% endif %}>Unpaid</option>
+                        <option value="Partial" {% if a.payment_status == 'Partial' %}selected{% endif %}>Partial</option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Admin Notes & Remarks</label>
+                    <textarea name="notes" rows="3" placeholder="Any internal notes or remarks..."
+                              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors resize-none">{{ a.notes or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Buttons ── -->
+        <div class="flex gap-3 pt-2">
+            <button type="submit"
+                    class="flex-1 py-3 bg-amber-600 hover:bg-amber-500 text-white font-black uppercase tracking-widest text-sm rounded-xl transition-colors">
+                Save Changes to Record
+            </button>
+            <a href="{{ url_for('employee.skillnest_records_page') }}"
+               class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-sm rounded-xl transition-colors">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<script>
+function calcAge(){
+    const day   = parseInt(document.querySelector('[name=dob_day]').value);
+    const month = parseInt(document.querySelector('[name=dob_month]').value);
+    const year  = parseInt(document.querySelector('[name=dob_year]').value);
+    if(!day || !month || !year) return;
+    const today = new Date();
+    let age = today.getFullYear() - year;
+    const mDiff = today.getMonth() + 1 - month;
+    if(mDiff < 0 || (mDiff === 0 && today.getDate() < day)) age--;
+    if(age >= 1 && age <= 100){
+        document.getElementById('child_age_field').value = age;
+    }
+}
+document.querySelector('[name=dob_day]').addEventListener('change', calcAge);
+document.querySelector('[name=dob_month]').addEventListener('change', calcAge);
+document.querySelector('[name=dob_year]').addEventListener('change', calcAge);
+</script>
+{% endblock %}

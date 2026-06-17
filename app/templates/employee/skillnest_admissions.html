@@ -1,0 +1,151 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}SkillNest Admissions{% endblock %}
+{% block page_title %}SkillNest{% endblock %}
+{% block page_subtitle %}<p class="emp-header-subtitle" style="margin-top:2px;">Admissions Management</p>{% endblock %}
+{% block page_content %}
+<div class="space-y-6">
+
+    <!-- Sub-nav -->
+    <div class="flex gap-3 text-xs font-bold uppercase tracking-widest">
+        {% if emp.has_permission('skillnest_admissions') %}<a href="{{ url_for('employee.skillnest_admissions') }}" class="px-4 py-2 rounded-lg {% if request.endpoint == 'employee.skillnest_admissions' %}bg-amber-500 text-black{% else %}bg-zinc-800 text-zinc-600 hover:text-zinc-900{% endif %} transition-colors">Admissions</a>{% endif %}
+        {% if emp.has_permission('skillnest_settings') %}<a href="{{ url_for('employee.skillnest_settings') }}" class="px-4 py-2 rounded-lg {% if request.endpoint == 'employee.skillnest_settings' %}bg-amber-500 text-black{% else %}bg-zinc-800 text-zinc-600 hover:text-zinc-900{% endif %} transition-colors">Settings</a>{% endif %}
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-3 gap-4">
+        <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl p-5 text-center">
+            <p class="text-3xl font-black text-zinc-900">{{ admissions|length }}</p>
+            <p class="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-1">Total</p>
+        </div>
+        <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl p-5 text-center">
+            <p class="text-3xl font-black text-emerald-400">{{ admissions|selectattr('status','equalto','approved')|list|length }}</p>
+            <p class="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-1">Approved</p>
+        </div>
+        <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl p-5 text-center">
+            <p class="text-3xl font-black text-amber-400">{{ admissions|selectattr('status','equalto','pending')|list|length }}</p>
+            <p class="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-1">Pending</p>
+        </div>
+    </div>
+
+    {% if total_seats %}
+    <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl p-4 flex items-center gap-4">
+        <div class="flex-1 bg-zinc-300 rounded-full h-2.5 overflow-hidden">
+            <div class="h-full bg-amber-500 rounded-full transition-all" style="width: {{ ((seats_taken / total_seats) * 100)|int }}%"></div>
+        </div>
+        <p class="text-xs text-zinc-600 shrink-0">{{ seats_taken }}/{{ total_seats }} seats filled{% if seats_left is not none %} — {{ seats_left }} left{% endif %}</p>
+    </div>
+    {% endif %}
+
+    <!-- Admissions List -->
+    <div class="space-y-2">
+        {% for a in admissions %}
+        <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl overflow-hidden hover:border-zinc-600 transition-colors">
+            <!-- Summary Row (clickable) -->
+            <div class="px-5 py-4 flex items-center gap-4 cursor-pointer"
+                 onclick="this.parentElement.querySelector('.emp-detail').classList.toggle('hidden')">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-lg
+                    {% if a.status == 'approved' %}bg-emerald-900/40 text-emerald-400
+                    {% elif a.status == 'rejected' %}bg-red-900/40 text-red-400
+                    {% else %}bg-amber-900/40 text-amber-400{% endif %}">
+                    {{ a.child_name[0]|upper }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-zinc-900 font-black text-sm truncate">{{ a.child_name }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">
+                        {% if a.child_age %}Age {{ a.child_age }}{% endif %}
+                        {% if a.class_grade %} · {{ a.class_grade }}{% endif %}
+                        {% if a.school_name %} · {{ a.school_name }}{% endif %}
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
+                        {% if a.status == 'approved' %}bg-emerald-900/40 text-emerald-400 border border-emerald-700
+                        {% elif a.status == 'rejected' %}bg-red-900/40 text-red-400 border border-red-700
+                        {% else %}bg-amber-900/40 text-amber-400 border border-amber-700{% endif %}">
+                        {{ a.status|title }}
+                    </span>
+                    {% if a.payment_status == 'Paid' %}
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-900/30 text-emerald-400 border border-emerald-800">💰 Paid</span>
+                    {% endif %}
+                    <svg class="w-4 h-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+            </div>
+
+            <!-- Expanded Detail -->
+            <div class="emp-detail hidden border-t border-zinc-200 p-4 space-y-3">
+                <!-- Row 1 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-zinc-800/50 rounded-lg p-3">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-amber-400 mb-2">👶 Student</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">DOB</p><p class="text-zinc-900 font-semibold">{{ a.dob or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Gender</p><p class="text-zinc-900 font-semibold">{{ a.gender or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Class</p><p class="text-zinc-900 font-semibold">{{ a.class_grade or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">School</p><p class="text-zinc-900 font-semibold">{{ a.school_name or '—' }}</p></div>
+                        </div>
+                    </div>
+                    <div class="bg-zinc-800/50 rounded-lg p-3">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-emerald-400 mb-2">👨‍👩‍👦 Parent/Guardian</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Father</p><p class="text-zinc-900 font-semibold">{{ a.father_name or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Mother</p><p class="text-zinc-900 font-semibold">{{ a.mother_name or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Primary</p><p class="text-amber-400 font-black">{{ a.parent_mobile }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Alternate</p><p class="text-zinc-900 font-semibold">{{ a.alt_contact or '—' }}</p></div>
+                            <div class="col-span-2"><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Address</p><p class="text-zinc-900 font-semibold">{{ a.address or '—' }}</p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Row 2 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-zinc-800/50 rounded-lg p-3">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-sky-400 mb-2">📚 Academic & Health</p>
+                        <div class="space-y-1.5 text-xs">
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Subjects Needed</p><p class="text-zinc-900 font-semibold">{{ a.subjects_help or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Homework Support</p><p class="text-zinc-900 font-semibold">{{ a.homework_support or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Strengths</p><p class="text-zinc-900 font-semibold">{{ a.child_strengths or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Areas to Improve</p><p class="text-zinc-900 font-semibold">{{ a.areas_to_improve or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Behaviour</p><p class="text-zinc-900 font-semibold">{{ a.child_behavior or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Medical / Allergy</p><p class="text-zinc-900 font-semibold">{{ a.medical_condition or '—' }}</p></div>
+                        </div>
+                    </div>
+                    <div class="bg-zinc-800/50 rounded-lg p-3">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-2">🕐 Program</p>
+                        <div class="space-y-1.5 text-xs">
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Preferred Timing</p><p class="text-zinc-900 font-semibold">{{ a.preferred_timing or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Evening Snack</p><p class="text-zinc-900 font-semibold">{{ a.evening_snack or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Batch Assigned</p><p class="text-amber-400 font-black">{{ a.batch_assigned or '—' }}</p></div>
+                            <div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Fees Paid</p><p class="text-emerald-400 font-black">{{ a.fees_paid or '—' }}</p></div>
+                            {% if a.notes %}<div><p class="text-zinc-600 text-[9px] uppercase tracking-wider">Notes</p><p class="text-zinc-900 font-semibold">{{ a.notes }}</p></div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-2 pt-1">
+                    {% if a.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('employee.approve_admission', admission_id=a.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button class="px-3 py-1.5 text-xs font-black uppercase text-emerald-400 border border-emerald-700 rounded-lg hover:bg-emerald-900/40 transition-colors">✓ Approve</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('employee.reject_admission', admission_id=a.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button class="px-3 py-1.5 text-xs font-black uppercase text-red-400 border border-red-700 rounded-lg hover:bg-red-900/40 transition-colors">✗ Reject</button>
+                    </form>
+                    {% endif %}
+                    {% if a.status == 'approved' and a.payment_status != 'Paid' %}
+                    <form method="POST" action="{{ url_for('employee.skillnest_mark_paid', admission_id=a.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button class="px-3 py-1.5 text-xs font-black uppercase text-amber-400 border border-amber-700 rounded-lg hover:bg-amber-900/40 transition-colors">💰 Mark Paid</button>
+                    </form>
+                    {% endif %}
+                    <span class="ml-auto text-[10px] text-zinc-700 self-center">Applied {{ a.created_at.strftime('%d %b %Y') }}</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-[#FFFFFF] shadow-sm border border-zinc-200 rounded-xl p-12 text-center">
+            <p class="text-zinc-600 text-sm">No admissions yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

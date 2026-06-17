@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Report — {{ a.personal_info.full_name or a.client_username }} | Daichiro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ── Reset ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── Screen: action bar ── */
+        body { background: #f3f4f6; font-family: 'Inter', Arial, sans-serif; color: #111; }
+
+        .action-bar {
+            position: sticky; top: 0; z-index: 50;
+            background: #000; color: #fff;
+            padding: 14px 28px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .action-bar a {
+            color: #fff; font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            text-decoration: none;
+        }
+        .action-bar a:hover { color: #f59e0b; }
+        .print-btn {
+            background: #fff; color: #000;
+            border: none; cursor: pointer;
+            padding: 9px 24px;
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .print-btn:hover { background: #f59e0b; }
+
+        /* ── Screen: paper wrapper ── */
+        #pdf-content {
+            max-width: 820px;
+            margin: 32px auto 56px;
+            background: #fff;
+            padding: 52px 56px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 28px rgba(0,0,0,0.09);
+        }
+
+        /* ── Typography ── */
+        .anton { font-family: 'Anton', Arial, sans-serif; }
+
+        /* ── Header ── */
+        .pdf-header { text-align: center; border-bottom: 4px solid #000; padding-bottom: 22px; margin-bottom: 36px; }
+        .pdf-header h1 { font-family: 'Anton', Arial, sans-serif; font-size: 38px; text-transform: uppercase; letter-spacing: -1px; line-height: 1; }
+        .pdf-header .subtitle { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.35em; color: #6b7280; margin-top: 8px; }
+        .pdf-header .date { font-size: 11px; color: #9ca3af; margin-top: 5px; }
+
+        /* ── Section wrapper ── */
+        .section { margin-bottom: 36px; }
+        .section-title {
+            font-family: 'Anton', Arial, sans-serif;
+            font-size: 20px; text-transform: uppercase; letter-spacing: 0.02em;
+            border-bottom: 2.5px solid #000;
+            padding-bottom: 7px; margin-bottom: 18px;
+        }
+
+        /* ── Personal Info: 2-col table ── */
+        .info-table { width: 100%; border-collapse: collapse; }
+        .info-table td { width: 50%; vertical-align: top; padding: 7px 16px 7px 0; }
+        .info-label { display: block; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 3px; }
+        .info-value { font-size: 15px; font-weight: 700; color: #111; line-height: 1.3; }
+        .info-value-sm { font-size: 13px; font-weight: 600; color: #111; }
+
+        /* ── Tags ── */
+        .tag-group { margin-bottom: 16px; }
+        .tag-group-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 8px; }
+        .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag {
+            display: inline-block; padding: 4px 11px;
+            font-size: 12px; font-weight: 600; border-radius: 4px;
+            white-space: nowrap;
+        }
+        .tag-gray  { background: #f3f4f6; border: 1px solid #d1d5db; color: #111; }
+        .tag-blue  { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+        .tag-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        .tag-amber { background: #fffbeb; border: 1px solid #fde68a; color: #78350f; }
+        .tag-none  { font-size: 12px; font-style: italic; color: #9ca3af; }
+
+        /* ── Aptitude bars ── */
+        .apt-table { width: 100%; border-collapse: collapse; }
+        .apt-table td { vertical-align: middle; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+        .apt-label-cell { width: 220px; font-size: 12.5px; font-weight: 600; padding-right: 14px; }
+        .apt-bar-cell { padding-right: 12px; }
+        .apt-bar-bg { background: #e5e7eb; border-radius: 3px; height: 10px; width: 100%; }
+        .apt-bar-fill { height: 10px; background: #111; border-radius: 3px; }
+        .apt-score-cell { width: 46px; text-align: right; font-size: 15px; font-weight: 900; white-space: nowrap; }
+        .apt-score-cell span { font-size: 10px; font-weight: 400; color: #9ca3af; }
+
+        /* ── Career Vision ── */
+        .vision-item { margin-bottom: 12px; }
+        .vision-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 5px; }
+        .vision-text { font-size: 13px; font-weight: 500; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; padding: 10px 14px; min-height: 36px; line-height: 1.5; }
+
+        /* ── AI Analysis ── */
+        .ai-divider { border-top: 4px solid #000; padding-top: 32px; margin-top: 32px; }
+        .ai-main-title { font-family: 'Anton', Arial, sans-serif; font-size: 28px; text-transform: uppercase; margin-bottom: 24px; }
+        .ai-sub-title { font-size: 15px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #d1d5db; padding-bottom: 7px; margin-bottom: 14px; }
+        .ai-body { font-size: 13px; font-weight: 500; line-height: 1.75; color: #374151; }
+
+        /* Pathway cards — flexbox row on desktop, column on mobile */
+        .pathway-row { display: flex; flex-direction: row; gap: 10px; width: 100%; }
+        .pathway-card { flex: 1; border: 2px solid #000; padding: 14px 16px; background: #f9fafb; }
+        .pathway-num { font-family: 'Anton', Arial, sans-serif; font-size: 30px; color: #000; opacity: 0.1; line-height: 1; margin-bottom: 5px; }
+        .pathway-title { font-size: 13px; font-weight: 800; text-transform: uppercase; margin-bottom: 7px; }
+        .pathway-why { font-size: 11px; color: #6b7280; line-height: 1.5; margin-bottom: 9px; }
+        .pathway-options { font-size: 11px; color: #374151; padding-left: 16px; }
+        .pathway-options li { margin-bottom: 3px; line-height: 1.4; }
+
+        /* Roadmap */
+        .roadmap-item { border-left: 4px solid #000; padding: 6px 0 6px 20px; margin-bottom: 12px; }
+        .roadmap-year { font-size: 13px; font-weight: 800; text-transform: uppercase; }
+        .roadmap-milestones { margin-top: 5px; padding-left: 16px; }
+        .roadmap-milestones li { font-size: 12px; color: #374151; margin-bottom: 3px; line-height: 1.4; }
+
+        /* ── Footer ── */
+        .pdf-footer { margin-top: 48px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        .pdf-footer p { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: #9ca3af; }
+        .pdf-footer small { font-size: 9px; color: #d1d5db; display: block; margin-top: 5px; }
+
+        /* ══════════════════════════════════════
+           MOBILE RESPONSIVE STYLES
+           ══════════════════════════════════════ */
+        @media (max-width: 768px) {
+            /* Action bar: smaller, wrap-friendly */
+            .action-bar {
+                padding: 10px 14px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .action-bar a {
+                font-size: 11px;
+            }
+            .print-btn {
+                padding: 8px 16px;
+                font-size: 11px;
+            }
+
+            /* Remove desktop padding from the paper wrapper */
+            #pdf-content {
+                margin: 12px 8px 32px;
+                padding: 20px 16px;
+                border-radius: 4px;
+            }
+
+            /* Header */
+            .pdf-header h1 { font-size: 24px; }
+            .pdf-header .subtitle { font-size: 10px; letter-spacing: 0.2em; }
+
+            /* Section title */
+            .section-title { font-size: 16px; }
+
+            /* Personal info: stack 2 cols into 1 col */
+            .info-table,
+            .info-table tbody,
+            .info-table tr,
+            .info-table td {
+                display: block;
+                width: 100% !important;
+            }
+            .info-table td { padding: 5px 0; }
+            .info-value { font-size: 14px; }
+
+            /* Tags: allow full wrap */
+            .tag { font-size: 11px; padding: 4px 9px; white-space: normal; }
+
+            /* Aptitude table: shrink label, let bar be fluid */
+            .apt-table { table-layout: fixed; width: 100%; }
+            .apt-label-cell {
+                width: auto !important;
+                max-width: 130px;
+                font-size: 11px;
+                padding-right: 8px;
+                word-break: break-word;
+                white-space: normal;
+            }
+            .apt-score-cell { width: 36px; font-size: 13px; }
+
+            /* Pathway cards: stack vertically on mobile */
+            .pathway-row {
+                flex-direction: column;
+            }
+            .pathway-card {
+                margin-bottom: 14px;
+                padding: 16px;
+            }
+            .pathway-num { font-size: 24px; }
+            .pathway-title { font-size: 12px; }
+            .pathway-why,
+            .pathway-options { font-size: 11px; }
+
+            /* Roadmap */
+            .roadmap-year { font-size: 12px; }
+            .roadmap-milestones li { font-size: 11px; }
+
+            /* AI section */
+            .ai-main-title { font-size: 22px; }
+            .ai-sub-title { font-size: 13px; }
+            .ai-body { font-size: 12px; line-height: 1.65; }
+
+            /* Vision text */
+            .vision-text { font-size: 12px; padding: 8px 10px; }
+        }
+
+        /* ══════════════════════════════════════
+           PRINT STYLES — these are what matters
+           ══════════════════════════════════════ */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 15mm 16mm 15mm 16mm;
+            }
+
+            html, body {
+                background: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Hide action bar when printing */
+            .action-bar { display: none !important; }
+
+            /* Remove screen-only wrapper styling */
+            #pdf-content {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            /* Page breaks */
+            .section { page-break-inside: avoid; }
+            .ai-divider { page-break-before: always; }
+            .roadmap-item { page-break-inside: avoid; }
+            .pathway-card { page-break-inside: avoid; }
+
+            /* Ensure backgrounds print */
+            .tag-gray  { background: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+            .tag-blue  { background: #eff6ff !important; -webkit-print-color-adjust: exact; }
+            .tag-green { background: #f0fdf4 !important; -webkit-print-color-adjust: exact; }
+            .tag-amber { background: #fffbeb !important; -webkit-print-color-adjust: exact; }
+            .apt-bar-fill { background: #111 !important; -webkit-print-color-adjust: exact; }
+            .pathway-card { background: #f9fafb !important; -webkit-print-color-adjust: exact; }
+            .vision-text { background: #f9fafb !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Action Bar (hidden when printing) -->
+    <div class="action-bar">
+        <a href="{{ request.args.get('ref') or url_for('admin.assessments_page') }}">← Back to Assessments</a>
+        <button class="print-btn" onclick="window.print()">Download PDF ↓</button>
+    </div>
+
+    <!-- Report Content -->
+    <div id="pdf-content">
+
+        <!-- Header -->
+        <div class="pdf-header">
+            <h1>Daichiro Academy</h1>
+            <p class="subtitle">Career Assessment Report</p>
+            <p class="date">Generated: {{ a.created_at.strftime('%d %B %Y, %H:%M UTC') }}</p>
+        </div>
+
+        <!-- SECTION A: Personal Info -->
+        <div class="section">
+            <div class="section-title">Section A — Personal Information</div>
+            <table class="info-table">
+                <tr>
+                    <td>
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value">{{ a.personal_info.full_name or '—' }}</span>
+                    </td>
+                    <td>
+                        <span class="info-label">Class / Grade</span>
+                        <span class="info-value">{{ a.personal_info.class_grade or '—' }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="info-label">School / College / University</span>
+                        <span class="info-value info-value-sm">{{ a.personal_info.school_name or '—' }}</span>
+                    </td>
+                    <td>
+                        <span class="info-label">Session ID</span>
+                        <span class="info-value info-value-sm">{{ a.client_username }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="info-label">Contact</span>
+                        <span class="info-value">{{ a.personal_info.contact_number or '—' }}</span>
+                    </td>
+                    <td>
+                        <span class="info-label">Email</span>
+                        <span class="info-value info-value-sm">{{ a.personal_info.email or '—' }}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- SECTION B: Interests -->
+        <div class="section">
+            <div class="section-title">Section B — Interests</div>
+
+            <div class="tag-group">
+                <div class="tag-group-label">Activities Enjoyed</div>
+                <div class="tag-row">
+                    {% for item in (a.interests.activities or []) %}
+                    <span class="tag tag-gray">{{ item }}</span>
+                    {% endfor %}
+                    {% if not a.interests.activities %}<span class="tag-none">None selected</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="tag-group">
+                <div class="tag-group-label">Favourite Subjects</div>
+                <div class="tag-row">
+                    {% for item in (a.interests.subjects or []) %}
+                    <span class="tag tag-blue">{{ item }}</span>
+                    {% endfor %}
+                    {% if not a.interests.subjects %}<span class="tag-none">None selected</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="tag-group">
+                <div class="tag-group-label">Professions of Interest</div>
+                <div class="tag-row">
+                    {% for item in (a.interests.professions or []) %}
+                    <span class="tag tag-green">{{ item }}</span>
+                    {% endfor %}
+                    {% if not a.interests.professions %}<span class="tag-none">None selected</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION C: Aptitude -->
+        <div class="section">
+            <div class="section-title">Section C — Aptitude Self-Assessment</div>
+            <p style="font-size:11px;color:#6b7280;margin-bottom:14px;">Scale: 1 = Not confident &rarr; 5 = Very confident</p>
+            {% set apt_labels = {
+                'logical':   'Solving logical / numerical problems',
+                'science':   'Understanding scientific concepts',
+                'writing':   'Writing or expressing clearly',
+                'computers': 'Using computers or apps',
+                'design':    'Creating or designing',
+                'speaking':  'Public speaking / leading',
+                'planning':  'Planning or organizing',
+                'helping':   'Helping others',
+                'tech':      'Learning new technologies'
+            } %}
+            <table class="apt-table">
+                {% for key, label in apt_labels.items() %}
+                {% set score = (a.aptitude[key] or '3') | int %}
+                <tr>
+                    <td class="apt-label-cell">{{ label }}</td>
+                    <td class="apt-bar-cell">
+                        <div class="apt-bar-bg">
+                            <div class="apt-bar-fill" style="width:{{ score * 20 }}%;"></div>
+                        </div>
+                    </td>
+                    <td class="apt-score-cell">{{ score }}<span>/5</span></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- SECTION D: Personality -->
+        <div class="section">
+            <div class="section-title">Section D — Personality &amp; Values</div>
+            <div class="tag-row">
+                {% for trait in (a.personality or []) %}
+                <span class="tag tag-amber">{{ trait }}</span>
+                {% endfor %}
+                {% if not a.personality %}<span class="tag-none">None selected</span>{% endif %}
+            </div>
+        </div>
+
+        <!-- SECTION E: Career Vision -->
+        <div class="section">
+            <div class="section-title">Section E — Career Vision</div>
+            <div class="vision-item">
+                <div class="vision-label">Currently Considering</div>
+                <div class="vision-text">{{ career_vision.current_careers or career_vision.get('raw', '') or '—' }}</div>
+            </div>
+            <div class="vision-item">
+                <div class="vision-label">5-Year Goals</div>
+                <div class="vision-text">{{ career_vision.five_year_goals or '—' }}</div>
+            </div>
+            <div class="vision-item">
+                <div class="vision-label">Ideal Future Life</div>
+                <div class="vision-text">{{ career_vision.ideal_life or '—' }}</div>
+            </div>
+        </div>
+
+        <!-- AI ANALYSIS -->
+        {% if a.ai_response %}
+        <div class="ai-divider">
+            <div class="ai-main-title">Career Analysis</div>
+
+            <div class="section">
+                <div class="ai-sub-title">Profile Summary</div>
+                <p class="ai-body">{{ a.ai_response.profile_summary }}</p>
+            </div>
+
+            <div class="section">
+                <div class="ai-sub-title">Career Pathways</div>
+                <div class="pathway-row">
+                    {% for p in (a.ai_response.pathways or []) %}
+                    <div class="pathway-card">
+                        <div class="pathway-num">0{{ loop.index }}</div>
+                        <div class="pathway-title">{{ p.title }}</div>
+                        <div class="pathway-why"><strong>Why:</strong> {{ p.why }}</div>
+                        <ul class="pathway-options">
+                            {% for o in (p.options or []) %}<li>{{ o }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="ai-sub-title">5-Year Roadmap</div>
+                {% for r in (a.ai_response.roadmap or []) %}
+                <div class="roadmap-item">
+                    <div class="roadmap-year">Year {{ r.year }}: {{ r.focus }}</div>
+                    <ul class="roadmap-milestones">
+                        {% for m in (r.milestones or []) %}<li>{{ m }}</li>{% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="pdf-footer">
+            <p>Daichiro Professional Skills Academy</p>
+            <small>Powered by <strong>ARTORYX</strong></small>
+        </div>
+
+    </div><!-- /#pdf-content -->
+
+</body>
+</html>

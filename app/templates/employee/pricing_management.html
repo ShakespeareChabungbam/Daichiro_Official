@@ -1,0 +1,204 @@
+{% extends "employee/base_employee.html" %}
+
+{% block title %}Pricing Management{% endblock %}
+{% block page_title %}Pricing Management{% endblock %}
+{% block page_subtitle %}Control session & package prices{% endblock %}
+
+{% block page_content %}
+
+<a href="{{ url_for('employee.appointments_page') }}"
+   class="inline-flex items-center gap-2 mb-6 text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Back to Appointments
+</a>
+
+<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-amber-400/15 flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <div>
+            <h3 class="text-sm font-black uppercase tracking-widest">Pricing Management</h3>
+            <p class="text-xs text-white mt-0.5">Control what clients see on the booking page. Changes go live immediately.</p>
+        </div>
+        <a href="{{ url_for('main.book_page') }}" target="_blank"
+           class="ml-auto inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold border border-zinc-700 rounded-xl hover:border-amber-400 hover:text-amber-400 transition-all">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+            View Booking Page
+        </a>
+    </div>
+
+    <form action="{{ url_for('employee.set_pricing') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+
+        <!-- ── Single Session Card ── -->
+        <div class="bg-zinc-800/50 border border-zinc-700 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400 mb-1">Single Session</p>
+                    <p class="text-xs text-zinc-300">Per individual session (student / parent / joint)</p>
+                </div>
+                {% set single_price = counselling_fee %}
+                {% set single_offer = offer_price %}
+                {% if single_offer %}
+                <div class="text-right">
+                    <span class="text-xs line-through text-zinc-300">₹{{ single_price }}</span>
+                    <span class="ml-2 px-3 py-1 bg-amber-400 text-black text-sm font-black rounded-full">₹{{ single_offer }}</span>
+                </div>
+                {% elif single_price %}
+                <span class="px-4 py-1.5 text-sm font-black rounded-full bg-amber-400 text-black">₹{{ single_price }}</span>
+                {% else %}
+                <span class="px-3 py-1 text-xs font-bold rounded-full bg-zinc-700 text-zinc-400 border border-zinc-600">Not Set</span>
+                {% endif %}
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold uppercase tracking-wider text-white mb-1 block">Regular Price (₹)</label>
+                    <input type="number" id="s_regular" name="session_price" min="0" placeholder="e.g. 499"
+                        value="{{ counselling_fee or '' }}"
+                        oninput="calcOffer('s')"
+                        class="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-sm font-bold text-white rounded-lg transition-colors placeholder-zinc-600">
+                </div>
+                <div class="grid grid-cols-2 gap-2 items-end">
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-white mb-1 block">Offer Price (₹) <span class="text-zinc-300 normal-case font-normal">— direct</span></label>
+                        <input type="number" id="s_offer" name="session_offer_price" min="0" placeholder="e.g. 299"
+                            value="{{ offer_price or '' }}"
+                            oninput="clearPct('s_pct')"
+                            class="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-sm font-bold text-white rounded-lg transition-colors placeholder-zinc-600">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-white mb-1 block">Discount %</label>
+                        <input type="number" id="s_pct" min="1" max="99" step="1" placeholder="e.g. 20"
+                            oninput="calcOffer('s')"
+                            class="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-sm font-bold text-white rounded-lg transition-colors placeholder-zinc-600">
+                    </div>
+                </div>
+                <p id="s_hint" class="text-[10px] text-amber-400 font-bold hidden"></p>
+            </div>
+        </div>
+
+        <!-- ── Package Card ── -->
+        <div class="bg-zinc-800/50 border border-zinc-700 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400 mb-1">Complete Package</p>
+                    <p class="text-xs text-zinc-300">All 3 session types — student + parent + joint</p>
+                </div>
+                {% set pkg_price = package_price %}
+                {% set pkg_offer = package_offer_price %}
+                {% if pkg_offer %}
+                <div class="text-right">
+                    <span class="text-xs line-through text-zinc-300">₹{{ pkg_price }}</span>
+                    <span class="ml-2 px-3 py-1 bg-amber-400 text-black text-sm font-black rounded-full">₹{{ pkg_offer }}</span>
+                </div>
+                {% elif pkg_price %}
+                <span class="px-4 py-1.5 text-sm font-black rounded-full bg-amber-400 text-black">₹{{ pkg_price }}</span>
+                {% else %}
+                <span class="px-3 py-1 text-xs font-bold rounded-full bg-zinc-700 text-zinc-400 border border-zinc-600">Not Set</span>
+                {% endif %}
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold uppercase tracking-wider text-white mb-1 block">Regular Price (₹)</label>
+                    <input type="number" id="p_regular" name="package_price" min="0" placeholder="e.g. 999"
+                        value="{{ package_price or '' }}"
+                        oninput="calcOffer('p')"
+                        class="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-sm font-bold text-white rounded-lg transition-colors placeholder-zinc-600">
+                </div>
+                <div class="grid grid-cols-2 gap-2 items-end">
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-white mb-1 block">Offer Price (₹) <span class="text-zinc-300 normal-case font-normal">— direct</span></label>
+                        <input type="number" id="p_offer" name="package_offer_price" min="0" placeholder="e.g. 799"
+                            value="{{ package_offer_price or '' }}"
+                            oninput="clearPct('p_pct')"
+                            class="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-sm font-bold text-white rounded-lg transition-colors placeholder-zinc-600">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold uppercase tracking-wider text-white mb-1 block">Discount %</label>
+                        <input type="number" id="p_pct" min="1" max="99" step="1" placeholder="e.g. 20"
+                            oninput="calcOffer('p')"
+                            class="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-sm font-bold text-white rounded-lg transition-colors placeholder-zinc-600">
+                    </div>
+                </div>
+                <p id="p_hint" class="text-[10px] text-amber-400 font-bold hidden"></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Offer Details (shared) -->
+    <div class="bg-zinc-800/50 border border-zinc-700 rounded-xl p-5 mb-4">
+        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400 mb-4">Offer Details (Optional)</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="min-w-0 w-full">
+                <label class="text-xs font-bold uppercase tracking-wider text-white mb-1.5 block">Offer Label / Event Name</label>
+                <input type="text" name="offer_label" maxlength="80"
+                    placeholder="e.g. Independence Day Special, New Year Offer…"
+                    value="{{ offer_label or '' }}"
+                    class="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-sm font-bold text-white rounded-lg transition-colors placeholder-zinc-600">
+                <p class="text-[10px] text-zinc-300 mt-1">Shown as a badge on the booking page</p>
+            </div>
+            <div class="min-w-0 w-full overflow-hidden">
+                <label class="text-xs font-bold uppercase tracking-wider text-white mb-1.5 block">Offer Valid Until</label>
+                <div class="w-full overflow-hidden rounded-lg">
+                    <input type="date" name="offer_expiry"
+                        value="{{ offer_expiry or '' }}"
+                        style="min-width: 0; width: 100%; min-height: 44px;"
+                        class="w-full max-w-full min-w-[0] shrink bg-zinc-900 border border-zinc-700 focus:border-amber-400 outline-none px-4 py-2.5 text-base sm:text-sm font-bold text-white rounded-lg transition-colors">
+                </div>
+                <p class="text-[10px] text-zinc-300 mt-1">Offer countdown shown to clients. Leave blank if open-ended.</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
+        <div class="flex items-start sm:items-center gap-2 text-xs text-zinc-500">
+            <svg class="w-3.5 h-3.5 text-zinc-600 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="leading-snug">Prices are reflected live on the <a href="{{ url_for('main.book_page') }}" target="_blank" class="text-amber-400 hover:underline">booking page</a></p>
+        </div>
+        <button type="submit"
+            class="w-full sm:w-auto px-6 py-2.5 bg-amber-400 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all duration-200">
+            Save All Pricing
+        </button>
+    </div>
+    </form>
+</div>
+
+<script>
+function calcOffer(prefix) {
+    var regular = parseFloat(document.getElementById(prefix + '_regular').value) || 0;
+    var pct     = parseFloat(document.getElementById(prefix + '_pct').value);
+    var offerEl = document.getElementById(prefix + '_offer');
+    var hintEl  = document.getElementById(prefix + '_hint');
+    if (!isNaN(pct) && pct > 0 && pct < 100 && regular > 0) {
+        var calculated = Math.floor(regular * (1 - pct / 100));
+        offerEl.value = calculated;
+        hintEl.textContent = '→ Offer price: ₹' + calculated + ' — saving ₹' + (regular - calculated) + ' (' + Math.floor(pct) + '% off)';
+        hintEl.classList.remove('hidden');
+    } else if (!document.getElementById(prefix + '_pct').value) {
+        hintEl.classList.add('hidden');
+        offerEl.value = '';
+    }
+}
+function clearPct(pctId) {
+    var el = document.getElementById(pctId);
+    if (el) el.value = '';
+    var prefix = pctId.charAt(0);
+    var hintEl = document.getElementById(prefix + '_hint');
+    if (hintEl) hintEl.classList.add('hidden');
+}
+</script>
+
+{% endblock %}

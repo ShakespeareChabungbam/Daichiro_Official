@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicondaichiro.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicondaichiro.png') }}">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  PRIMARY SEO META TAGS                             -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <title>{% block title %}Daichiro Professional Skills Academy — Student Counselling & Career Guidance{% endblock %}</title>
+    <meta name="description"    content="{% block meta_description %}Daichiro Professional Skills Academy — Imphal's leading career counselling centre. AI-powered career assessments, skill development, SkillNest programs, and expert student counselling in Manipur.{% endblock %}">
+    <meta name="keywords"       content="{% block meta_keywords %}Daichiro, career counselling Imphal, student career guidance Manipur, skill development academy, SkillNest, career assessment, professional skills Manipur, counselling centre Imphal{% endblock %}">
+    <meta name="author"         content="Daichiro Professional Skills Academy">
+    <meta name="robots"         content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="google-site-verification" content="8mxDuPgeqs8lQWc9xm5varzJ76OKVVvXU5cSEJmIg1Q">
+    <meta name="theme-color"    content="#0F2D5E">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicondaichiro.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicondaichiro.png') }}">
+
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical %}https://daichiro.in{{ request.path }}{% endblock %}">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  OPEN GRAPH (Facebook / WhatsApp / LinkedIn)       -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <meta property="og:type"          content="website">
+    <meta property="og:site_name"     content="Daichiro Professional Skills Academy">
+    <meta property="og:title"         content="{% block og_title %}Daichiro Professional Skills Academy — Career Guidance Imphal{% endblock %}">
+    <meta property="og:description"   content="{% block og_description %}Imphal's leading career counselling & skill development centre. AI-powered assessments, SkillNest programs, and expert student guidance in Manipur.{% endblock %}">
+    <meta property="og:url"           content="https://daichiro.in{{ request.path }}">
+    <meta property="og:image"         content="{% block og_image %}https://daichiro.in{{ url_for('static', filename='img/logo.png') }}{% endblock %}">
+    <meta property="og:image:width"   content="1200">
+    <meta property="og:image:height"  content="630">
+    <meta property="og:locale"        content="en_IN">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  TWITTER / X CARD                                  -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="{% block twitter_title %}Daichiro Professional Skills Academy{% endblock %}">
+    <meta name="twitter:description" content="Career counselling & skill development in Imphal, Manipur. AI career assessments & SkillNest programs.">
+    <meta name="twitter:image"       content="https://daichiro.in{{ url_for('static', filename='img/logo.png') }}">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  SCHEMA.ORG STRUCTURED DATA (Google Rich Results)  -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["EducationalOrganization", "LocalBusiness"],
+          "@id": "https://daichiro.in/#organization",
+          "name": "Daichiro Professional Skills Academy",
+          "alternateName": "Daichiro Academy",
+          "url": "https://daichiro.in",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://daichiro.in{{ url_for('static', filename='img/logo.png') }}"
+          },
+          "image": "https://daichiro.in{{ url_for('static', filename='img/1.jpg') }}",
+          "description": "Daichiro Professional Skills Academy is Imphal's leading career counselling and skill development centre, offering AI-powered career assessments, SkillNest programs, and expert student counselling in Manipur.",
+          "slogan": "Transforming Individuals, Transforming Lives",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ site_location_address or 'Old Lambulane, near GP Women College' }}",
+            "addressLocality": "{{ site_phone_primary and 'Imphal' or 'Imphal' }}",
+            "addressRegion": "Manipur",
+            "addressCountry": "IN"
+          },
+          "telephone": ["{% if site_phone_primary %}+91{{ site_phone_primary }}{% else %}+919366862651{% endif %}", "{% if site_phone_secondary %}+91{{ site_phone_secondary }}{% else %}+9103853142519{% endif %}"],
+          "email": "daichiro.academy@gmail.com",
+          "sameAs": [
+            "https://facebook.com/Daichiro_professional_skills",
+            "https://instagram.com/Daichiro_professional_skills"
+          ],
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+            "opens": "09:00",
+            "closes": "18:00"
+          },
+          "areaServed": {
+            "@type": "State",
+            "name": "Manipur"
+          },
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Programs & Services",
+            "itemListElement": [
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Career Assessment & Counselling"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "SkillNest Skill Development Program"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Student Counselling Sessions"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Professional Communication Training"}}
+            ]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://daichiro.in/#website",
+          "url": "https://daichiro.in",
+          "name": "Daichiro Professional Skills Academy",
+          "publisher": {"@id": "https://daichiro.in/#organization"},
+          "inLanguage": "en-IN"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Google Fonts — school-professional look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;900&family=Anton&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS — locally built, CDN-free -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.min.css') }}">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* Page load */
+        body { opacity: 0; transition: opacity 0.4s ease; }
+        body.loaded { opacity: 1; }
+
+        /* School nav link underline effect */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 0; height: 2px;
+            background: #C9A84C;
+            transition: width 0.25s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+        a, button, input, [class*="hover:"] {
+            transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+    </style>
+</head>
+<body class="bg-school-light text-school-text font-sans antialiased">
+
+    <!-- ══════════════════ TOP UTILITY BAR ══════════════════ -->
+    <div class="school-topbar hidden sm:block bg-school-navy text-white/80 text-xs py-2 px-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                {% if site_phone_primary %}
+                <a href="tel:{{ site_phone_primary }}" class="flex items-center gap-1.5 hover:text-school-gold transition-colors">
+                    <svg class="w-3 h-3 text-school-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+                    {{ site_phone_primary }}{% if site_phone_secondary %} / {{ site_phone_secondary }}{% endif %}
+                </a>
+                {% endif %}
+                <span class="flex items-center gap-1.5">
+                    <svg class="w-3 h-3 text-school-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                    daichiro.academy@gmail.com
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                {% if site_facebook %}
+                <a href="{{ site_facebook }}" target="_blank" rel="noopener" class="hover:text-school-gold transition-colors">Facebook</a>
+                {% endif %}
+                {% if site_instagram %}
+                <a href="{{ site_instagram }}" target="_blank" rel="noopener" class="hover:text-school-gold transition-colors">Instagram</a>
+                {% endif %}
+                {% if site_youtube %}
+                <a href="{{ site_youtube }}" target="_blank" rel="noopener" class="hover:text-school-gold transition-colors">YouTube</a>
+                {% endif %}
+                {% if site_linkedin %}
+                <a href="{{ site_linkedin }}" target="_blank" rel="noopener" class="hover:text-school-gold transition-colors">LinkedIn</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════ MAIN NAVBAR ══════════════════ -->
+    <nav id="main-nav" class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-school-mid shadow-school transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-[72px]">
+
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="group flex items-center gap-3">
+                        <img class="h-12 w-auto group-hover:scale-105 transition-transform duration-300"
+                             src="{{ url_for('static', filename='img/logo.png') }}" alt="Daichiro Logo">
+                        <div class="flex flex-col leading-tight">
+                            <span class="font-serif text-xl font-black text-school-navy tracking-wide">Daichiro</span>
+                            <span class="text-[9px] font-semibold uppercase tracking-[0.2em] text-school-muted hidden sm:block">Professional Skills Academy</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="{{ url_for('main.index') }}"  class="nav-link relative px-4 py-2 text-[13px] font-semibold text-school-text hover:text-school-navy transition-colors">Home</a>
+                    <a href="{{ url_for('main.about') }}"  class="nav-link relative px-4 py-2 text-[13px] font-semibold text-school-text hover:text-school-navy transition-colors">About</a>
+                    <a href="{{ url_for('main.skillnest') }}" class="nav-link relative px-4 py-2 text-[13px] font-semibold text-school-text hover:text-school-navy transition-colors">SkillNest</a>
+                    <a href="{{ url_for('main.sunday_programs') }}" class="nav-link relative px-4 py-2 text-[13px] font-semibold text-school-text hover:text-school-navy transition-colors">Sunday Programs</a>
+                    <a href="{{ url_for('main.book_page') }}" class="nav-link relative px-4 py-2 text-[13px] font-semibold text-school-text hover:text-school-navy transition-colors">Book Session</a>
+
+                    <div class="h-5 w-px bg-school-mid mx-2"></div>
+
+                    <!-- Career Assessment — highlighted -->
+                    <a href="{{ url_for('client.login') }}"
+                       class="px-5 py-2 text-[13px] font-bold text-school-navy border-2 border-school-navy rounded-lg hover:bg-school-navy hover:text-white transition-all duration-200">
+                        Career Assessment
+                    </a>
+
+                    {% if session.get('admin_id') %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="ml-1 px-5 py-2 text-[13px] font-bold text-school-gold border-2 border-school-gold rounded-lg hover:bg-school-gold hover:text-white transition-all">Dashboard</a>
+                    <a href="{{ url_for('admin.logout') }}" class="ml-1 px-5 py-2 text-[13px] font-bold text-red-600 border-2 border-red-300 rounded-lg hover:bg-red-600 hover:text-white transition-all">Logout</a>
+                    {% else %}
+                    <a href="{{ url_for('admin.login') }}" class="ml-1 px-5 py-2 text-[13px] font-semibold bg-school-navy text-white rounded-lg hover:bg-school-text transition-all">Login</a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile menu button — Nike 2-line style -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" aria-label="Toggle menu"
+                            class="relative w-10 h-10 flex flex-col items-center justify-center gap-[7px] focus:outline-none group">
+                        <span id="bar1" class="block h-[2px] bg-school-navy transition-all duration-300 ease-in-out origin-center" style="width:24px"></span>
+                        <span id="bar2" class="block h-[2px] bg-school-navy transition-all duration-300 ease-in-out origin-center" style="width:16px"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu — Nike style slide-down -->
+        <div id="mobile-menu"
+             class="md:hidden overflow-hidden transition-all duration-500 ease-in-out"
+             style="max-height:0; opacity:0; visibility:hidden;">
+            <div class="border-t border-school-mid bg-white">
+                <div class="px-6 py-6 space-y-1">
+                    {% for label, url in [
+                        ('Home', url_for('main.index')),
+                        ('About', url_for('main.about')),
+                        ('SkillNest', url_for('main.skillnest')),
+                        ('Sunday Programs', url_for('main.sunday_programs')),
+                        ('Book Session', url_for('main.book_page'))
+                    ] %}
+                    <a href="{{ url }}"
+                       class="mob-link group flex items-center justify-between py-4 border-b border-school-mid/50 text-[22px] font-black text-school-navy tracking-tight transition-colors duration-200 hover:text-school-gold">
+                        {{ label }}
+                        <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-school-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    {% endfor %}
+
+                    <div class="pt-5 space-y-3">
+                        <a href="{{ url_for('client.login') }}"
+                           class="flex items-center justify-center gap-2 w-full py-4 bg-school-navy text-white font-black text-sm uppercase tracking-wider rounded-xl hover:bg-school-gold hover:text-school-navy transition-all duration-300">
+                            Career Assessment →
+                        </a>
+                        {% if session.get('admin_id') %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="block text-center py-3 text-sm font-bold text-school-gold border-2 border-school-gold rounded-xl">Dashboard</a>
+                        <a href="{{ url_for('admin.logout') }}" class="block text-center py-3 text-sm font-bold text-red-600 border border-red-300 rounded-xl">Logout</a>
+                        {% else %}
+                        <a href="{{ url_for('admin.login') }}" class="block text-center py-2.5 text-sm font-semibold text-school-navy border border-school-mid rounded-xl hover:bg-school-light transition-all">Staff Login</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Backdrop -->
+    <div id="menu-backdrop" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+    <style>
+    #mobile-menu { position: relative; z-index: 49; }
+    #mobile-menu.is-open { max-height: 600px !important; opacity: 1 !important; visibility: visible !important; }
+    #mobile-menu-btn.is-open #bar1 { transform: translateY(4.5px) rotate(45deg); width: 24px !important; }
+    #mobile-menu-btn.is-open #bar2 { transform: translateY(-4.5px) rotate(-45deg); width: 24px !important; }
+    </style>
+
+    <script>
+    (function(){
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const backdrop = document.getElementById('menu-backdrop');
+        let open = false;
+        btn.addEventListener('click', function(){
+            open = !open;
+            btn.classList.toggle('is-open', open);
+            menu.classList.toggle('is-open', open);
+            backdrop.style.opacity = open ? '1' : '0';
+            backdrop.style.pointerEvents = open ? 'auto' : 'none';
+        });
+        backdrop.addEventListener('click', function(){
+            open = false;
+            btn.classList.remove('is-open');
+            menu.classList.remove('is-open');
+            backdrop.style.opacity = '0';
+            backdrop.style.pointerEvents = 'none';
+        });
+        // Close on nav link click
+        menu.querySelectorAll('a').forEach(function(a){
+            a.addEventListener('click', function(){
+                open = false;
+                btn.classList.remove('is-open');
+                menu.classList.remove('is-open');
+                backdrop.style.opacity = '0';
+                backdrop.style.pointerEvents = 'none';
+            });
+        });
+    })();
+    </script>
+
+    <!-- Main Content -->
+    <main class="w-full overflow-hidden">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ══════════════════ FOOTER ══════════════════ -->
+    <footer class="bg-school-navy text-white pt-10 sm:pt-16 pb-6 sm:pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Top divider bar -->
+            <div class="w-12 h-1 bg-school-gold rounded mb-6 sm:mb-10"></div>
+
+            <!-- Brand block -->
+            <div class="mb-7 pb-7 border-b border-white/10 md:hidden">
+                <span class="font-serif text-2xl font-black text-white">Daichiro</span>
+                <p class="text-[10px] font-semibold uppercase tracking-widest text-school-gold mt-1">Professional Skills Academy</p>
+                <p class="mt-3 text-white/55 leading-relaxed text-sm">
+                    "Transforming Individuals, Transforming Lives" — holistic skill development and career guidance.
+                </p>
+                <div class="flex items-center gap-3 mt-4">
+                    {% if site_facebook %}
+                    <a href="{{ site_facebook }}" target="_blank" rel="noopener"
+                       class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="Facebook">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if site_instagram %}
+                    <a href="{{ site_instagram }}" target="_blank" rel="noopener"
+                       class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="Instagram">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke-width="1.8"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" stroke-width="1.8"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke-width="2" stroke-linecap="round"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if site_youtube %}
+                    <a href="{{ site_youtube }}" target="_blank" rel="noopener"
+                       class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="YouTube">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if site_linkedin %}
+                    <a href="{{ site_linkedin }}" target="_blank" rel="noopener"
+                       class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="LinkedIn">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Main grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10 mb-7 sm:mb-12">
+
+                <!-- Brand (desktop only — shown via grid) -->
+                <div class="hidden md:block md:col-span-2">
+                    <span class="font-serif text-3xl font-black text-white">Daichiro</span>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-school-gold mt-1">Professional Skills Academy</p>
+                    <p class="mt-4 text-white/60 leading-relaxed text-sm max-w-sm">
+                        "Transforming Individuals, Transforming Lives" — a premier institution dedicated to holistic skill development and career guidance.
+                    </p>
+                    <div class="flex items-center gap-3 mt-6">
+                        {% if site_facebook %}
+                        <a href="{{ site_facebook }}" target="_blank" rel="noopener"
+                           class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="Facebook">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if site_instagram %}
+                        <a href="{{ site_instagram }}" target="_blank" rel="noopener"
+                           class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="Instagram">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke-width="1.8"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" stroke-width="1.8"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke-width="2" stroke-linecap="round"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if site_youtube %}
+                        <a href="{{ site_youtube }}" target="_blank" rel="noopener"
+                           class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="YouTube">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if site_linkedin %}
+                        <a href="{{ site_linkedin }}" target="_blank" rel="noopener"
+                           class="w-9 h-9 rounded-lg bg-white/10 hover:bg-school-gold flex items-center justify-center transition-all" title="LinkedIn">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-3">Quick Links</h4>
+                    <ul class="space-y-1.5">
+                        {% for label, route in [
+                            ('Home', 'main.index'),
+                            ('About Us', 'main.about'),
+                            ('SkillNest', 'main.skillnest'),
+                            ('Sunday Programs', 'main.sunday_programs'),
+                            ('Book a Session', 'main.book_page'),
+                            ('Career Assessment', 'client.login')
+                        ] %}
+                        <li><a href="{{ url_for(route) }}" class="text-sm text-white/55 hover:text-school-gold transition-colors flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-school-gold/50 flex-shrink-0"></span>{{ label }}
+                        </a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-school-gold mb-3">Contact</h4>
+                    <ul class="space-y-2 text-sm text-white/55">
+                        {% if site_phone_primary %}
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-school-gold flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+                            <span><a href="tel:{{ site_phone_primary }}" class="hover:text-school-gold transition-colors">{{ site_phone_primary }}</a>{% if site_phone_secondary %}<br/><a href="tel:{{ site_phone_secondary }}" class="hover:text-school-gold transition-colors">{{ site_phone_secondary }}</a>{% endif %}</span>
+                        </li>
+                        {% endif %}
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-school-gold flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                            <span class="break-all">daichiro.academy@gmail.com</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-school-gold flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                            {% if site_location_map_url %}
+                            <a href="{{ site_location_map_url }}" target="_blank" class="hover:text-school-gold transition-colors"><span>{{ site_location_address or 'Old Lambulane, near GP Women College' }}</span></a>
+                            {% else %}
+                            <span>{{ site_location_address or 'Old Lambulane, near GP Women College' }}</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Bottom bar -->
+            <div class="pt-5 border-t border-white/10 flex flex-col items-center md:flex-row md:justify-between gap-2 text-center md:text-left">
+                <p class="text-xs text-white/40">
+                    &copy; {{ now.year if now else '2026' }} Daichiro Professional Skills Academy. All rights reserved.
+                </p>
+                <p class="text-[11px] text-school-gold/60 font-semibold tracking-wider">
+                    Communication · Character · Confidence · Care
+                </p>
+                <p class="text-[10px] text-white/25 font-semibold uppercase tracking-widest">
+                    Powered by
+                    <a href="{% if dev_credit_link %}{{ dev_credit_link }}{% else %}{{ url_for('developer.login') }}{% endif %}"
+                       class="text-white/35 font-black hover:text-white/50 transition-colors"
+                       {% if dev_credit_link %}target="_blank" rel="noopener"{% endif %}
+                       style="text-decoration:none;">{{ dev_credit_text }}</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('loaded');
+        });
+    </script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

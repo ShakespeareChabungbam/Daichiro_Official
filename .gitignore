@@ -1,0 +1,19 @@
+# ── Python / Flask ──
+venv/
+test_venv/
+__pycache__/
+*.pyc
+.env
+
+# ── Sensitive scripts ──
+db_backup.sh
+manual_backup.sh
+update_deps.sh
+deploy.sh
+
+# ── AWS Keys (never commit) ──
+IMPORTANT_DAICHIRO/
+
+# ── OS junk ──
+.DS_Store
+*.swp

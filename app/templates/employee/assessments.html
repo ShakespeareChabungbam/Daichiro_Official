@@ -1,0 +1,55 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}Assessments{% endblock %}
+{% block page_title %}Assessments{% endblock %}
+{% block page_subtitle %}Career Intelligence Dashboard{% endblock %}
+
+{% block page_content %}
+
+{# ── New Session ── #}
+{% if emp.has_permission('assessments_create_client') %}
+<div style="margin-bottom:2.5rem;border:1px solid #2D3F5C;border-radius:16px;overflow:hidden;background:#0C2547;">
+    <div style="padding:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;">
+        <div>
+            <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.35em;color:rgba(255,255,255,.4);margin:0 0 6px;">Quick Action</p>
+            <h3 style="font-size:1.5rem;font-weight:900;text-transform:uppercase;letter-spacing:-.03em;color:#ffffff;margin:0 0 4px;line-height:1.2;">New Assessment Session</h3>
+            <p style="font-size:12px;color:rgba(255,255,255,.5);margin:0;">One-time credentials. Expires in <strong style="color:#f59e0b;">3 hours</strong>.</p>
+        </div>
+        <form action="{{ url_for('employee.create_client') }}" method="POST" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div>
+                <label style="display:block;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#2563EB;margin-bottom:6px;">Student Name</label>
+                <input type="text" name="client_name" required placeholder="e.g. Rohan Sharma"
+                    style="padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;background:#1A2B4A;color:#fff;border:1.5px solid #2D3F5C;min-width:220px;outline:none;">
+            </div>
+            <button type="submit"
+                style="padding:10px 20px;background:#f59e0b;color:#000;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;border-radius:10px;border:none;cursor:pointer;white-space:nowrap;">
+                Generate ⚡
+            </button>
+        </form>
+    </div>
+    {% if clients %}
+    <div style="border-top:1px solid #2D3F5C;padding:16px 24px;background:rgba(0,0,0,.2);">
+        <p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.3em;color:#f59e0b;margin:0 0 12px;">{{ clients|length }} Active Session{{ 's' if clients|length > 1 }}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;">
+            {% for client in clients %}
+            <div style="background:#1A2B4A;border:1px solid #2D3F5C;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                    <p style="font-size:12px;font-weight:900;color:#ffffff;margin:0;">{{ client.display_name or client.username }}</p>
+                    <p style="font-family:monospace;font-size:10px;color:rgba(255,255,255,.4);margin:2px 0 0;">{{ client.username }} / {{ client.temp_password_hash or '—' }}</p>
+                </div>
+                <button
+                    data-user="{{ client.username }}"
+                    data-pw="{{ client.temp_password_hash or '' }}"
+                    onclick="navigator.clipboard.writeText(this.dataset.user+'\n'+this.dataset.pw).then(()=>alert('Copied!'))"
+                    style="padding:5px 10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#f59e0b;font-size:9px;font-weight:900;text-transform:uppercase;border-radius:6px;cursor:pointer;">
+                    Copy
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

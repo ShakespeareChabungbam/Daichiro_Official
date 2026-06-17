@@ -1,0 +1,287 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Employees{% endblock %}
+{% block page_title %}Employees{% endblock %}
+{% block page_subtitle %}Manage staff accounts & access permissions{% endblock %}
+
+{% block page_content %}
+<div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Flash: show credentials after creation/reset -->
+
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- ── Add Employee Form ── -->
+        <div class="lg:col-span-1">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 sticky top-24">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-5">➕ Add Employee</h3>
+                <form method="POST" action="{{ url_for('admin.create_employee') }}" class="space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div>
+                        <label class="text-xs text-white/70 block mb-1">Full Name <span class="text-amber-400">*</span></label>
+                        <input type="text" name="name" required placeholder="e.g. Priya Sharma"
+                               class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-amber-500 focus:outline-none">
+                        <p class="text-[10px] text-white/40 mt-1">Username will be <span class="font-mono">firstname.lastname</span></p>
+                    </div>
+                    <div>
+                        <label class="text-xs text-white/70 block mb-1">Designation</label>
+                        <input type="text" name="designation" placeholder="e.g. Counsellor Assistant"
+                               class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white text-sm focus:border-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs text-white/70 block mb-2">Section Access</label>
+                        <div class="space-y-3">
+
+                            <!-- Appointments -->
+                            <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-3">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">📅 Appointments</p>
+                                <div class="space-y-1.5">
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_appt_booking_status" class="w-3.5 h-3.5 accent-amber-500"> Booking Status
+                                    </label>
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_appt_pricing" class="w-3.5 h-3.5 accent-amber-500"> Pricing Management
+                                    </label>
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_appt_history" class="w-3.5 h-3.5 accent-amber-500"> Appointment History
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- SkillNest -->
+                            <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-3">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">🎯 SkillNest</p>
+                                <div class="space-y-1.5">
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_skillnest_admissions" class="w-3.5 h-3.5 accent-amber-500"> Admissions
+                                    </label>
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_skillnest_settings" class="w-3.5 h-3.5 accent-amber-500"> Settings & Seats
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Assessments -->
+                            <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-3">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">🧠 Assessments</p>
+                                <div class="space-y-1.5">
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_assessments_create_client" class="w-3.5 h-3.5 accent-amber-500"> Generate Client Password
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Gallery -->
+                            <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-3">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">🖼️ Gallery</p>
+                                <div class="space-y-1.5">
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_gallery_view" class="w-3.5 h-3.5 accent-amber-500"> View Gallery
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Contact & Social -->
+                            <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-3">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">📞 Contact & Social</p>
+                                <div class="space-y-1.5">
+                                    <label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+                                        <input type="checkbox" name="perm_contact_social" class="w-3.5 h-3.5 accent-amber-500"> Manage Contact & Social
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold uppercase tracking-widest py-2.5 rounded-lg text-sm transition-colors">
+                        Create Employee
+                    </button>
+                </form>
+                <div class="mt-4 pt-4 border-t border-zinc-800 text-[10px] text-white/40 space-y-1">
+                    <p>🔑 Employee portal: <span class="font-mono text-white/60">/admin/login</span></p>
+                    <p>🔒 Employee must change password on first login.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Employee List ── -->
+        <div class="lg:col-span-2 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-blue-600">All Employees ({{ employees|length }})</h3>
+
+            {% if employees %}
+            {% for emp in employees %}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5" id="emp-{{ emp.id }}">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+                            <span class="text-sm font-black text-amber-400">{{ emp.name[0].upper() }}</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white">{{ emp.name }}</p>
+                            <p class="text-xs text-white/60">{{ emp.designation or 'No designation' }}</p>
+                            <p class="text-xs font-mono text-white/40 mt-0.5">@{{ emp.username }}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[10px] px-2 py-0.5 rounded border {% if emp.must_change_password %}border-amber-500/40 bg-amber-900/20 text-amber-400{% else %}border-emerald-500/40 bg-emerald-900/20 text-emerald-400{% endif %}">
+                            {% if emp.must_change_password %}Temp Password{% else %}Active{% endif %}
+                        </span>
+                        <button onclick="toggleEdit({{ emp.id }})"
+                                class="px-3 py-1 text-xs font-bold border border-zinc-700 text-zinc-400 rounded hover:border-amber-500 hover:text-amber-400 transition-all">
+                            Edit
+                        </button>
+                        <form method="POST" action="{{ url_for('admin.delete_employee', emp_id=emp.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="px-3 py-1 text-xs font-bold border border-zinc-700 text-zinc-400 rounded hover:border-red-500 hover:text-red-400 transition-all">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Permission Badges -->
+                <div class="flex flex-wrap gap-1 mt-3">
+                    {% set perms = emp.permissions or {} %}
+                    {% for key, label in [
+                        ('appt_booking_status','Booking Status'),
+                        ('appt_pricing','Pricing'),
+                        ('appt_history','History'),
+                        ('skillnest_admissions','SN Admissions'),
+                        ('skillnest_settings','SN Settings'),
+                        ('assessments_create_client','Client Gen'),
+                        ('gallery_view','Gallery'),
+                        ('contact_social','Contact & Social')
+                    ] %}
+                    {% if emp.has_permission(key) %}
+                    <span class="text-[9px] px-2 py-0.5 rounded font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">✓ {{ label }}</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Temp Password (visible until employee changes it) -->
+                {% if emp.must_change_password and emp.temp_password_hash %}
+                <div class="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-zinc-900 border border-amber-500/50 rounded-lg px-4 py-2.5">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 shrink-0">🔑 Temp</span>
+                    <div class="flex items-center justify-between gap-2 px-3 py-1.5 bg-white/10 rounded-lg w-full sm:w-auto overflow-hidden">
+                    <p class="text-[11px] sm:text-xs font-mono text-white flex-1 select-all truncate" id="pw-{{ emp.id }}">{{ emp.username }} | {{ emp.temp_password_hash }}</p>
+                    <button onclick="copyEmpPw('{{ emp.id }}')"
+                            id="copybtn-{{ emp.id }}"
+                            class="shrink-0 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-black text-[10px] font-bold rounded transition-colors">
+                        📋 Copy
+                    </button>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- Edit Form (hidden) -->
+
+                <div id="edit-{{ emp.id }}" class="hidden mt-4 pt-4 border-t border-zinc-800">
+                    <form method="POST" action="{{ url_for('admin.edit_employee', emp_id=emp.id) }}" class="space-y-3">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs text-white/70 block mb-1">Name</label>
+                                <input type="text" name="name" value="{{ emp.name }}" required
+                                       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs text-white/70 block mb-1">Designation</label>
+                                <input type="text" name="designation" value="{{ emp.designation or '' }}"
+                                       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-white/70 block mb-2">Section Access</label>
+                            <div class="space-y-2">
+
+                                <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-2.5">
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-amber-400 mb-1.5">📅 Appointments</p>
+                                    <div class="space-y-1">
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_appt_booking_status" {% if emp.has_permission('appt_booking_status') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> Booking Status</label>
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_appt_pricing" {% if emp.has_permission('appt_pricing') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> Pricing Management</label>
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_appt_history" {% if emp.has_permission('appt_history') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> Appointment History</label>
+                                    </div>
+                                </div>
+
+                                <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-2.5">
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-amber-400 mb-1.5">🎯 SkillNest</p>
+                                    <div class="space-y-1">
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_skillnest_admissions" {% if emp.has_permission('skillnest_admissions') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> Admissions</label>
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_skillnest_settings" {% if emp.has_permission('skillnest_settings') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> Settings & Seats</label>
+                                    </div>
+                                </div>
+
+                                <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-2.5">
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-amber-400 mb-1.5">🧠 Assessments</p>
+                                    <div class="space-y-1">
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_assessments_create_client" {% if emp.has_permission('assessments_create_client') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> Generate Client Password</label>
+                                    </div>
+                                </div>
+
+                                <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-2.5">
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-amber-400 mb-1.5">🖼️ Gallery</p>
+                                    <div class="space-y-1">
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_gallery_view" {% if emp.has_permission('gallery_view') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> View Gallery</label>
+                                    </div>
+                                </div>
+
+                                <div class="bg-zinc-800/60 border border-zinc-600 rounded-lg p-2.5">
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-amber-400 mb-1.5">📞 Contact & Social</p>
+                                    <div class="space-y-1">
+                                        <label class="flex items-center gap-2 text-xs text-white"><input type="checkbox" name="perm_contact_social" {% if emp.has_permission('contact_social') %}checked{% endif %} class="w-3.5 h-3.5 accent-amber-500"> Manage Contact & Social</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-widest rounded-lg transition-colors">
+                                Save Changes
+                            </button>
+                            <button type="button" onclick="toggleEdit({{ emp.id }})"
+                                    class="px-4 py-2 border border-zinc-700 text-zinc-400 font-bold text-xs uppercase tracking-widest rounded-lg hover:border-zinc-500 transition-colors">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                    <!-- Reset Password -->
+                    <form method="POST" action="{{ url_for('admin.reset_employee_password', emp_id=emp.id) }}"
+                          class="mt-3 pt-3 border-t border-zinc-800"
+                          onsubmit="return confirm('Reset password for {{ emp.name }}? They will need to change it on next login.')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors">
+                            🔑 Reset Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center text-white/50">
+                <div class="text-4xl mb-3">👥</div>
+                <p class="font-semibold">No employees yet.</p>
+                <p class="text-sm mt-1">Add your first employee using the form on the left.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleEdit(id) {
+    const el = document.getElementById('edit-' + id);
+    el.classList.toggle('hidden');
+}
+function copyEmpPw(id) {
+    const text = document.getElementById('pw-' + id).textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copybtn-' + id);
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+    });
+}
+</script>
+{% endblock %}

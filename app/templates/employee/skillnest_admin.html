@@ -1,0 +1,197 @@
+{% extends 'employee/base_employee.html' %}
+{% block title %}SkillNest{% endblock %}
+{% block page_title %}SkillNest{% endblock %}
+{% block page_subtitle %}{{ admissions|length }} Admissions{% endblock %}
+
+{% block page_content %}
+
+<style>
+/* ── Hub Cards ── */
+.hub-card {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 28px;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+}
+.hub-card:hover { transform: translateY(-4px); }
+.hub-card .card-overlay {
+    position: absolute; inset: 0;
+    opacity: 0; transition: opacity .3s;
+}
+.hub-card:hover .card-overlay { opacity: 1; }
+.hub-badge {
+    position: absolute; top: 16px; right: 16px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 9px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .1em;
+}
+.hub-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+}
+.hub-eyebrow {
+    font-size: 9px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .35em;
+    margin-bottom: 6px; display: block;
+}
+.hub-title {
+    font-size: 1.125rem; font-weight: 900;
+    color: #ffffff !important; margin-bottom: 6px;
+    display: block; line-height: 1.3;
+}
+.hub-desc {
+    font-size: .75rem; color: rgba(255,255,255,.5) !important;
+    margin-bottom: 20px; display: block; line-height: 1.6;
+}
+.hub-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .12em;
+    padding: 8px 14px; border-radius: 10px;
+}
+.hub-stat-num { font-weight: 900; line-height: 1; display: block; }
+.hub-stat-lbl {
+    font-size: 9px; text-transform: uppercase;
+    letter-spacing: .12em; color: rgba(255,255,255,.4) !important;
+    display: block; margin-top: 3px;
+}
+</style>
+
+{% set pending_count  = admissions|selectattr('status', 'equalto', 'pending')|list|length %}
+{% set approved_count = admissions|selectattr('status', 'equalto', 'approved')|list|length %}
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+    <!-- ── SETTINGS & CONFIG ─────────────────── -->
+    {% if emp.has_permission('skillnest_settings') %}
+    <a href="{{ url_for('employee.skillnest_settings_page') }}" class="hub-card"
+       style="background: linear-gradient(145deg, #201800 0%, #140f00 100%);
+              border: 1.5px solid rgba(245,158,11,.25);
+              box-shadow: 0 4px 24px rgba(245,158,11,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(245,158,11,.12) 0%,transparent 70%);"></div>
+
+        <!-- Badge -->
+        {% if admission_closed == '1' %}
+        <span class="hub-badge" style="background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.3);">⛔ Closed</span>
+        {% else %}
+        <span class="hub-badge" style="background:rgba(52,211,153,.18);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);">✅ Open</span>
+        {% endif %}
+
+        <div style="position:relative;z-index:10;">
+            <div class="hub-icon" style="background:rgba(245,158,11,.15);">
+                <svg style="width:26px;height:26px;color:#f59e0b;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+
+            <span class="hub-eyebrow" style="color:#f59e0b;">Settings &amp; Config</span>
+            <span class="hub-title">Fee, Seats &amp; Status</span>
+            <span class="hub-desc">Set monthly fee · manage capacity · control admissions open/close</span>
+
+            {% if admission_fee %}
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+                <div>
+                    <p style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">Fee</p>
+                    <p style="font-size:1.25rem;font-weight:900;color:#f59e0b;line-height:1;">₹{{ admission_fee }}</p>
+                </div>
+                {% if total_seats %}
+                <div style="width:1px;height:32px;background:rgba(255,255,255,.1);"></div>
+                <div>
+                    <p style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">Seats</p>
+                    <p style="font-size:1.25rem;font-weight:900;color:{% if seats_left == 0 %}#f87171{% else %}#34d399{% endif %};line-height:1;">{{ seats_left }}/{{ total_seats }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <span class="hub-btn" style="background:rgba(245,158,11,.15);color:#f59e0b;">
+                Edit Settings
+                <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </span>
+        </div>
+    </a>
+    {% endif %}
+
+    <!-- ── ADD ADMISSION ─────────────────────── -->
+    {% if emp.has_permission('skillnest_admissions') %}
+    <a href="{{ url_for('employee.skillnest_add_admission_page') }}" class="hub-card"
+       style="background: linear-gradient(145deg, #0d2218 0%, #071510 100%);
+              border: 1.5px solid rgba(52,211,153,.25);
+              box-shadow: 0 4px 24px rgba(52,211,153,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(52,211,153,.12) 0%,transparent 70%);"></div>
+
+        <div style="position:relative;z-index:10;">
+            <div class="hub-icon" style="background:rgba(52,211,153,.15);">
+                <svg style="width:26px;height:26px;color:#34d399;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                </svg>
+            </div>
+
+            <span class="hub-eyebrow" style="color:#34d399;">New Admission</span>
+            <span class="hub-title">Add Walk-in / Manual</span>
+            <span class="hub-desc">Register a student directly · skip the online form · instant entry</span>
+
+            <span class="hub-btn" style="background:rgba(52,211,153,.15);color:#34d399;">
+                Add Student
+                <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                </svg>
+            </span>
+        </div>
+    </a>
+
+    <!-- ── ADMISSION RECORDS ─────────────────── -->
+    <a href="{{ url_for('employee.skillnest_records_page') }}" class="hub-card"
+       style="background: linear-gradient(145deg, #071525 0%, #040d18 100%);
+              border: 1.5px solid rgba(96,165,250,.25);
+              box-shadow: 0 4px 24px rgba(96,165,250,.08);">
+        <div class="card-overlay" style="background:linear-gradient(135deg,rgba(96,165,250,.12) 0%,transparent 70%);"></div>
+
+        <div style="position:relative;z-index:10;">
+            <div class="hub-icon" style="background:rgba(96,165,250,.15);">
+                <svg style="width:26px;height:26px;color:#60a5fa;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+
+            <span class="hub-eyebrow" style="color:#60a5fa;">Admission Records</span>
+            <span class="hub-title">All Applications</span>
+            <span class="hub-desc">View details · approve/reject · mark payment · track status</span>
+
+            <div style="display:flex;align-items:center;gap:24px;margin-bottom:20px;">
+                <div>
+                    <span class="hub-stat-num" style="font-size:2rem;color:#60a5fa;">{{ admissions|length }}</span>
+                    <span class="hub-stat-lbl">Total</span>
+                </div>
+                <div style="width:1px;height:36px;background:rgba(255,255,255,.08);"></div>
+                <div>
+                    <span class="hub-stat-num" style="font-size:1.5rem;color:#fbbf24;">{{ pending_count }}</span>
+                    <span class="hub-stat-lbl">Pending</span>
+                </div>
+                <div style="width:1px;height:36px;background:rgba(255,255,255,.08);"></div>
+                <div>
+                    <span class="hub-stat-num" style="font-size:1.5rem;color:#34d399;">{{ approved_count }}</span>
+                    <span class="hub-stat-lbl">Approved</span>
+                </div>
+            </div>
+
+            <span class="hub-btn" style="background:rgba(96,165,250,.15);color:#60a5fa;">
+                View Records
+                <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </span>
+        </div>
+    </a>
+    {% endif %}
+
+</div>
+
+{% endblock %}

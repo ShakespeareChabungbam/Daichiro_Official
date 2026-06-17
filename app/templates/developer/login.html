@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeveloperX — Secure Access · Daichiro</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:     #071a3e;
+    --navy-m:   #0F2D5E;
+    --navy-lt:  #1a3d6e;
+    --gold:     #C9A84C;
+    --gold-lt:  #f0c96e;
+    --gold-dim: rgba(201,168,76,0.12);
+    --border:   rgba(255,255,255,0.09);
+    --muted:    rgba(255,255,255,0.45);
+    --subtle:   rgba(255,255,255,0.06);
+  }
+  html, body {
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: #060e22;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Decorative background */
+  .bg-deco {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .bg-deco::before {
+    content: '';
+    position: absolute; top: -120px; right: -120px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+  }
+  .bg-deco::after {
+    content: '';
+    position: absolute; bottom: -80px; left: -80px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(15,45,94,0.6) 0%, transparent 70%);
+  }
+  .bg-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, rgba(0,0,0,0.7), transparent);
+  }
+
+  /* ── Layout ── */
+  .page {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* Left panel */
+  .left-panel {
+    width: 420px; flex-shrink: 0;
+    background: linear-gradient(180deg, #0a1a3a 0%, #060e22 100%);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 48px 44px;
+    position: relative; overflow: hidden;
+  }
+  .left-panel::before {
+    content: '';
+    position: absolute; top: -60px; left: -60px;
+    width: 280px; height: 280px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.1), transparent 70%);
+    pointer-events: none;
+  }
+  .lp-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 56px; }
+  .lp-brand-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--gold), #e0a830);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(201,168,76,0.35);
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900; color: var(--navy);
+  }
+  .lp-brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; letter-spacing: -0.02em; }
+  .lp-brand-sub { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.28em; color: var(--gold); margin-top: 2px; }
+
+  .lp-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px; font-weight: 900; line-height: 1.15;
+    letter-spacing: -0.02em; color: #fff; margin-bottom: 16px;
+  }
+  .lp-title span { color: var(--gold); }
+  .lp-sub { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 48px; }
+
+  /* Features list */
+  .lp-features { display: flex; flex-direction: column; gap: 14px; margin-top: auto; }
+  .lp-feat {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12.5px; font-weight: 500; color: var(--muted);
+  }
+  .lp-feat-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .lp-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25);
+    color: var(--gold); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 28px;
+  }
+  .lp-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: blink 2.5s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Right panel — form */
+  .right-panel {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 48px 36px;
+  }
+  .form-card {
+    width: 100%; max-width: 420px;
+    animation: cardIn 0.7s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .form-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 900; letter-spacing: -0.03em;
+    margin-bottom: 6px;
+  }
+  .form-card-sub { font-size: 13px; color: var(--muted); margin-bottom: 36px; line-height: 1.6; }
+
+  /* Inputs */
+  .field { margin-bottom: 22px; }
+  .label {
+    display: block; font-size: 10px; font-weight: 800;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: rgba(255,255,255,0.4); margin-bottom: 8px;
+  }
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+    color: rgba(255,255,255,0.2); pointer-events: none; transition: color 0.2s;
+  }
+  .input-wrap:focus-within .input-icon { color: var(--gold); }
+  input {
+    width: 100%;
+    padding: 14px 16px 14px 46px;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    color: #fff; font-size: 14px; font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.22s, background 0.22s, box-shadow 0.22s;
+  }
+  input::placeholder { color: rgba(255,255,255,0.18); }
+  input:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.1);
+  }
+  .toggle-pw {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.25); transition: color 0.2s; padding: 0; display: flex;
+  }
+  .toggle-pw:hover { color: var(--gold); }
+
+  /* Button */
+  .btn {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--gold), #e0a830);
+    border: none; border-radius: 12px;
+    color: var(--navy); font-size: 13px; font-weight: 900;
+    letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden; margin-top: 4px;
+  }
+  .btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201,168,76,0.45); }
+  .btn:hover::before { opacity: 1; }
+  .btn:active { transform: translateY(0); }
+
+  /* Alert */
+  .alert {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 13px 16px; border-radius: 12px; margin-bottom: 24px;
+    font-size: 13px; font-weight: 600; line-height: 1.5;
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5;
+  }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 28px 0; position: relative; }
+  .divider::after {
+    content: 'OR'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #060e22; padding: 0 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);
+  }
+
+  /* Link */
+  .link-row { text-align: center; margin-top: 20px; }
+  .link { color: var(--gold); font-size: 13px; font-weight: 600; text-decoration: none; transition: color 0.2s; }
+  .link:hover { color: var(--gold-lt); }
+
+  /* Mobile */
+  @media (max-width: 860px) {
+    .left-panel { display: none; }
+    .right-panel { padding: 32px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-deco"></div>
+<div class="bg-grid"></div>
+
+<div class="page">
+  <!-- Left Panel -->
+  <div class="left-panel">
+    <div class="lp-brand">
+      <div class="lp-brand-icon">D</div>
+      <div>
+        <div class="lp-brand-name">Daichiro</div>
+        <div class="lp-brand-sub">Professional Skills Academy</div>
+      </div>
+    </div>
+
+    <div class="lp-badge">
+      <span class="lp-badge-dot"></span>
+      Developer Portal
+    </div>
+
+    <h1 class="lp-title">Site Owner<br><span>Control</span><br>Panel.</h1>
+    <p class="lp-sub">Private access for site management. Authentication required to proceed.</p>
+
+    <div class="lp-features">
+      <div class="lp-feat">
+        <div class="lp-feat-icon">⚡</div>
+        Edit footer credit & branding
+      </div>
+      <div class="lp-feat">
+        <div class="lp-feat-icon">🔑</div>
+        Secure credential management
+      </div>
+      <div class="lp-feat">
+        <div class="lp-feat-icon">🔒</div>
+        Private · Not indexed by search
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel — Form -->
+  <div class="right-panel">
+    <div class="form-card">
+      <h2 class="form-card-title">Welcome back</h2>
+      <p class="form-card-sub">Sign in to access the developer control panel.</p>
+
+      <form method="POST" autocomplete="on">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="field">
+          <label class="label">Email Address</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <input type="email" name="email" required autocomplete="email" placeholder="developer@email.com">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <input type="password" name="password" id="pw-field" required autocomplete="current-password" placeholder="••••••••">
+            <button type="button" class="toggle-pw" onclick="togglePW()" tabindex="-1" aria-label="Toggle password">
+              <svg id="eye-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Access Control Panel →</button>
+      </form>
+
+      <div class="link-row" style="margin-top:24px;">
+        <a href="{{ url_for('developer.forgot_password') }}" class="link">Forgot your password?</a>
+      </div>
+
+      <div class="divider" style="margin-top:36px;margin-bottom:0;"></div>
+      <p style="text-align:center;margin-top:24px;font-size:10px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:rgba(255,255,255,0.15);">
+        Powered by <span style="color:rgba(201,168,76,0.5);font-weight:900;">ARTORYX</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePW() {
+  const f = document.getElementById('pw-field');
+  const show = f.type === 'password';
+  f.type = show ? 'text' : 'password';
+  document.getElementById('eye-icon').innerHTML = show
+    ? '<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>'
+    : '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+}
+</script>
+</body>
+</html>

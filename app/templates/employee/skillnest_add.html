@@ -1,0 +1,246 @@
+{% extends "employee/base_employee.html" %}
+{% block title %}Add Admission — SkillNest{% endblock %}
+{% block page_title %}Add Admission{% endblock %}
+{% block page_subtitle %}Walk-in / Manual Entry{% endblock %}
+{% block page_content %}
+<div class="max-w-3xl mx-auto">
+
+    <form method="POST" action="{{ url_for('employee.skillnest_add_manual') }}" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <!-- ── SECTION 01: Student Information ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-black px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-white font-black uppercase tracking-widest">Section 01</span>
+                <span class="text-cyan-400 font-bold text-sm">Student Information</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <!-- Full Name -->
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">
+                        Full Name of the Student <span class="text-red-400">*</span>
+                    </label>
+                    <input name="child_name" type="text" required
+                           placeholder="Enter student's full name"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <!-- DOB -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Date of Birth</label>
+                    <div class="flex gap-2">
+                        <select name="dob_day" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-400">
+                            <option value="">Day</option>
+                            {% for d in range(1,32) %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+                        </select>
+                        <select name="dob_month" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-400">
+                            <option value="">Month</option>
+                            {% for m,n in [(1,'Jan'),(2,'Feb'),(3,'Mar'),(4,'Apr'),(5,'May'),(6,'Jun'),(7,'Jul'),(8,'Aug'),(9,'Sep'),(10,'Oct'),(11,'Nov'),(12,'Dec')] %}
+                            <option value="{{ m }}">{{ n }}</option>{% endfor %}
+                        </select>
+                        <select name="dob_year" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-400">
+                            <option value="">Year</option>
+                            {% for y in range(current_year, 1950, -1) %}<option value="{{ y }}">{{ y }}</option>{% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Age -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Age</label>
+                    <input id="child_age_field" name="child_age" type="number" min="1" max="100"
+                           placeholder="e.g. 8"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <!-- Gender -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Gender</label>
+                    <div class="flex gap-5 pt-1">
+                        {% for g in ['Male','Female','Other'] %}
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                            <input type="radio" name="gender" value="{{ g }}" class="accent-blue-400"> {{ g }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Class / Grade -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Class / Grade</label>
+                    <input name="class_grade" type="text" placeholder="e.g. Class 5"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <!-- School Name -->
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">
+                        School Name <span class="text-zinc-500 font-normal normal-case">(Optional)</span>
+                    </label>
+                    <input name="school_name" type="text" placeholder="Enter school name"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION 02: Parent / Guardian Details ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-black px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-white font-black uppercase tracking-widest">Section 02</span>
+                <span class="text-cyan-400 font-bold text-sm">Parent / Guardian Details</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Father's Name</label>
+                    <input name="father_name" type="text" placeholder="Enter father's full name"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Mother's Name</label>
+                    <input name="mother_name" type="text" placeholder="Enter mother's full name"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">
+                        Contact Number (Primary) <span class="text-red-400">*</span>
+                    </label>
+                    <input name="parent_mobile" type="tel" required placeholder="e.g. 9876543210"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">
+                        Alternate Contact Number <span class="text-zinc-500 font-normal normal-case">(Optional)</span>
+                    </label>
+                    <input name="alt_contact" type="tel" placeholder="Optional"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">
+                        Email Address <span class="text-zinc-500 font-normal normal-case">(Optional)</span>
+                    </label>
+                    <input name="parent_email" type="email" placeholder="parent@email.com"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Home Address</label>
+                    <input name="address" type="text" placeholder="Enter home address"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION 03: Academic & Learning Details (Optional) ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-black px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-white font-black uppercase tracking-widest">Section 03</span>
+                <span class="text-cyan-400 font-bold text-sm">Academic &amp; Learning Details</span>
+                <span class="ml-auto text-xs text-yellow-400 font-bold uppercase tracking-wider">Optional</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Any specific subject child needs help with?</label>
+                    <input name="subjects_help" type="text" placeholder="e.g. Maths, Science"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Homework support required?</label>
+                    <div class="flex gap-5">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                            <input type="radio" name="homework_support" value="Yes" class="accent-blue-400"> Yes
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                            <input type="radio" name="homework_support" value="No" class="accent-blue-400"> No
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Child's Strengths (if any)</label>
+                    <textarea name="child_strengths" rows="2" placeholder="e.g. Good in drawing, creative thinking..."
+                              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Areas to Improve (if any)</label>
+                    <textarea name="areas_to_improve" rows="2" placeholder="e.g. Focus, reading skills..."
+                              class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors resize-none"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION 04: Behaviour & Health Information (Optional) ── -->
+        <div class="rounded-xl overflow-hidden border border-zinc-700">
+            <div class="bg-black px-5 py-3 flex items-center gap-3">
+                <span class="text-xs text-white font-black uppercase tracking-widest">Section 04</span>
+                <span class="text-cyan-400 font-bold text-sm">Behaviour &amp; Health Information</span>
+                <span class="ml-auto text-xs text-yellow-400 font-bold uppercase tracking-wider">Optional</span>
+            </div>
+            <div class="bg-zinc-900 p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Is the Child Shy / Confident / Active?</label>
+                    <input name="child_behavior" type="text" placeholder="e.g. Confident and active"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Any Medical Condition / Allergy (if any)?</label>
+                    <input name="medical_condition" type="text" placeholder="e.g. Asthma, peanut allergy, or None"
+                           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Admin Notes (Optional) ── -->
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">
+                Admin Notes <span class="text-zinc-500 font-normal normal-case">(Optional)</span>
+            </label>
+            <textarea name="notes" rows="2" placeholder="Any special notes for admin use..."
+                      class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-400 transition-colors resize-none"></textarea>
+        </div>
+
+        <!-- ── Buttons ── -->
+        <div class="flex gap-3 pt-2">
+            <button type="submit"
+                    class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-sm rounded-xl transition-colors">
+                Register Admission
+            </button>
+            <a href="{{ url_for('employee.skillnest_records_page') }}"
+               class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-sm rounded-xl transition-colors">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<script>
+// Auto-calculate age from DOB selects
+function calcAge(){
+    const day   = parseInt(document.querySelector('[name=dob_day]').value);
+    const month = parseInt(document.querySelector('[name=dob_month]').value);
+    const year  = parseInt(document.querySelector('[name=dob_year]').value);
+    if(!day || !month || !year) return;
+    const today = new Date();
+    let age = today.getFullYear() - year;
+    const mDiff = today.getMonth() + 1 - month;
+    if(mDiff < 0 || (mDiff === 0 && today.getDate() < day)) age--;
+    if(age >= 1 && age <= 100){
+        document.getElementById('child_age_field').value = age;
+    }
+}
+document.querySelector('[name=dob_day]').addEventListener('change', calcAge);
+document.querySelector('[name=dob_month]').addEventListener('change', calcAge);
+document.querySelector('[name=dob_year]').addEventListener('change', calcAge);
+</script>
+{% endblock %}

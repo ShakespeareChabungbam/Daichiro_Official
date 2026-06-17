@@ -1,0 +1,366 @@
+{% extends "employee/base_employee.html" %}
+
+{% block title %}Review Scanned Assessment{% endblock %}
+{% block page_title %}Review Extracted Data{% endblock %}
+{% block page_subtitle %}Verify and correct the AI-extracted data before saving{% endblock %}
+
+{% block page_content %}
+
+<form method="POST" action="{{ url_for('admin.save_scanned_assessment') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Section A: Personal Info -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-4">Section A — Personal Information</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs text-zinc-500 block mb-1">Full Name</label>
+                <input type="text" name="full_name" value="{{ data.personal_info.full_name or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-zinc-500 block mb-1">Class / Grade</label>
+                <input type="text" name="class_grade" value="{{ data.personal_info.class_grade or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-zinc-500 block mb-1">School Name</label>
+                <input type="text" name="school_name" value="{{ data.personal_info.school_name or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-zinc-500 block mb-1">Contact Number</label>
+                <input type="text" name="contact_number" value="{{ data.personal_info.contact_number or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+            <div class="sm:col-span-2">
+                <label class="text-xs text-zinc-500 block mb-1">Email</label>
+                <input type="text" name="email" value="{{ data.personal_info.email or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+        </div>
+    </div>
+
+    <!-- Section B: Interests -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-4">Section B — Interests</h3>
+        
+        <div class="mb-5">
+            <label class="text-xs text-zinc-500 block mb-2">Activities Enjoyed</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {% set all_activities = ["Solving math problems or puzzles", "Drawing, painting, or designing", "Writing stories or essays", "Playing computer games or coding", "Helping others with their problems", "Working with tools or machines", "Participating in debates or public speaking", "Taking care of animals or nature", "Organizing events or planning tasks", "Selling or promoting products/services"] %}
+                {% for act in all_activities %}
+                <label class="flex items-center gap-2 text-sm text-zinc-300 hover:text-white cursor-pointer">
+                    <input type="checkbox" name="activities" value="{{ act }}" {% if act in (data.interests.activities or []) %}checked{% endif %}
+                           class="w-4 h-4 rounded bg-zinc-700 border-zinc-600 text-amber-500 focus:ring-amber-500">
+                    {{ act }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <label class="text-xs text-zinc-500 block mb-2">Favourite Subjects</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {% set all_subjects = ["Mathematics", "Science - Physics", "Chemistry", "Biology", "English", "Languages", "Computer Science / IT", "Social Science", "History", "Business Studies", "Economics", "Art", "Music", "Drama", "Physical Education", "Environmental Studies"] %}
+                {% for sub in all_subjects %}
+                <label class="flex items-center gap-2 text-sm text-zinc-300 hover:text-white cursor-pointer">
+                    <input type="checkbox" name="subjects" value="{{ sub }}" {% if sub in (data.interests.subjects or []) %}checked{% endif %}
+                           class="w-4 h-4 rounded bg-zinc-700 border-zinc-600 text-amber-500 focus:ring-amber-500">
+                    {{ sub }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <label class="text-xs text-zinc-500 block mb-2">Professions of Interest</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {% set all_professions = ["Doctor / Nurse", "Engineer / Scientist", "Teacher / Professor", "Artist / Designer", "Business Owner / Entrepreneur", "Lawyer / Judge", "Software Developer / Game Designer", "Police / Army Officer", "Social Worker / Counselor", "YouTuber / Influencer / Filmmaker"] %}
+                {% for prof in all_professions %}
+                <label class="flex items-center gap-2 text-sm text-zinc-300 hover:text-white cursor-pointer">
+                    <input type="checkbox" name="professions" value="{{ prof }}" {% if prof in (data.interests.professions or []) %}checked{% endif %}
+                           class="w-4 h-4 rounded bg-zinc-700 border-zinc-600 text-amber-500 focus:ring-amber-500">
+                    {{ prof }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section C: Aptitude -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-4">Section C — Aptitude Self-Assessment</h3>
+        <div class="space-y-3">
+            {% set apt_items = [
+                ('logical', 'Solving logical or numerical problems'),
+                ('science', 'Understanding scientific concepts'),
+                ('writing', 'Writing or expressing yourself clearly'),
+                ('computers', 'Using computers or apps'),
+                ('design', 'Creating or designing something'),
+                ('speaking', 'Speaking in public or leading a team'),
+                ('planning', 'Planning or organizing tasks'),
+                ('helping', 'Helping others solve their problems'),
+                ('tech', 'Learning new technologies quickly')
+            ] %}
+            {% for key, label in apt_items %}
+            <div class="flex items-center justify-between bg-zinc-800/50 rounded-lg px-4 py-3">
+                <span class="text-sm text-zinc-300">{{ label }}</span>
+                <div class="flex gap-2" id="apt-group-{{ key }}">
+                    {% for i in range(1, 6) %}
+                    <button type="button"
+                        data-name="apt_{{ key }}"
+                        data-value="{{ i }}"
+                        onclick="selectRating(this)"
+                        class="rating-btn w-8 h-8 flex items-center justify-center rounded-full border-2 border-zinc-600 text-sm font-bold text-zinc-400 transition-all hover:border-amber-400 hover:text-amber-400"
+                        {% if (data.aptitude[key]|string) == (i|string) %}data-preselected="true"{% endif %}
+                    >{{ i }}</button>
+                    {% endfor %}
+                    <input type="hidden" name="apt_{{ key }}" id="apt-input-{{ key }}" value="{{ data.aptitude[key] or '' }}">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section D: Personality -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-4">Section D — Personality & Values</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% set all_traits = [
+                "I enjoy solving problems or challenges",
+                "I like to express myself creatively",
+                "I prefer working independently",
+                "I like working with others in a team",
+                "I care about helping people and making a difference",
+                "I like leading and taking responsibility",
+                "I enjoy experimenting and learning how things work",
+                "I like keeping things organized and structured",
+                "I enjoy physical activity or outdoor work"
+            ] %}
+            {% for trait in all_traits %}
+            <label class="flex items-center gap-2 text-sm text-zinc-300 hover:text-white cursor-pointer">
+                <input type="checkbox" name="personality" value="{{ trait }}" {% if trait in (data.personality or []) %}checked{% endif %}
+                       class="w-4 h-4 rounded bg-zinc-700 border-zinc-600 text-amber-500 focus:ring-amber-500">
+                {{ trait }}
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section E: Career Vision -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-4">Section E — Career Vision</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs text-zinc-500 block mb-1">What career(s) are you currently considering?</label>
+                <input type="text" name="vision_careers" value="{{ data.career_vision.current_careers or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-zinc-500 block mb-1">5-year goals</label>
+                <input type="text" name="vision_goals" value="{{ data.career_vision.five_year_goals or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="text-xs text-zinc-500 block mb-1">Ideal future life</label>
+                <input type="text" name="vision_life" value="{{ data.career_vision.ideal_life or '' }}" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-between items-center">
+        <a href="{{ url_for('employee.upload_assessment') }}" class="px-6 py-3 border border-zinc-700 text-zinc-400 font-bold uppercase tracking-widest rounded-lg hover:border-zinc-500 transition-colors text-sm no-underline">
+            ← Re-scan
+        </a>
+        <button type="button" id="analyze-btn" onclick="startAnalysis()" class="px-8 py-3 bg-amber-500 text-black font-bold uppercase tracking-widest rounded-lg hover:bg-amber-400 transition-all text-sm flex items-center gap-2">
+            ✓ Save &amp; Analyze with AI
+        </button>
+    </div>
+
+</div>
+</form>
+
+<!-- ══════  LOADING OVERLAY  ══════ -->
+<div id="ai-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);">
+    <div class="text-center px-6 max-w-sm w-full">
+        <div class="relative flex items-center justify-center mb-8 mx-auto" style="width:100px;height:100px;">
+            <div class="absolute inset-0 rounded-full border-2 border-amber-500/30" style="animation:ring-pulse 2s ease-out infinite;"></div>
+            <div class="absolute inset-0 rounded-full border-2 border-amber-500/20" style="animation:ring-pulse 2s ease-out infinite 0.5s;"></div>
+            <div class="absolute inset-0 rounded-full border-2 border-amber-500/10" style="animation:ring-pulse 2s ease-out infinite 1s;"></div>
+            <div class="w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center relative z-10">
+                <svg class="w-10 h-10 text-amber-400" style="animation:brain-pulse 1.5s ease-in-out infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+            </div>
+        </div>
+        <h2 class="text-white font-bold text-xl mb-2 tracking-tight">Analysing with AI</h2>
+        <p id="ai-status" class="text-zinc-400 text-sm mb-8 transition-opacity duration-500">Reading student profile...</p>
+        <div class="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-3">
+            <div id="ai-progress" class="h-full bg-amber-500 rounded-full transition-all duration-700 ease-out" style="width:5%;"></div>
+        </div>
+        <p class="text-zinc-600 text-xs uppercase tracking-widest">Please wait — this takes 10–20 seconds</p>
+    </div>
+</div>
+
+<!-- ══════  SUCCESS POPUP  ══════ -->
+<div id="success-popup" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);">
+    <div id="success-card" class="relative bg-zinc-900 border border-zinc-700 rounded-3xl p-10 max-w-md w-full mx-4 text-center overflow-hidden" style="transform:scale(0.8);opacity:0;transition:all 0.5s cubic-bezier(0.34,1.56,0.64,1);">
+        <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+
+        <!-- Animated checkmark -->
+        <div class="relative mx-auto mb-6" style="width:90px;height:90px;">
+            <svg class="w-full h-full" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="40" fill="none" stroke="#27272a" stroke-width="4"/>
+                <circle id="check-ring" cx="45" cy="45" r="40" fill="none" stroke="#f59e0b" stroke-width="4"
+                        stroke-dasharray="251" stroke-dashoffset="251"
+                        style="transition:stroke-dashoffset 0.8s ease-out 0.2s;transform:rotate(-90deg);transform-origin:center;"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <svg id="check-tick" class="w-10 h-10 text-amber-400" style="opacity:0;transform:scale(0.5);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.9s;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+        </div>
+
+        <p class="text-amber-400 text-xs font-black uppercase tracking-[0.3em] mb-2">✦ AI Analysis Complete ✦</p>
+        <h2 class="text-white text-2xl font-black mb-3" id="success-name">Assessment Saved</h2>
+        <p class="text-zinc-400 text-sm mb-8">The career profile has been generated and saved.<br>Redirecting to assessments dashboard...</p>
+        <div class="flex items-center justify-center gap-2 text-xs text-zinc-500 uppercase tracking-widest">
+            <svg class="w-4 h-4 animate-spin text-amber-500" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Redirecting...
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes ring-pulse {
+    0%   { transform:scale(1); opacity:.8; }
+    100% { transform:scale(1.8); opacity:0; }
+}
+@keyframes brain-pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.65; transform:scale(1.1); }
+}
+</style>
+
+<script>
+// Rating button selection
+function selectRating(btn) {
+    const name = btn.dataset.name;
+    // Deselect all buttons in this group
+    document.querySelectorAll(`.rating-btn[data-name="${name}"]`).forEach(b => {
+        b.classList.remove('border-amber-500', 'bg-amber-500', 'text-black');
+        b.classList.add('border-zinc-600', 'text-zinc-400');
+    });
+    // Select clicked button
+    btn.classList.remove('border-zinc-600', 'text-zinc-400');
+    btn.classList.add('border-amber-500', 'bg-amber-500', 'text-black');
+    // Update hidden input
+    const key = name.replace('apt_', '');
+    document.getElementById('apt-input-' + key).value = btn.dataset.value;
+}
+
+// On page load: highlight pre-selected buttons (from AI extract)
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.rating-btn[data-preselected="true"]').forEach(btn => {
+        selectRating(btn);
+    });
+});
+
+const _statusMsgs = [
+    "Reading student profile...",
+    "Mapping interests and aptitudes...",
+    "Consulting career pathways...",
+    "Building 5-year roadmap...",
+    "Personalising for NE India context...",
+    "Finalising recommendations...",
+    "Almost there..."
+];
+
+function startAnalysis() {
+    const btn = document.getElementById('analyze-btn');
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+    document.getElementById('ai-overlay').classList.remove('hidden');
+
+    const bar = document.getElementById('ai-progress');
+    const statusEl = document.getElementById('ai-status');
+    let msgIdx = 0;
+
+    // Simulate progress stages
+    [[15,800],[30,2500],[48,5000],[63,8000],[78,11000],[88,14000],[93,17000]].forEach(([pct,ms]) => {
+        setTimeout(() => { bar.style.width = pct + '%'; }, ms);
+    });
+
+    // Cycle status messages
+    const msgTimer = setInterval(() => {
+        msgIdx = (msgIdx + 1) % _statusMsgs.length;
+        statusEl.style.opacity = '0';
+        setTimeout(() => { statusEl.textContent = _statusMsgs[msgIdx]; statusEl.style.opacity = '1'; }, 300);
+    }, 2800);
+
+    // Submit form via fetch after short delay
+    setTimeout(() => {
+        const form = document.querySelector('form');
+        const formData = new FormData(form);
+        const studentName = (form.querySelector('[name="full_name"]') || {}).value || 'Student';
+        fetch(form.action, { method: 'POST', body: formData })
+            .then(() => {
+                clearInterval(msgTimer);
+                bar.style.width = '100%';
+                setTimeout(() => showSuccess(studentName), 600);
+            })
+            .catch(() => {
+                clearInterval(msgTimer);
+                document.getElementById('ai-overlay').classList.add('hidden');
+                btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+                alert('Network error. Please try again.');
+            });
+    }, 400);
+}
+
+function showSuccess(name) {
+    document.getElementById('ai-overlay').classList.add('hidden');
+    const popup = document.getElementById('success-popup');
+    const card = document.getElementById('success-card');
+    popup.classList.remove('hidden');
+    document.getElementById('success-name').textContent = name + "'s Report Ready";
+    // Animate card in
+    setTimeout(() => { card.style.transform = 'scale(1)'; card.style.opacity = '1'; }, 30);
+    // Animate check ring
+    setTimeout(() => { document.getElementById('check-ring').style.strokeDashoffset = '0'; }, 100);
+    // Animate tick
+    setTimeout(() => {
+        const t = document.getElementById('check-tick');
+        t.style.opacity = '1'; t.style.transform = 'scale(1)';
+    }, 950);
+    // Particles
+    setTimeout(() => spawnParticles(), 1100);
+    // Redirect
+    setTimeout(() => { window.location.href = "{{ url_for('employee.assessments_page') }}"; }, 3800);
+}
+
+function spawnParticles() {
+    const container = document.getElementById('particles');
+    const colors = ['#f59e0b','#fbbf24','#fcd34d','#ffffff','#d97706'];
+    for (let i = 0; i < 24; i++) {
+        const p = document.createElement('div');
+        const size = Math.random() * 9 + 4;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const x = 40 + Math.random() * 20;
+        const y = 40 + Math.random() * 20;
+        const angle = Math.random() * 360;
+        const dist = 70 + Math.random() * 100;
+        p.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:${Math.random()>0.4?'50%':'3px'};left:${x}%;top:${y}%;opacity:1;transition:all ${0.7+Math.random()*0.8}s cubic-bezier(0.25,0.46,0.45,0.94);`;
+        container.appendChild(p);
+        setTimeout(() => {
+            const rad = angle * Math.PI / 180;
+            p.style.transform = `translate(${Math.cos(rad)*dist}px,${Math.sin(rad)*dist - 30}px) rotate(${angle}deg) scale(0)`;
+            p.style.opacity = '0';
+        }, 20);
+    }
+}
+</script>
+
+{% endblock %}
+
